@@ -94,6 +94,42 @@ CREATE TABLE IF NOT EXISTS ingest_log (
   message TEXT
 );
 
+-- Transmission congestion (IESO renewed-market reports, see src/lib/ieso/market.ts).
+CREATE TABLE IF NOT EXISTS market_files (
+  report TEXT NOT NULL,
+  period TEXT NOT NULL,
+  url TEXT NOT NULL,
+  sha256 TEXT NOT NULL,
+  complete BOOLEAN NOT NULL,
+  row_count INTEGER,
+  fetched_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (report, period)
+);
+
+CREATE TABLE IF NOT EXISTS lmp_hourly (
+  location TEXT NOT NULL,
+  ts_utc TIMESTAMPTZ NOT NULL,
+  intervals SMALLINT NOT NULL,
+  lmp DOUBLE PRECISION,
+  loss DOUBLE PRECISION,
+  congestion DOUBLE PRECISION,
+  congestion_min DOUBLE PRECISION,
+  congestion_max DOUBLE PRECISION,
+  PRIMARY KEY (location, ts_utc)
+);
+CREATE INDEX IF NOT EXISTS lmp_hourly_ts_idx ON lmp_hourly (ts_utc);
+
+-- Only hours in which a constraint was binding are stored; market_files records coverage.
+CREATE TABLE IF NOT EXISTS constraint_hourly (
+  constraint_name TEXT NOT NULL,
+  ts_utc TIMESTAMPTZ NOT NULL,
+  binding_intervals SMALLINT NOT NULL,
+  avg_shadow_price DOUBLE PRECISION,
+  peak_shadow_price DOUBLE PRECISION,
+  PRIMARY KEY (constraint_name, ts_utc)
+);
+CREATE INDEX IF NOT EXISTS constraint_hourly_ts_idx ON constraint_hourly (ts_utc);
+
 -- Authoritative outage evidence (manually curated, each row must cite a source).
 CREATE TABLE IF NOT EXISTS outage_evidence (
   id SERIAL PRIMARY KEY,

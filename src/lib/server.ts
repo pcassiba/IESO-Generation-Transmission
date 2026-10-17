@@ -3,6 +3,7 @@ import path from "node:path";
 import { config } from "./config";
 import { getDb, type Db } from "./db";
 import { facilitiesDir, loadFacilityFiles, seedFacilities, validateFacilities, type MetadataIssue } from "./facilities";
+import { syncCongestion } from "./ieso/congestion-ingest";
 import { backfill, ingestDaily, ingestLatest, missingDailyDates } from "./ieso/ingest";
 
 /**
@@ -18,6 +19,7 @@ interface Runtime {
   schedulerStarted: boolean;
   backfillRunning: boolean;
   backfillProgress: string | null;
+  congestionRunning: boolean;
   lastPollAt: string | null;
   lastPollError: string | null;
   timer?: ReturnType<typeof setInterval>;
@@ -28,7 +30,7 @@ type G = typeof globalThis & { __ogeRuntime?: Runtime };
 export function runtime(): Runtime {
   const g = globalThis as G;
   if (!g.__ogeRuntime) {
-    g.__ogeRuntime = { metadataIssues: [], schedulerStarted: false, backfillRunning: false, backfillProgress: null, lastPollAt: null, lastPollError: null };
+    g.__ogeRuntime = { metadataIssues: [], schedulerStarted: false, backfillRunning: false, backfillProgress: null, congestionRunning: false, lastPollAt: null, lastPollError: null };
   }
   return g.__ogeRuntime;
 }
@@ -90,6 +92,23 @@ export async function pollOnce(db: Db): Promise<void> {
     if (missing.length && !rt.backfillRunning) await ingestDaily(db, missing[0]).catch(() => undefined);
   } catch {
     /* non-fatal */
+  }
+  void pollCongestion(db);
+}
+
+/** Price and constraint reports: runs in the background, never blocks the generator poll. */
+export async function pollCongestion(db: Db): Promise<void> {
+  const rt = runtime();
+  if (!config.congestion.enabled || rt.congestionRunning) return;
+  rt.congestionRunning = true;
+  try {
+    const r = await syncCongestion(db, (m) => console.log(`[congestion] ${m}`));
+    if (r.lmpHours || r.constraintDays) console.log(`[congestion] loaded ${r.lmpHours} price hours, ${r.constraintDays} constraint days`);
+    if (r.errors.length) console.warn(`[congestion] ${r.errors.length} errors, first: ${r.errors[0]}`);
+  } catch (e) {
+    console.warn(`[congestion] sync failed: ${(e as Error).message}`);
+  } finally {
+    rt.congestionRunning = false;
   }
 }
 

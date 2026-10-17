@@ -16,6 +16,19 @@ export const config = {
   backfillDays: num("IESO_BACKFILL_DAYS", 30),
   fetchTimeoutMs: num("IESO_FETCH_TIMEOUT_MS", 180_000),
 
+  congestion: {
+    /** Set CONGESTION_ENABLED=0 to stop fetching the price and constraint reports. */
+    enabled: process.env.CONGESTION_ENABLED !== "0",
+    lmpBaseUrl: process.env.IESO_LMP_BASE_URL ?? "https://reports-public.ieso.ca/public/RealtimeEnergyLMP/",
+    constraintsBaseUrl: process.env.IESO_CONSTRAINTS_BASE_URL ?? "https://reports-public.ieso.ca/public/RealtimeConstrShadowPrices/",
+    /** Days of hourly nodal prices to backfill (one file per hour, so keep this modest). */
+    lmpBackfillDays: num("CONGESTION_LMP_DAYS", 7),
+    /** Days of binding-constraint history to backfill (one file per day; IESO publishes these a few days late). */
+    constraintBackfillDays: num("CONGESTION_CONSTRAINT_DAYS", 30),
+    /** Congestion component (|$/MWh|) at or above which a location is shown as congested. */
+    thresholdPerMWh: num("CONGESTION_THRESHOLD", 2),
+  },
+
   status: {
     /** Output (MW) at or above which a resource is considered "generating". */
     generatingThresholdMW: num("STATUS_GENERATING_MW", 1),

@@ -1,0 +1,4 @@
+{
+  "_comment": "Manual links from facility id to IESO pricing-location nodes (the part of the location name before the first '-' or ':'), for facilities whose IESO resource name differs from their pricing node. Most facilities match automatically; unmatched generator nodes are listed in the Congestion panel.",
+  "bruce-a-ngs": ["BRUCE"]
+}
