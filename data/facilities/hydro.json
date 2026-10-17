@@ -1,0 +1,1420 @@
+[
+  {
+    "id": "abitibi-canyon-gs",
+    "name": "Abitibi Canyon GS",
+    "technology": "hydro",
+    "subtype": "Conventional hydro",
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Cochrane District",
+    "region": "Northeast",
+    "lat": 49.88196,
+    "lon": -81.56708,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 239147093 (power=plant)",
+    "installedCapacityMW": 349,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/239147093"
+    ],
+    "resources": [
+      {
+        "ieso": "CANYON"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "aguasabon-gs",
+    "name": "Aguasabon GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Terrace Bay",
+    "region": "Northwest",
+    "lat": 48.78667,
+    "lon": -87.16101,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 308435211 (power=plant)",
+    "installedCapacityMW": 51,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/308435211"
+    ],
+    "resources": [
+      {
+        "ieso": "AGUASABON"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "alexander-falls-gs",
+    "name": "Alexander GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Nipigon",
+    "region": "Northwest",
+    "lat": 49.13523,
+    "lon": -88.35799,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 256661255 (power=plant)",
+    "installedCapacityMW": 69,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/256661255"
+    ],
+    "resources": [
+      {
+        "ieso": "ALEXANDER"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "arnprior-gs",
+    "name": "Arnprior GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Arnprior",
+    "region": "Ottawa",
+    "lat": 45.41877,
+    "lon": -76.34708,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 196436145 (power=plant)",
+    "installedCapacityMW": 82,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/196436145"
+    ],
+    "resources": [
+      {
+        "ieso": "ARNPRIOR"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "aubrey-falls-gs",
+    "name": "Aubrey Falls GS",
+    "technology": "hydro",
+    "subtype": "Mississagi River",
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Algoma District",
+    "region": "Northeast",
+    "lat": 46.90952,
+    "lon": -83.21297,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 263554703 (power=plant)",
+    "installedCapacityMW": 162,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/263554703"
+    ],
+    "resources": [
+      {
+        "ieso": "AUBREYFALLS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "barrett-chute-gs",
+    "name": "Barrett Chute GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Greater Madawaska",
+    "region": "Ottawa",
+    "lat": 45.24926,
+    "lon": -76.75921,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 158762846 (power=plant)",
+    "installedCapacityMW": 176,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/158762846"
+    ],
+    "resources": [
+      {
+        "ieso": "BARRETT"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "sir-adam-beck-1",
+    "name": "Sir Adam Beck I GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Niagara Falls",
+    "region": "Niagara",
+    "lat": 43.14902,
+    "lon": -79.04472,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 158460554 (power=plant)",
+    "installedCapacityMW": 437,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/158460554"
+    ],
+    "resources": [
+      {
+        "ieso": "BECK1"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "sir-adam-beck-2",
+    "name": "Sir Adam Beck II GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Niagara Falls",
+    "region": "Niagara",
+    "lat": 43.1459,
+    "lon": -79.04421,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 37538927 (power=plant)",
+    "installedCapacityMW": 1499,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/37538927"
+    ],
+    "resources": [
+      {
+        "ieso": "BECK2"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "sir-adam-beck-pgs",
+    "name": "Sir Adam Beck Pump Generating Station",
+    "technology": "hydro",
+    "subtype": "Pumped storage",
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Niagara Falls",
+    "region": "Niagara",
+    "lat": 43.14445,
+    "lon": -79.06026,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 158460599 (power=plant)",
+    "installedCapacityMW": 174,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/158460599"
+    ],
+    "resources": [
+      {
+        "ieso": "BECK2 PGS"
+      }
+    ],
+    "notes": "Pumping (load) is not published in this report; only generation output is shown.",
+    "reviewFlag": false
+  },
+  {
+    "id": "cameron-falls-gs-nipigon",
+    "name": "Cameron Falls GS",
+    "technology": "hydro",
+    "subtype": "Nipigon River",
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Nipigon",
+    "region": "Northwest",
+    "lat": 49.15364,
+    "lon": -88.34574,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 423894829 (power=plant)",
+    "installedCapacityMW": 92,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/423894829"
+    ],
+    "resources": [
+      {
+        "ieso": "CAMERONFALLS"
+      }
+    ],
+    "notes": "Matched to OPG's Nipigon River station (not the 4 MW Brookfield Cameron Falls on the Aux Sables River).",
+    "reviewFlag": false
+  },
+  {
+    "id": "caribou-falls-gs",
+    "name": "Caribou Falls GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Kenora District",
+    "region": "Northwest",
+    "lat": 50.26237,
+    "lon": -94.97437,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 565448115 (power=plant)",
+    "installedCapacityMW": 91,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/565448115"
+    ],
+    "resources": [
+      {
+        "ieso": "CARIBOUFALLS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "carmichael-falls-gs",
+    "name": "Carmichael Falls GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Wawa area (per Brookfield Wawa operations)",
+    "region": "Northeast",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": 20,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "CARMICHAEL"
+      }
+    ],
+    "notes": "Location not verified in OpenStreetMap or Wikipedia coordinates; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "chats-falls-gs",
+    "name": "Chats Falls GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": null,
+    "municipality": "Fitzroy Harbour (Ottawa)",
+    "region": "Ottawa",
+    "lat": 45.47379,
+    "lon": -76.23685,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 158763288 (power=plant)",
+    "installedCapacityMW": 188,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/158763288"
+    ],
+    "resources": [
+      {
+        "ieso": "CHATSFALLS"
+      }
+    ],
+    "notes": "Interprovincial station shared with Hydro-Québec; OSM operator tag lists Hydro One. Capacity tag may cover the whole station.",
+    "reviewFlag": true
+  },
+  {
+    "id": "chenaux-gs",
+    "name": "Chenaux GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Renfrew County",
+    "region": "Ottawa",
+    "lat": 45.58371,
+    "lon": -76.67399,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 229406171 (power=plant)",
+    "installedCapacityMW": 144,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/229406171"
+    ],
+    "resources": [
+      {
+        "ieso": "CHENAUX"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "clergue-gs",
+    "name": "Francis H. Clergue GS",
+    "technology": "hydro",
+    "subtype": "St. Marys River",
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Sault Ste. Marie",
+    "region": "Northeast",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": 52,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "CLERGUE"
+      }
+    ],
+    "notes": "Location not verified in OpenStreetMap or Wikipedia coordinates; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "da-watson-gs",
+    "name": "D.A. Watson GS (unidentified)",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": null,
+    "owner": null,
+    "municipality": null,
+    "region": null,
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [],
+    "resources": [
+      {
+        "ieso": "DA WATSON"
+      }
+    ],
+    "notes": "Could not identify this IESO resource with a public source. Location not verified in OpenStreetMap or Wikipedia coordinates; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "decew-falls-gs",
+    "name": "DeCew Falls GS I & II",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "St. Catharines",
+    "region": "Niagara",
+    "lat": 43.11891,
+    "lon": -79.26147,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 418129924 (power=plant)",
+    "installedCapacityMW": 167,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/418129924",
+      "https://www.openstreetmap.org/way/69966315",
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "DECEWFALLS"
+      },
+      {
+        "ieso": "DECEWND1"
+      }
+    ],
+    "notes": "DeCew I (23 MW) and DeCew II (144 MW) are adjacent powerhouses. Which IESO resource corresponds to which powerhouse is not publicly documented, so both are grouped here.",
+    "reviewFlag": true
+  },
+  {
+    "id": "des-joachims-gs",
+    "name": "Des Joachims GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Rolphton",
+    "region": "Ottawa",
+    "lat": 46.18276,
+    "lon": -77.69688,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 238620183 (power=plant)",
+    "installedCapacityMW": 429,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/238620183"
+    ],
+    "resources": [
+      {
+        "ieso": "DESJOACHIMS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "ear-falls-gs",
+    "name": "Ear Falls GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Ear Falls",
+    "region": "Northwest",
+    "lat": 50.63109,
+    "lon": -93.22064,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 263918556 (power=plant)",
+    "installedCapacityMW": 22,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/263918556"
+    ],
+    "resources": [
+      {
+        "ieso": "EARFALLS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "fort-frances-gs",
+    "name": "Fort Frances GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "H2O Power",
+    "owner": null,
+    "municipality": "Fort Frances",
+    "region": "Northwest",
+    "lat": 48.60905,
+    "lon": -93.40236,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 1087621261 (power=plant)",
+    "installedCapacityMW": 13.1,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/1087621261"
+    ],
+    "resources": [
+      {
+        "ieso": "FORTFRANCSWC"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "gartshore-gs",
+    "name": "Gartshore GS",
+    "technology": "hydro",
+    "subtype": "Montreal River",
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Algoma District",
+    "region": "Northeast",
+    "lat": 47.24002,
+    "lon": -84.58369,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 492366725 (power=plant)",
+    "installedCapacityMW": 23,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/492366725"
+    ],
+    "resources": [
+      {
+        "ieso": "GARTSHORE"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "harmon-gs",
+    "name": "Harmon GS",
+    "technology": "hydro",
+    "subtype": "Lower Mattagami",
+    "operator": "Ontario Power Generation",
+    "owner": "OPG / Moose Cree First Nation (Amisk-oo-skow-sepe LP)",
+    "municipality": "Cochrane District",
+    "region": "Northeast",
+    "lat": 50.1114,
+    "lon": -82.20834,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 297490838 (power=plant)",
+    "installedCapacityMW": 141,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/297490838"
+    ],
+    "resources": [
+      {
+        "ieso": "HARMON"
+      },
+      {
+        "ieso": "HARMON 2",
+        "units": "Lower Mattagami expansion unit (inferred from IESO naming)"
+      }
+    ],
+    "notes": "HARMON 2 is treated as the Lower Mattagami expansion at the same site (inferred from naming).",
+    "reviewFlag": false
+  },
+  {
+    "id": "harris-gs",
+    "name": "Harris GS",
+    "technology": "hydro",
+    "subtype": "Michipicoten River",
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Wawa",
+    "region": "Northeast",
+    "lat": 47.93884,
+    "lon": -84.83767,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 190529867 (power=plant)",
+    "installedCapacityMW": 13,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/190529867"
+    ],
+    "resources": [
+      {
+        "ieso": "HARRIS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "otto-holden-gs",
+    "name": "Otto Holden GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Mattawa",
+    "region": "Northeast",
+    "lat": 46.37842,
+    "lon": -78.72767,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 259144136 (power=plant)",
+    "installedCapacityMW": 243,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/259144136"
+    ],
+    "resources": [
+      {
+        "ieso": "HOLDEN"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "hollingsworth-gs",
+    "name": "Hollingsworth GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Wawa",
+    "region": "Northeast",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": 23,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "HOLINGSWTH"
+      }
+    ],
+    "notes": "Location not verified in OpenStreetMap or Wikipedia coordinates; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "kakabeka-gs",
+    "name": "Kakabeka Falls GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Oliver Paipoonge",
+    "region": "Northwest",
+    "lat": 48.41497,
+    "lon": -89.62935,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "Wikipedia article coordinates",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/Kakabeka_Generating_Station"
+    ],
+    "resources": [
+      {
+        "ieso": "KAKABEKA"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "kipling-gs",
+    "name": "Kipling GS",
+    "technology": "hydro",
+    "subtype": "Lower Mattagami",
+    "operator": "Ontario Power Generation",
+    "owner": "OPG / Moose Cree First Nation (Amisk-oo-skow-sepe LP)",
+    "municipality": "Cochrane District",
+    "region": "Northeast",
+    "lat": 50.14518,
+    "lon": -82.20847,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 158946417 (power=plant)",
+    "installedCapacityMW": 203.5,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/158946417"
+    ],
+    "resources": [
+      {
+        "ieso": "KIPLING"
+      },
+      {
+        "ieso": "KIPLING 2",
+        "units": "Lower Mattagami expansion unit (inferred from IESO naming)"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "little-long-gs",
+    "name": "Little Long GS",
+    "technology": "hydro",
+    "subtype": "Lower Mattagami",
+    "operator": "Ontario Power Generation",
+    "owner": "OPG / Moose Cree First Nation (Amisk-oo-skow-sepe LP)",
+    "municipality": "Cochrane District",
+    "region": "Northeast",
+    "lat": 50.00451,
+    "lon": -82.1659,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 158944951 (power=plant)",
+    "installedCapacityMW": 233.3,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/158944951"
+    ],
+    "resources": [
+      {
+        "ieso": "LITTLELONG"
+      },
+      {
+        "ieso": "LITTLELONG 2",
+        "units": "Lower Mattagami expansion unit (inferred from IESO naming)"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "smoky-falls-gs",
+    "name": "Smoky Falls GS",
+    "technology": "hydro",
+    "subtype": "Lower Mattagami",
+    "operator": "Ontario Power Generation",
+    "owner": "OPG / Moose Cree First Nation (Amisk-oo-skow-sepe LP)",
+    "municipality": "Cochrane District",
+    "region": "Northeast",
+    "lat": 50.06118,
+    "lon": -82.16134,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 158945914 (power=plant)",
+    "installedCapacityMW": 267.9,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/158945914"
+    ],
+    "resources": [
+      {
+        "ieso": "SMOKY 2"
+      }
+    ],
+    "notes": "New Smoky Falls station built under the Lower Mattagami project (replacing the original).",
+    "reviewFlag": false
+  },
+  {
+    "id": "long-sault-rapids-gs",
+    "name": "Long Sault Rapids GS",
+    "technology": "hydro",
+    "subtype": "Abitibi River",
+    "operator": "Algonquin Power",
+    "owner": null,
+    "municipality": "Cochrane District",
+    "region": "Northeast",
+    "lat": 49.21358,
+    "lon": -81.02036,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap way 258892405 (power=plant)",
+    "installedCapacityMW": 16,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/258892405"
+    ],
+    "resources": [
+      {
+        "ieso": "LONGSAULTE"
+      }
+    ],
+    "notes": "Identification of LONGSAULTE with this station is inferred from the name.",
+    "reviewFlag": true
+  },
+  {
+    "id": "lower-notch-gs",
+    "name": "Lower Notch GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Timiskaming District",
+    "region": "Northeast",
+    "lat": 47.14025,
+    "lon": -79.4617,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 19293456 (power=plant)",
+    "installedCapacityMW": 274,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/19293456"
+    ],
+    "resources": [
+      {
+        "ieso": "LOWERNOTCH"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "mackay-gs",
+    "name": "MacKay GS",
+    "technology": "hydro",
+    "subtype": "Montreal River",
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Algoma District",
+    "region": "Northeast",
+    "lat": 47.26891,
+    "lon": -84.43699,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 432358487 (power=plant)",
+    "installedCapacityMW": 62,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/432358487"
+    ],
+    "resources": [
+      {
+        "ieso": "MACKAYGS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "manitou-falls-gs",
+    "name": "Manitou Falls GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Kenora District",
+    "region": "Northwest",
+    "lat": 50.58318,
+    "lon": -93.45442,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 262626314 (power=plant)",
+    "installedCapacityMW": 73,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": 1956,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/262626314"
+    ],
+    "resources": [
+      {
+        "ieso": "MANITOUFALLS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "mission-gs",
+    "name": "Mission GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Wawa",
+    "region": "Northeast",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": 16,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "MISSION"
+      }
+    ],
+    "notes": "Location not verified in OpenStreetMap or Wikipedia coordinates; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "mountain-chute-gs",
+    "name": "Mountain Chute GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Greater Madawaska",
+    "region": "Ottawa",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": 170,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": 1967,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "MTNCHUTE"
+      }
+    ],
+    "notes": "Location not verified in OpenStreetMap or Wikipedia coordinates; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "nagagami-gs",
+    "name": "Nagagami GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": null,
+    "owner": null,
+    "municipality": "Hornepayne area",
+    "region": "Northeast",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [],
+    "resources": [
+      {
+        "ieso": "NAGAGAMI"
+      }
+    ],
+    "notes": "Location not verified in OpenStreetMap or Wikipedia coordinates; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "otter-rapids-gs",
+    "name": "Otter Rapids GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Cochrane District",
+    "region": "Northeast",
+    "lat": 50.18134,
+    "lon": -81.6374,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 236458306 (power=plant)",
+    "installedCapacityMW": 182,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/236458306"
+    ],
+    "resources": [
+      {
+        "ieso": "OTTERRAPIDS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "peter-sutherland-sr-gs",
+    "name": "Peter Sutherland Sr. GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "PSS Generating Station LP (OPG / Coral Rapids Power)",
+    "owner": null,
+    "municipality": "Cochrane District",
+    "region": "Northeast",
+    "lat": 49.96211,
+    "lon": -81.5232,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 665102083 (power=plant)",
+    "installedCapacityMW": 28,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": 2018,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/665102083"
+    ],
+    "resources": [
+      {
+        "ieso": "PETER SUTHERLAND SR"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "pine-portage-gs",
+    "name": "Pine Portage GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Nipigon",
+    "region": "Northwest",
+    "lat": 49.30746,
+    "lon": -88.31032,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 244226942 (power=plant)",
+    "installedCapacityMW": 145,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/244226942"
+    ],
+    "resources": [
+      {
+        "ieso": "PINEPORTAGE"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "rayner-gs",
+    "name": "G.W. Rayner GS",
+    "technology": "hydro",
+    "subtype": "Mississagi River",
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Algoma District",
+    "region": "Northeast",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": 46,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "RAYNER"
+      }
+    ],
+    "notes": "Location not verified in OpenStreetMap or Wikipedia coordinates; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "red-rock-falls-gs",
+    "name": "Red Rock Falls GS",
+    "technology": "hydro",
+    "subtype": "Mississagi River",
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Algoma District",
+    "region": "Northeast",
+    "lat": 46.31501,
+    "lon": -83.2905,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap way 1381206606 (power=plant)",
+    "installedCapacityMW": 41,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/1381206606"
+    ],
+    "resources": [
+      {
+        "ieso": "REDROCK"
+      }
+    ],
+    "notes": "REDROCK matched to Brookfield's Red Rock Falls (Mississagi) by name; not officially confirmed.",
+    "reviewFlag": true
+  },
+  {
+    "id": "rh-saunders-gs",
+    "name": "R.H. Saunders GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Cornwall",
+    "region": "East",
+    "lat": 45.0078,
+    "lon": -74.7927,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 92195462 (power=plant)",
+    "installedCapacityMW": 1045,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/92195462"
+    ],
+    "resources": [
+      {
+        "ieso": "SAUNDERS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "silver-falls-gs",
+    "name": "Silver Falls GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Thunder Bay District",
+    "region": "Northwest",
+    "lat": 48.66094,
+    "lon": -89.59696,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 563742964 (power=plant)",
+    "installedCapacityMW": 48,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/563742964"
+    ],
+    "resources": [
+      {
+        "ieso": "SILVERFALLS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "steephill-falls-gs",
+    "name": "Steephill Falls GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Wawa",
+    "region": "Northeast",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": 15,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "STEEPHILL"
+      }
+    ],
+    "notes": "Location not verified in OpenStreetMap or Wikipedia coordinates; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "stewartville-gs",
+    "name": "Stewartville GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "McNab/Braeside",
+    "region": "Ottawa",
+    "lat": 45.40712,
+    "lon": -76.50671,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 255478124 (power=plant)",
+    "installedCapacityMW": 182,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/255478124"
+    ],
+    "resources": [
+      {
+        "ieso": "STEWARTVLE"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "umbata-falls-gs",
+    "name": "Umbata Falls GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Innergex",
+    "owner": null,
+    "municipality": "Marathon",
+    "region": "Northwest",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": 23,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "UMBATAFALLS"
+      }
+    ],
+    "notes": "Location not verified in OpenStreetMap or Wikipedia coordinates; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "wells-gs",
+    "name": "Wells GS",
+    "technology": "hydro",
+    "subtype": "Mississagi River",
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Algoma District",
+    "region": "Northeast",
+    "lat": 46.43152,
+    "lon": -83.3861,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 1417572598 (power=plant)",
+    "installedCapacityMW": 239,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": 1970,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/1417572598"
+    ],
+    "resources": [
+      {
+        "ieso": "WELLS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "whitedog-falls-gs",
+    "name": "Whitedog Falls GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Kenora District",
+    "region": "Northwest",
+    "lat": 50.11464,
+    "lon": -94.86888,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 336933592 (power=plant)",
+    "installedCapacityMW": 68,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/336933592"
+    ],
+    "resources": [
+      {
+        "ieso": "WHITEDOG"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "lower-white-river-gs",
+    "name": "Lower White River GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": null,
+    "owner": null,
+    "municipality": "White River",
+    "region": "Northwest",
+    "lat": 48.59572,
+    "lon": -85.87875,
+    "geocodeConfidence": "low",
+    "geocodeSource": "OpenStreetMap way 1423903454 (power=plant)",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/1423903454"
+    ],
+    "resources": [
+      {
+        "ieso": "LOWER WHITE RIVER"
+      }
+    ],
+    "notes": "OSM feature is named only 'White River Power Generation'; assigned as the downstream (western) station. Verify.",
+    "reviewFlag": true
+  },
+  {
+    "id": "upper-white-river-gs",
+    "name": "Upper White River GS",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": null,
+    "owner": null,
+    "municipality": "White River",
+    "region": "Northwest",
+    "lat": 48.64069,
+    "lon": -85.76624,
+    "geocodeConfidence": "low",
+    "geocodeSource": "OpenStreetMap way 1423900799 (power=plant)",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/1423900799"
+    ],
+    "resources": [
+      {
+        "ieso": "UPPER WHITE RIVER"
+      }
+    ],
+    "notes": "OSM feature is named only 'White River Power Generation'; assigned as the upstream (eastern) station. Verify.",
+    "reviewFlag": true
+  },
+  {
+    "id": "kenora-norman-gs",
+    "name": "Kenora & Norman GS (Abitibi Kenora)",
+    "technology": "hydro",
+    "subtype": null,
+    "operator": "H2O Power",
+    "owner": null,
+    "municipality": "Kenora",
+    "region": "Northwest",
+    "lat": 49.77254,
+    "lon": -94.50364,
+    "geocodeConfidence": "low",
+    "geocodeSource": "OpenStreetMap way 128220672 (power=plant)",
+    "installedCapacityMW": 18,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/128220672",
+      "https://www.openstreetmap.org/way/128220659"
+    ],
+    "resources": [
+      {
+        "ieso": "ABKENORA"
+      }
+    ],
+    "notes": "ABKENORA is believed to cover the former Abitibi Kenora (8 MW) and Norman (10 MW) stations ~1.5 km apart; marker placed at Kenora GS. Identification inferred.",
+    "reviewFlag": true
+  },
+  {
+    "id": "iroquois-falls-hydro-gs",
+    "name": "Iroquois Falls GS (hydro)",
+    "technology": "hydro",
+    "subtype": "Abitibi River",
+    "operator": "H2O Power",
+    "owner": null,
+    "municipality": "Iroquois Falls",
+    "region": "Northeast",
+    "lat": 48.76308,
+    "lon": -80.66929,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap way 1434887220 (power=plant)",
+    "installedCapacityMW": 29.7,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/1434887220"
+    ],
+    "resources": [
+      {
+        "ieso": "APIROQUOIS"
+      }
+    ],
+    "notes": "APIROQUOIS (Abitibi-Price Iroquois Falls) matched by name; not officially confirmed.",
+    "reviewFlag": true
+  }
+]

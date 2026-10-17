@@ -1,0 +1,1117 @@
+[
+  {
+    "id": "bruce-a-ngs",
+    "name": "Bruce A Nuclear Generating Station",
+    "technology": "nuclear",
+    "subtype": "CANDU",
+    "operator": "Bruce Power",
+    "owner": "Ontario Power Generation (leased to Bruce Power)",
+    "municipality": "Kincardine (Tiverton)",
+    "region": "Bruce",
+    "lat": 44.33925,
+    "lon": -81.5743,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 113853974 (building named \"Bruce A\")",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": 1977,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/113853974",
+      "https://en.wikipedia.org/wiki/Bruce_Nuclear_Generating_Station"
+    ],
+    "resources": [
+      {
+        "ieso": "BRUCEA-G1",
+        "units": "Unit 1 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "BRUCEA-G2",
+        "units": "Unit 2 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "BRUCEA-G3",
+        "units": "Unit 3 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "BRUCEA-G4",
+        "units": "Unit 4 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": "Bruce A (units 1-4) is the northern station of the Bruce site; unit net ratings ~750-830 MW each vary with refurbishment (MCR) uprates, so station total left null. Units undergo Major Component Replacement on a rolling basis.",
+    "reviewFlag": false
+  },
+  {
+    "id": "bruce-b-ngs",
+    "name": "Bruce B Nuclear Generating Station",
+    "technology": "nuclear",
+    "subtype": "CANDU",
+    "operator": "Bruce Power",
+    "owner": "Ontario Power Generation (leased to Bruce Power)",
+    "municipality": "Kincardine (Tiverton)",
+    "region": "Bruce",
+    "lat": 44.31908,
+    "lon": -81.60309,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 113855550 (building named \"Bruce B\")",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": 1984,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/113855550",
+      "https://en.wikipedia.org/wiki/Bruce_Nuclear_Generating_Station"
+    ],
+    "resources": [
+      {
+        "ieso": "BRUCEB-G5",
+        "units": "Unit 5 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "BRUCEB-G6",
+        "units": "Unit 6 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "BRUCEB-G7",
+        "units": "Unit 7 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "BRUCEB-G8",
+        "units": "Unit 8 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": "Bruce B (units 5-8) is the southern station of the Bruce site. Whole Bruce site OSM way 198181501 tagged 6232 MW (both stations). Unit 6 completed MCR; others scheduled.",
+    "reviewFlag": false
+  },
+  {
+    "id": "darlington-ngs",
+    "name": "Darlington Nuclear Generating Station",
+    "technology": "nuclear",
+    "subtype": "CANDU",
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Clarington",
+    "region": "East",
+    "lat": 43.87059,
+    "lon": -78.71994,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 274901437 (power=plant)",
+    "installedCapacityMW": 3512,
+    "capacitySource": "OSM tag plant:output:electricity (4 x ~878 MW net per https://en.wikipedia.org/wiki/Darlington_Nuclear_Generating_Station)",
+    "commissioningYear": 1990,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/274901437",
+      "https://en.wikipedia.org/wiki/Darlington_Nuclear_Generating_Station"
+    ],
+    "resources": [
+      {
+        "ieso": "DARLINGTON-G1",
+        "units": "Unit 1 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "DARLINGTON-G2",
+        "units": "Unit 2 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "DARLINGTON-G3",
+        "units": "Unit 3 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "DARLINGTON-G4",
+        "units": "Unit 4 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": "Units in service 1990-1993; all four refurbished 2016-2026.",
+    "reviewFlag": false
+  },
+  {
+    "id": "pickering-b-ngs",
+    "name": "Pickering B Nuclear Generating Station (Units 5-8)",
+    "technology": "nuclear",
+    "subtype": "CANDU",
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Pickering",
+    "region": "Toronto",
+    "lat": 43.81116,
+    "lon": -79.06322,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap way 24656911 (whole Pickering NGS site polygon centroid; units 5-8 are within this site)",
+    "installedCapacityMW": 2064,
+    "capacitySource": "https://en.wikipedia.org/wiki/Pickering_Nuclear_Generating_Station (4 x 516 MW net)",
+    "commissioningYear": 1983,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/24656911",
+      "https://en.wikipedia.org/wiki/Pickering_Nuclear_Generating_Station"
+    ],
+    "resources": [
+      {
+        "ieso": "PICKERINGB-G5",
+        "units": "Unit 5 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "PICKERINGB-G6",
+        "units": "Unit 6 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "PICKERINGB-G7",
+        "units": "Unit 7 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "PICKERINGB-G8",
+        "units": "Unit 8 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": "Pickering A units 1 and 4 shut down in 2024; units 5-8 slated for refurbishment after end of current operation (~2026). Marker is site centroid, not the B-station powerhouse specifically.",
+    "reviewFlag": false
+  },
+  {
+    "id": "brighton-beach-gs",
+    "name": "Brighton Beach Generating Station",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": "Atura Power",
+    "owner": "Ontario Power Generation",
+    "municipality": "Windsor",
+    "region": "West",
+    "lat": 42.27933,
+    "lon": -83.09446,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 165631500 (power=plant)",
+    "installedCapacityMW": 580,
+    "capacitySource": "https://en.wikipedia.org/wiki/Brighton_Beach_Generating_Station",
+    "commissioningYear": 2004,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/165631500",
+      "https://en.wikipedia.org/wiki/Brighton_Beach_Generating_Station",
+      "https://www.aturapower.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "BRIGHTON BEACH"
+      }
+    ],
+    "notes": "Upgrades reportedly raised output above 600 MW (Atura).",
+    "reviewFlag": false
+  },
+  {
+    "id": "cardinal-power",
+    "name": "Cardinal Power Plant",
+    "technology": "gas",
+    "subtype": "Cogeneration (combined cycle)",
+    "operator": "Capstone Infrastructure",
+    "owner": "Capstone Infrastructure",
+    "municipality": "Edwardsburgh/Cardinal",
+    "region": "East",
+    "lat": 44.78461,
+    "lon": -75.37674,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 972892019 (power=plant, \"Cardinal Power Plant\")",
+    "installedCapacityMW": 156,
+    "capacitySource": "https://www.capstoneinfrastructure.com/",
+    "commissioningYear": 1994,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/972892019",
+      "https://www.capstoneinfrastructure.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "CARDINAL"
+      }
+    ],
+    "notes": "Supplies steam to adjacent Ingredion (formerly Casco) corn wet mill.",
+    "reviewFlag": false
+  },
+  {
+    "id": "east-windsor-cogeneration-centre",
+    "name": "East Windsor Cogeneration Centre",
+    "technology": "gas",
+    "subtype": "Cogeneration (combined cycle)",
+    "operator": "Capital Power",
+    "owner": "Capital Power",
+    "municipality": "Windsor",
+    "region": "West",
+    "lat": 42.3255,
+    "lon": -83.00019,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 23757824 (power=plant)",
+    "installedCapacityMW": 84,
+    "capacitySource": "https://www.capitalpower.com/ (84 MW; OSM tag 92 MW)",
+    "commissioningYear": 2009,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/23757824",
+      "https://www.capitalpower.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "EAST WINDSOR-G1",
+        "units": "Unit 1 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "EAST WINDSOR-G2",
+        "units": "Unit 2 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "EAST WINDSOR-G3",
+        "units": "Unit 3 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": "Two GE LM6000 gas turbines plus steam turbine; G1-G3 mapping to these is inferred. Sources cite 84-92 MW.",
+    "reviewFlag": false
+  },
+  {
+    "id": "west-windsor-power",
+    "name": "West Windsor Power",
+    "technology": "gas",
+    "subtype": "Cogeneration (combined cycle)",
+    "operator": "ENGIE",
+    "owner": "ENGIE (via Tractebel/West Windsor Power)",
+    "municipality": "Windsor",
+    "region": "West",
+    "lat": 42.28095,
+    "lon": -83.08666,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap way 165631501 (power=plant, \"West Windsor Power Plant\")",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/165631501",
+      "https://www.gem.wiki/"
+    ],
+    "resources": [
+      {
+        "ieso": "WESTWINDSOR"
+      }
+    ],
+    "notes": "OSM polygon name matches, but its operator/capacity tags (TransAlta, 72 MW) appear to be copied from the separate TransAlta Windsor plant; capacity reported ~112-135 MW in secondary sources, so left null. Owner/operator per GEM wiki (ENGIE) – verify.",
+    "reviewFlag": true
+  },
+  {
+    "id": "transalta-windsor",
+    "name": "Windsor Cogeneration Plant (TransAlta Windsor)",
+    "technology": "gas",
+    "subtype": "Cogeneration (combined cycle)",
+    "operator": "TransAlta",
+    "owner": "TransAlta",
+    "municipality": "Windsor",
+    "region": "West",
+    "lat": 42.2876,
+    "lon": -82.9803,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "Global Energy Monitor wiki coordinates (south of Stellantis Windsor Assembly Plant)",
+    "installedCapacityMW": 72,
+    "capacitySource": "https://www.transalta.com/",
+    "commissioningYear": 1996,
+    "sourceUrls": [
+      "https://www.transalta.com/",
+      "https://www.gem.wiki/"
+    ],
+    "resources": [
+      {
+        "ieso": "TAWINDSOR"
+      }
+    ],
+    "notes": "Supplies steam to Stellantis (Chrysler) Windsor Assembly. Not in OSM extract.",
+    "reviewFlag": false
+  },
+  {
+    "id": "greenfield-energy-centre",
+    "name": "Greenfield Energy Centre",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": "Calpine",
+    "owner": "Calpine / Mitsui",
+    "municipality": "St. Clair Township (Courtright)",
+    "region": "West",
+    "lat": 42.76956,
+    "lon": -82.45227,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 268086514 (power=plant)",
+    "installedCapacityMW": 1038,
+    "capacitySource": "OSM tag plant:output:electricity",
+    "commissioningYear": 2008,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/268086514",
+      "https://en.wikipedia.org/wiki/Greenfield_Energy_Centre"
+    ],
+    "resources": [
+      {
+        "ieso": "GREENFIELD ENERGY CENTRE-G1",
+        "units": "Unit 1 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "GREENFIELD ENERGY CENTRE-G2",
+        "units": "Unit 2 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "GREENFIELD ENERGY CENTRE-G3",
+        "units": "Unit 3 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "GREENFIELD ENERGY CENTRE-G4",
+        "units": "Unit 4 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": "Three gas turbines + one steam turbine; G1-G4 correspondence inferred. Wikipedia cites ~1005 MW.",
+    "reviewFlag": false
+  },
+  {
+    "id": "green-electron-power-plant",
+    "name": "Green Electron Power Plant (Greenfield South)",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": "Eastern Power",
+    "owner": "Greenfield South Power Corporation (Eastern Power)",
+    "municipality": "St. Clair Township (Courtright)",
+    "region": "West",
+    "lat": 42.78688,
+    "lon": -82.42753,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 750529296 (\"Green Electron Power Plant\")",
+    "installedCapacityMW": 300,
+    "capacitySource": "https://www.gem.wiki/ (~280-334 MW reported)",
+    "commissioningYear": 2017,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/750529296",
+      "https://hydrogenreadypowerplant.ca/"
+    ],
+    "resources": [
+      {
+        "ieso": "GREENFIELD SOUTH-G1",
+        "units": "Unit 1 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "GREENFIELD SOUTH-G2",
+        "units": "Unit 2 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": "Greenfield South project was relocated from Mississauga to St. Clair Township (2012) and built as the Green Electron Power Project; IESO resource names keep the Greenfield South name.",
+    "reviewFlag": false
+  },
+  {
+    "id": "hydrogen-ready-power-plant",
+    "name": "Hydrogen Ready Power Plant (HRPP)",
+    "technology": "gas",
+    "subtype": "Hydrogen-ready gas plant",
+    "operator": "Eastern Power",
+    "owner": "Greenfield South Power Inc. (Eastern Power)",
+    "municipality": "St. Clair Township (Courtright)",
+    "region": "West",
+    "lat": 42.78688,
+    "lon": -82.42753,
+    "geocodeConfidence": "low",
+    "geocodeSource": "Placed at adjacent Green Electron Power Plant (OSM way 750529296); IAAC/OEB describe HRPP as adjacent to Green Electron",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": 2025,
+    "sourceUrls": [
+      "https://hydrogenreadypowerplant.ca/",
+      "https://iaac-aeic.gc.ca/",
+      "https://www.oeb.ca/"
+    ],
+    "resources": [
+      {
+        "ieso": "HYDROGEN READY POWER PLANT (HRPP)"
+      }
+    ],
+    "notes": "HINT CORRECTED: the name \"Hydrogen Ready Power Plant (HRPP)\" belongs to Eastern Power's project in St. Clair Township (website hydrogenreadypowerplant.ca), contracted under IESO E-LT1 with target COD ~May 2025 — not Atura's Halton Hills site. Full build-out proposed up to 600 MW; E-LT1 contracted capacity unclear, so null. Exact footprint not mapped; coordinates duplicate Green Electron.",
+    "reviewFlag": true
+  },
+  {
+    "id": "st-clair-energy-centre",
+    "name": "St. Clair Energy Centre",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": "Invenergy",
+    "owner": "St. Clair Power LP (Invenergy)",
+    "municipality": "St. Clair Township",
+    "region": "West",
+    "lat": 42.89727,
+    "lon": -82.39842,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 488285723 (power=plant)",
+    "installedCapacityMW": 584,
+    "capacitySource": "https://en.wikipedia.org/wiki/St._Clair_Energy_Centre",
+    "commissioningYear": 2009,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/488285723",
+      "https://en.wikipedia.org/wiki/St._Clair_Energy_Centre"
+    ],
+    "resources": [
+      {
+        "ieso": "STCLAIRCGS"
+      }
+    ],
+    "notes": "STCLAIRCGS assumed to be St. Clair Energy Centre (name match).",
+    "reviewFlag": false
+  },
+  {
+    "id": "sarnia-regional-cogeneration",
+    "name": "Sarnia Regional Cogeneration Plant",
+    "technology": "gas",
+    "subtype": "Cogeneration (combined cycle)",
+    "operator": "TransAlta",
+    "owner": "TransAlta",
+    "municipality": "Sarnia",
+    "region": "West",
+    "lat": 42.93526,
+    "lon": -82.43866,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 514000842 (power=plant)",
+    "installedCapacityMW": 444,
+    "capacitySource": "OSM tag plant:output:electricity (other sources cite ~499-506 MW)",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/514000842",
+      "https://en.wikipedia.org/wiki/Sarnia_Regional_Cogeneration_Plant"
+    ],
+    "resources": [
+      {
+        "ieso": "TASARNIA"
+      }
+    ],
+    "notes": "Built on the former Dow Chemical Sarnia site; supplies steam to Lambton chemical valley industries.",
+    "reviewFlag": false
+  },
+  {
+    "id": "dow-chemical-sarnia",
+    "name": "Dow Chemical (Sarnia) generator",
+    "technology": "gas",
+    "subtype": "Cogeneration",
+    "operator": null,
+    "owner": null,
+    "municipality": "Sarnia (assumed)",
+    "region": "West",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [],
+    "resources": [
+      {
+        "ieso": "DOWCHEMICAL"
+      }
+    ],
+    "notes": "Could not identify the physical facility behind IESO resource DOWCHEMICAL. Dow Chemical Canada's historical Ontario operations were in Sarnia, but its power assets there were folded into TransAlta's Sarnia Regional Cogeneration Plant (separate resource TASARNIA). Needs manual verification.",
+    "reviewFlag": true
+  },
+  {
+    "id": "thorold-cogeneration",
+    "name": "Thorold Cogeneration Station",
+    "technology": "gas",
+    "subtype": "Cogeneration (combined cycle)",
+    "operator": "Northland Power",
+    "owner": "Northland Power",
+    "municipality": "Thorold",
+    "region": "Niagara",
+    "lat": 43.10657,
+    "lon": -79.19853,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 938230606 (power=plant, \"Thorold Power Plant\")",
+    "installedCapacityMW": 265,
+    "capacitySource": "https://en.wikipedia.org/wiki/Thorold_Cogeneration_Station",
+    "commissioningYear": 2010,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/938230606",
+      "https://www.northlandpower.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "THOROLDCGS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "goreway-station",
+    "name": "Goreway Station",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": "Capital Power",
+    "owner": "Capital Power",
+    "municipality": "Brampton",
+    "region": "Toronto",
+    "lat": 43.747,
+    "lon": -79.68017,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 158464934 (power=plant)",
+    "installedCapacityMW": 875,
+    "capacitySource": "https://www.capitalpower.com/",
+    "commissioningYear": 2009,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/158464934",
+      "https://en.wikipedia.org/wiki/Goreway_Power_Station"
+    ],
+    "resources": [
+      {
+        "ieso": "SITHE GOREWAY-G11"
+      },
+      {
+        "ieso": "SITHE GOREWAY-G12"
+      },
+      {
+        "ieso": "SITHE GOREWAY-G13"
+      },
+      {
+        "ieso": "SITHE GOREWAY-G15"
+      }
+    ],
+    "notes": "Originally developed by Sithe Global (hence IESO name). 3 GTs + 1 ST; resource-to-unit mapping not published.",
+    "reviewFlag": false
+  },
+  {
+    "id": "gtaa-cogeneration-plant",
+    "name": "GTAA Cogeneration Plant (Toronto Pearson)",
+    "technology": "gas",
+    "subtype": "Cogeneration (combined cycle)",
+    "operator": "Greater Toronto Airports Authority",
+    "owner": "Greater Toronto Airports Authority",
+    "municipality": "Mississauga",
+    "region": "Toronto",
+    "lat": 43.69159,
+    "lon": -79.6102,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 200695859 (building \"GTAA Cogeneration Plant\")",
+    "installedCapacityMW": 117,
+    "capacitySource": "https://en.wikipedia.org/wiki/GTAA_Cogeneration_Plant",
+    "commissioningYear": 2006,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/200695859",
+      "https://en.wikipedia.org/wiki/GTAA_Cogeneration_Plant"
+    ],
+    "resources": [
+      {
+        "ieso": "GTAA-G1",
+        "units": "Unit 1 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "GTAA-G2",
+        "units": "Unit 2 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "GTAA-G3",
+        "units": "Unit 3 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": "2 x GE LM6000 GTs + 1 ST; OPA contract for 90 MW to grid.",
+    "reviewFlag": false
+  },
+  {
+    "id": "halton-hills-gs",
+    "name": "Halton Hills Generating Station",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": "Atura Power",
+    "owner": "Ontario Power Generation",
+    "municipality": "Halton Hills",
+    "region": "Toronto",
+    "lat": 43.56039,
+    "lon": -79.84534,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 33787918 (power=plant)",
+    "installedCapacityMW": 683,
+    "capacitySource": "https://www.aturapower.com/ (~683 MW; ~711 MW after upgrades; OSM tag 641.5)",
+    "commissioningYear": 2010,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/33787918",
+      "https://www.aturapower.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "HALTONHILLS-LT.G1"
+      },
+      {
+        "ieso": "HALTONHILLS-LT.G2"
+      },
+      {
+        "ieso": "HALTONHILLS-LT.G3"
+      }
+    ],
+    "notes": "2 GTs + 1 ST; unit mapping inferred only. Hydrogen co-firing pilot 2025 (distinct from Eastern Power HRPP).",
+    "reviewFlag": false
+  },
+  {
+    "id": "portlands-energy-centre",
+    "name": "Portlands Energy Centre",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": "Atura Power",
+    "owner": "Ontario Power Generation",
+    "municipality": "Toronto",
+    "region": "Toronto",
+    "lat": 43.64954,
+    "lon": -79.33125,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 176711932 (power=plant)",
+    "installedCapacityMW": 550,
+    "capacitySource": "https://en.wikipedia.org/wiki/Portlands_Energy_Centre",
+    "commissioningYear": 2009,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/176711932",
+      "https://en.wikipedia.org/wiki/Portlands_Energy_Centre"
+    ],
+    "resources": [
+      {
+        "ieso": "PORTLANDS-G1",
+        "units": "Unit 1 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "PORTLANDS-G2",
+        "units": "Unit 2 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "PORTLANDS-G3",
+        "units": "Unit 3 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "york-energy-centre",
+    "name": "York Energy Centre",
+    "technology": "gas",
+    "subtype": "Peaker (simple cycle)",
+    "operator": "Capital Power",
+    "owner": "Capital Power (co-owned)",
+    "municipality": "King Township",
+    "region": "Toronto",
+    "lat": 44.07549,
+    "lon": -79.53123,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 247885747 (power=plant)",
+    "installedCapacityMW": 400,
+    "capacitySource": "https://www.capitalpower.com/ (OSM tag 462)",
+    "commissioningYear": 2012,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/247885747",
+      "https://en.wikipedia.org/wiki/York_Energy_Centre"
+    ],
+    "resources": [
+      {
+        "ieso": "YORKCGS-G1",
+        "units": "Unit 1 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "YORKCGS-G2",
+        "units": "Unit 2 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "whitby-cogeneration",
+    "name": "Whitby Cogeneration",
+    "technology": "gas",
+    "subtype": "Cogeneration",
+    "operator": null,
+    "owner": "Whitby Cogeneration LP",
+    "municipality": "Whitby",
+    "region": "East",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": "Address 1550 Wentworth St W, Whitby (GEO) could only be resolved to street level",
+    "installedCapacityMW": 50,
+    "capacitySource": "https://www.gem.wiki/ (50-58 MW reported)",
+    "commissioningYear": 1998,
+    "sourceUrls": [
+      "https://www.gem.wiki/",
+      "http://globalenergyobservatory.org/"
+    ],
+    "resources": [
+      {
+        "ieso": "WHITBYCGS"
+      }
+    ],
+    "notes": "Single gas turbine (Rolls-Royce Trent) with OTSG. Not in OSM extract. Current operator unverified.",
+    "reviewFlag": true
+  },
+  {
+    "id": "lennox-gs",
+    "name": "Lennox Generating Station",
+    "technology": "gas",
+    "subtype": "Steam (dual fuel oil/gas)",
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Greater Napanee",
+    "region": "East",
+    "lat": 44.14779,
+    "lon": -76.85114,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 198183739 (power=plant)",
+    "installedCapacityMW": 2100,
+    "capacitySource": "https://en.wikipedia.org/wiki/Lennox_Generating_Station",
+    "commissioningYear": 1976,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/198183739",
+      "https://en.wikipedia.org/wiki/Lennox_Generating_Station"
+    ],
+    "resources": [
+      {
+        "ieso": "LENNOX-G1",
+        "units": "Unit 1 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "LENNOX-G2",
+        "units": "Unit 2 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "LENNOX-G3",
+        "units": "Unit 3 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "LENNOX-G4",
+        "units": "Unit 4 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": "Can burn heavy fuel oil as well as natural gas; classified gas per IESO fuel type.",
+    "reviewFlag": false
+  },
+  {
+    "id": "napanee-gs",
+    "name": "Napanee Generating Station",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": "Atura Power",
+    "owner": "Ontario Power Generation",
+    "municipality": "Greater Napanee",
+    "region": "East",
+    "lat": 44.14779,
+    "lon": -76.85114,
+    "geocodeConfidence": "low",
+    "geocodeSource": "No separate OSM feature; placed at Lennox GS site (OSM way 198183739), on whose lands Napanee GS was built",
+    "installedCapacityMW": 900,
+    "capacitySource": "https://www.aturapower.com/",
+    "commissioningYear": 2020,
+    "sourceUrls": [
+      "https://www.aturapower.com/",
+      "https://en.wikipedia.org/wiki/Napanee_Generating_Station"
+    ],
+    "resources": [
+      {
+        "ieso": "NAPANEE-G1",
+        "units": "Unit 1 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "NAPANEE-G2",
+        "units": "Unit 2 (inferred from IESO resource naming)"
+      },
+      {
+        "ieso": "NAPANEE-G3",
+        "units": "Unit 3 (inferred from IESO resource naming)"
+      }
+    ],
+    "notes": "Coordinates duplicate Lennox GS; actual powerhouse is on/adjacent to the Lennox property.",
+    "reviewFlag": true
+  },
+  {
+    "id": "kingston-cogen",
+    "name": "Kingston Generating Station (Kingston Cogen)",
+    "technology": "gas",
+    "subtype": "Cogeneration (combined cycle)",
+    "operator": null,
+    "owner": null,
+    "municipality": "Kingston",
+    "region": "East",
+    "lat": 44.21001,
+    "lon": -76.7247,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 639142496 (power=plant, \"Kingston Generating Station\")",
+    "installedCapacityMW": 110,
+    "capacitySource": "OSM tag / https://www.northlandpower.com/ (110 MW)",
+    "commissioningYear": 1997,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/639142496",
+      "https://www.northlandpower.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "DESTEC"
+      }
+    ],
+    "notes": "DESTEC identified as the Kingston cogeneration plant originally developed by Destec Energy (Dow subsidiary); resource-identity is from secondary sources. Formerly Northland Power; sold to Validus Power 2022, then acquired out of receivership (Hut 8, 2024) – current owner/operator unverified.",
+    "reviewFlag": true
+  },
+  {
+    "id": "invista-maitland-cogen",
+    "name": "Invista Maitland Cogeneration",
+    "technology": "gas",
+    "subtype": "Cogeneration",
+    "operator": "INVISTA",
+    "owner": "INVISTA",
+    "municipality": "Augusta Township (Maitland)",
+    "region": "East",
+    "lat": 44.662,
+    "lon": -75.58304,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 1218112008 (power=plant, \"Invista Maitland\")",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/1218112008"
+    ],
+    "resources": [
+      {
+        "ieso": "DPNTMTLND"
+      }
+    ],
+    "notes": "Former DuPont Maitland site. Capacity unclear: OSM tag 42.8 MW vs engineering-firm reference to a 7.9 MW CHP.",
+    "reviewFlag": false
+  },
+  {
+    "id": "ottawa-health-sciences-cogen",
+    "name": "Ottawa Health Sciences Centre Cogeneration Plant",
+    "technology": "gas",
+    "subtype": "Cogeneration (combined cycle)",
+    "operator": "TransAlta",
+    "owner": "TransAlta",
+    "municipality": "Ottawa",
+    "region": "Ottawa",
+    "lat": 45.40328,
+    "lon": -75.65418,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 68586722 (power=plant, \"Ottawa Cogeneration Plant\", operator TransAlta)",
+    "installedCapacityMW": 74,
+    "capacitySource": "OSM tag plant:output:electricity",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/68586722",
+      "https://www.transalta.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "TAOHSC"
+      }
+    ],
+    "notes": "Serves the Ottawa Hospital/Health Sciences campus on Smyth Road.",
+    "reviewFlag": false
+  },
+  {
+    "id": "kapuskasing-power-plant",
+    "name": "Kapuskasing Power Plant",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": null,
+    "owner": null,
+    "municipality": "Kapuskasing",
+    "region": "Northeast",
+    "lat": 49.39068,
+    "lon": -82.43845,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 297163781 (landuse=industrial, \"Kapuskasing Power Plant\") via Nominatim",
+    "installedCapacityMW": 40,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": 1997,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/297163781"
+    ],
+    "resources": [
+      {
+        "ieso": "KAPGS"
+      }
+    ],
+    "notes": "Address 47 Gough Road. Formerly Atlantic Power, then Validus Power; acquired out of receivership by Hut 8 (2024) – current operator unverified.",
+    "reviewFlag": false
+  },
+  {
+    "id": "north-bay-power-plant",
+    "name": "North Bay Power Plant",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": null,
+    "owner": null,
+    "municipality": "North Bay",
+    "region": "Northeast",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": "Address 4001 Highway 11 North not resolvable to a site",
+    "installedCapacityMW": 40,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.oeb.ca/"
+    ],
+    "resources": [
+      {
+        "ieso": "NORTHBAYGS"
+      }
+    ],
+    "notes": "Formerly Atlantic Power, then Validus Power; acquired by Hut 8 (2024) – verify. Located adjacent to TransCanada Mainline north of city.",
+    "reviewFlag": true
+  },
+  {
+    "id": "nipigon-power-plant",
+    "name": "Nipigon Power Plant",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": "Atlantic Power",
+    "owner": "Atlantic Power",
+    "municipality": "Nipigon",
+    "region": "Northwest",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": 40,
+    "capacitySource": "https://www.atlanticpower.com/",
+    "commissioningYear": 1992,
+    "sourceUrls": [
+      "https://www.atlanticpower.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "NIPIGONGS"
+      }
+    ],
+    "notes": "Enhanced combined cycle near Highway 11 / TransCanada Mainline north of Nipigon; not in OSM extract.",
+    "reviewFlag": true
+  },
+  {
+    "id": "cochrane-cogeneration",
+    "name": "Cochrane Cogeneration Plant",
+    "technology": "gas",
+    "subtype": "Cogeneration",
+    "operator": "Cochrane Power Corporation",
+    "owner": "Hydromega Services / Energaz Canada",
+    "municipality": "Cochrane",
+    "region": "Northeast",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": "Address 506 Fourth Street East, Cochrane not geocoded to a site",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": 1990,
+    "sourceUrls": [
+      "https://cochranepowercorp.ca/"
+    ],
+    "resources": [
+      {
+        "ieso": "COCHRANECGS"
+      }
+    ],
+    "notes": "Idle 2015-2023; ~27 MW gas turbine refurbished and recontracted (IESO MTC) 2024. Total 35-38 MW historically incl. biomass steam.",
+    "reviewFlag": true
+  },
+  {
+    "id": "tunis-power-plant",
+    "name": "Tunis Power Plant",
+    "technology": "gas",
+    "subtype": "Simple Cycle",
+    "operator": "Atlantic Power",
+    "owner": "Atlantic Power",
+    "municipality": "Cochrane District (near Iroquois Falls)",
+    "region": "Northeast",
+    "lat": 48.87124,
+    "lon": -80.89311,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 295323519 (power=plant)",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/295323519",
+      "https://www.atlanticpower.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "TUNISGS"
+      }
+    ],
+    "notes": "Restarted under 15-yr IESO contract Oct 2018; capacity reported 37-43 MW.",
+    "reviewFlag": false
+  },
+  {
+    "id": "iroquois-falls-npi",
+    "name": "Iroquois Falls Power Plant (NPI)",
+    "technology": "gas",
+    "subtype": "Combined Cycle",
+    "operator": null,
+    "owner": null,
+    "municipality": "Iroquois Falls",
+    "region": "Northeast",
+    "lat": 48.76944,
+    "lon": -80.66655,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 375112638 (power=plant, \"Iroquois Falls NPI Power Plant\")",
+    "installedCapacityMW": 120,
+    "capacitySource": "https://www.northlandpower.com/",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/375112638"
+    ],
+    "resources": [
+      {
+        "ieso": "NPIROQFALLS"
+      }
+    ],
+    "notes": "Built by Northland Power (NPI); sold to Validus 2022, then Hut 8 (2024) – current owner unverified.",
+    "reviewFlag": false
+  },
+  {
+    "id": "kirkland-lake-gs",
+    "name": "Kirkland Lake Generating Station",
+    "technology": "gas",
+    "subtype": "Combined Cycle (gas/biomass)",
+    "operator": "Northland Power",
+    "owner": "Northland Power",
+    "municipality": "Kirkland Lake",
+    "region": "Northeast",
+    "lat": 48.13415,
+    "lon": -80.04129,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 20124677 (power=plant)",
+    "installedCapacityMW": 132,
+    "capacitySource": "https://www.northlandpower.com/",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/20124677",
+      "https://www.northlandpower.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "NPKIRKLAND-G1-G5"
+      },
+      {
+        "ieso": "NPKIRKLAND-G6"
+      }
+    ],
+    "notes": "G1-G5 and G6 grouped as one station; split likely baseload vs additional unit (not published).",
+    "reviewFlag": false
+  },
+  {
+    "id": "lake-superior-power",
+    "name": "Lake Superior Power Plant",
+    "technology": "gas",
+    "subtype": "Cogeneration (combined cycle)",
+    "operator": "Algoma Steel",
+    "owner": "Algoma Steel",
+    "municipality": "Sault Ste. Marie",
+    "region": "Northeast",
+    "lat": 46.51554,
+    "lon": -84.36954,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 927994162 (power=plant)",
+    "installedCapacityMW": 110,
+    "capacitySource": "https://www.sootoday.com/ (original 110 MW)",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/927994162",
+      "https://www.algoma.com/"
+    ],
+    "resources": [
+      {
+        "ieso": "LAKESUPERIOR"
+      }
+    ],
+    "notes": "Mothballed by Brookfield 2014; acquired by Algoma 2018 and operated (reported ~55 MW CHP config).",
+    "reviewFlag": false
+  }
+]

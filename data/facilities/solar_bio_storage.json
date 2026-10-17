@@ -1,0 +1,478 @@
+[
+  {
+    "id": "grand-renewable-solar",
+    "name": "Grand Renewable Solar",
+    "technology": "solar",
+    "subtype": "Utility-scale PV",
+    "operator": "Samsung Renewable Energy / Six Nations",
+    "owner": null,
+    "municipality": "Haldimand County",
+    "region": "Southwest",
+    "lat": 42.89109,
+    "lon": -79.81185,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15570902 (power=plant)",
+    "installedCapacityMW": 100,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15570902"
+    ],
+    "resources": [
+      {
+        "ieso": "GRANDSF"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "kingston-solar",
+    "name": "Kingston Solar",
+    "technology": "solar",
+    "subtype": "Utility-scale PV",
+    "operator": "Samsung Renewable Energy / Six Nations",
+    "owner": null,
+    "municipality": "Loyalist / South Frontenac",
+    "region": "East",
+    "lat": 44.272,
+    "lon": -76.66998,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15567838 (power=plant)",
+    "installedCapacityMW": 100,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15567838"
+    ],
+    "resources": [
+      {
+        "ieso": "KINGSTONSF"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "nanticoke-solar",
+    "name": "Nanticoke Solar",
+    "technology": "solar",
+    "subtype": "Utility-scale PV",
+    "operator": "Ontario Power Generation / Six Nations GRDC / Mississaugas of the Credit",
+    "owner": null,
+    "municipality": "Haldimand County",
+    "region": "Southwest",
+    "lat": 42.80764,
+    "lon": -80.03559,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15062457 (power=plant)",
+    "installedCapacityMW": 44,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15062457"
+    ],
+    "resources": [
+      {
+        "ieso": "NANTICOKE SOLAR"
+      }
+    ],
+    "notes": "Built on the former Nanticoke coal station site.",
+    "reviewFlag": false
+  },
+  {
+    "id": "southgate-solar",
+    "name": "Southgate Solar",
+    "technology": "solar",
+    "subtype": "Utility-scale PV",
+    "operator": "Southgate Solar LP (Samsung)",
+    "owner": null,
+    "municipality": "Southgate",
+    "region": "West",
+    "lat": 44.09915,
+    "lon": -80.74595,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15577906 (power=plant)",
+    "installedCapacityMW": 50,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15577906"
+    ],
+    "resources": [
+      {
+        "ieso": "SOUTHGATE SF"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "stone-mills-solar",
+    "name": "Stone Mills Solar",
+    "technology": "solar",
+    "subtype": "Utility-scale PV",
+    "operator": "DIF Infrastructure (OSM tag)",
+    "owner": null,
+    "municipality": "Stone Mills",
+    "region": "East",
+    "lat": 44.29582,
+    "lon": -76.89545,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap way 525387527 (power=plant)",
+    "installedCapacityMW": 11,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/525387527"
+    ],
+    "resources": [
+      {
+        "ieso": "STONE MILLS SF"
+      }
+    ],
+    "notes": "OSM feature named 'Stone Mills' (11 MW tag); IESO-registered capacity may differ. Verify.",
+    "reviewFlag": true
+  },
+  {
+    "id": "windsor-airport-solar",
+    "name": "Windsor Solar (Windsor Airport)",
+    "technology": "solar",
+    "subtype": "Utility-scale PV",
+    "operator": "Samsung Renewable Energy",
+    "owner": null,
+    "municipality": "Windsor",
+    "region": "West",
+    "lat": 42.28397,
+    "lon": -82.93226,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 732008131 (power=plant)",
+    "installedCapacityMW": 50,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/732008131",
+      "https://www.openstreetmap.org/way/732008135"
+    ],
+    "resources": [
+      {
+        "ieso": "WINDSOR AIRPORT SF"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "northland-power-solar",
+    "name": "Northland Power Solar Facilities (aggregate)",
+    "technology": "solar",
+    "subtype": "Utility-scale PV",
+    "operator": "Northland Power",
+    "owner": "Northland Power",
+    "municipality": "Multiple sites (eastern & northeastern Ontario)",
+    "region": null,
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "NORTHLAND POWER SOLAR FACILITIES"
+      }
+    ],
+    "notes": "This IESO resource aggregates several Northland Power ground-mount solar farms (e.g. Belleville North/South, Burk's Falls East/West, Crosby, North Burgess, Rideau Lakes, McCann, Glendale, and Cochrane-area projects Abitibi, Empire, Martin's Meadows, Long Lake). It cannot honestly be placed at one point, so it is not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "atikokan-gs",
+    "name": "Atikokan GS",
+    "technology": "bioenergy",
+    "subtype": "Biomass",
+    "operator": "Ontario Power Generation",
+    "owner": "Ontario Power Generation",
+    "municipality": "Atikokan",
+    "region": "Northwest",
+    "lat": 48.83563,
+    "lon": -91.56637,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 225965807 (power=plant)",
+    "installedCapacityMW": 205,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/225965807"
+    ],
+    "resources": [
+      {
+        "ieso": "ATIKOKAN-G1"
+      }
+    ],
+    "notes": "Former coal station converted to biomass (wood pellets).",
+    "reviewFlag": false
+  },
+  {
+    "id": "calstock-gs",
+    "name": "Calstock Power Plant",
+    "technology": "bioenergy",
+    "subtype": "Biomass",
+    "operator": null,
+    "owner": null,
+    "municipality": "Calstock (near Hearst)",
+    "region": "Northeast",
+    "lat": 49.74521,
+    "lon": -84.07038,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 253815017 (power=plant)",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/253815017"
+    ],
+    "resources": [
+      {
+        "ieso": "CALSTOCKGS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "thunder-bay-abibow",
+    "name": "Thunder Bay Biomass Cogeneration (Resolute/AbiBow)",
+    "technology": "bioenergy",
+    "subtype": "Biomass cogeneration",
+    "operator": null,
+    "owner": null,
+    "municipality": "Thunder Bay",
+    "region": "Northwest",
+    "lat": 48.35801,
+    "lon": -89.23169,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap way 1240220222 (power=plant)",
+    "installedCapacityMW": 62,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/1240220222"
+    ],
+    "resources": [
+      {
+        "ieso": "TBAYBOWATER CTS"
+      }
+    ],
+    "notes": "Matched to the OSM 'Thunder Bay Abibow power station' at the Thunder Bay pulp & paper mill.",
+    "reviewFlag": false
+  },
+  {
+    "id": "oneida-energy-storage",
+    "name": "Oneida Energy Storage",
+    "technology": "storage",
+    "subtype": "Battery (BESS)",
+    "operator": "Northland Power / Six Nations / NRStor",
+    "owner": null,
+    "municipality": "Haldimand County",
+    "region": "Southwest",
+    "lat": 42.8292,
+    "lon": -80.06088,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap way 1417964762 (power=plant)",
+    "installedCapacityMW": 250,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": 2025,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/way/1417964762",
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "ONEIDA ENERGY STORAGE"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "hagersville-bess",
+    "name": "Hagersville Battery Energy Storage",
+    "technology": "storage",
+    "subtype": "Battery (BESS)",
+    "operator": "Boralex / Six Nations of the Grand River",
+    "owner": null,
+    "municipality": "Haldimand County",
+    "region": "Southwest",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": 300,
+    "capacitySource": "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario",
+    "commissioningYear": 2026,
+    "sourceUrls": [
+      "https://en.wikipedia.org/wiki/List_of_generating_stations_in_Ontario"
+    ],
+    "resources": [
+      {
+        "ieso": "HAGERSVILLE BESS"
+      }
+    ],
+    "notes": "Exact site of this battery storage facility could not be verified from OpenStreetMap or an official source; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "arlen-bess",
+    "name": "Arlen BESS",
+    "technology": "storage",
+    "subtype": "Battery (BESS)",
+    "operator": null,
+    "owner": null,
+    "municipality": null,
+    "region": null,
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [],
+    "resources": [
+      {
+        "ieso": "ARLEN BESS"
+      }
+    ],
+    "notes": "Exact site of this battery storage facility could not be verified from OpenStreetMap or an official source; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "goreway-bess",
+    "name": "Goreway BESS",
+    "technology": "storage",
+    "subtype": "Battery (BESS)",
+    "operator": null,
+    "owner": null,
+    "municipality": "Brampton (presumed, at Goreway Station)",
+    "region": "Toronto",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [],
+    "resources": [
+      {
+        "ieso": "GOREWAY BESS"
+      }
+    ],
+    "notes": "Exact site of this battery storage facility could not be verified from OpenStreetMap or an official source; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "napanee-bess",
+    "name": "Napanee BESS",
+    "technology": "storage",
+    "subtype": "Battery (BESS)",
+    "operator": null,
+    "owner": null,
+    "municipality": "Greater Napanee (presumed)",
+    "region": "East",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [],
+    "resources": [
+      {
+        "ieso": "NAPANEE BESS"
+      }
+    ],
+    "notes": "Exact site of this battery storage facility could not be verified from OpenStreetMap or an official source; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "tilbury-bess",
+    "name": "Tilbury Battery Storage",
+    "technology": "storage",
+    "subtype": "Battery (BESS)",
+    "operator": null,
+    "owner": null,
+    "municipality": "Chatham-Kent / Lakeshore (presumed)",
+    "region": "West",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [],
+    "resources": [
+      {
+        "ieso": "TILBURY BATTERY STORAGE"
+      }
+    ],
+    "notes": "Exact site of this battery storage facility could not be verified from OpenStreetMap or an official source; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "vaughan-1-bess",
+    "name": "Vaughan 1 BESS",
+    "technology": "storage",
+    "subtype": "Battery (BESS)",
+    "operator": null,
+    "owner": null,
+    "municipality": "Vaughan (presumed)",
+    "region": "Toronto",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [],
+    "resources": [
+      {
+        "ieso": "VAUGHAN 1 BESS"
+      }
+    ],
+    "notes": "Exact site of this battery storage facility could not be verified from OpenStreetMap or an official source; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "york-bess",
+    "name": "York BESS",
+    "technology": "storage",
+    "subtype": "Battery (BESS)",
+    "operator": null,
+    "owner": null,
+    "municipality": "King Township (presumed, near York Energy Centre)",
+    "region": "Toronto",
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [],
+    "resources": [
+      {
+        "ieso": "YORK BESS"
+      }
+    ],
+    "notes": "Exact site of this battery storage facility could not be verified from OpenStreetMap or an official source; not plotted.",
+    "reviewFlag": true
+  }
+]

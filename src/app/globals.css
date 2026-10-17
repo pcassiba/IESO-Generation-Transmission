@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root,
+.dark {
+  --bg: #070b14;
+  --panel: #0e1525;
+  --hover: #1a2438;
+  --border: #1f2a40;
+  --fg: #e2e8f0;
+  --muted: #8b98ae;
+  --grid: #1f2a40;
+}
+
+.light {
+  --bg: #f1f5f9;
+  --panel: #ffffff;
+  --hover: #eef2f7;
+  --border: #d5dde8;
+  --fg: #0f172a;
+  --muted: #5b6b82;
+  --grid: #e2e8f0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+}
+
+.font-mono {
+  font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
+}
+
+/* Light-mode adjustments for hover utilities used in dark-first markup */
+.light .hover\:bg-white\/5:hover,
+.light .hover\:bg-white\/10:hover {
+  background: var(--hover);
+}
+.light .bg-black\/20 {
+  background: #f1f5f9;
+}
+
+.ring-dashed {
+  --tw-ring-color: transparent;
+  outline: 1px dashed rgb(239 68 68 / 0.7);
+}
+
+/* MapLibre tooltip */
+.oge-popup .maplibregl-popup-content {
+  background: var(--panel);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+}
+.oge-popup .maplibregl-popup-tip {
+  display: none;
+}
+.oge-tip-title {
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.oge-tip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.oge-tip-row b {
+  color: var(--fg);
+  font-weight: 500;
+}
+
+.maplibregl-ctrl-group {
+  background: var(--panel) !important;
+  border: 1px solid var(--border);
+}
+.dark .maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1);
+}
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
