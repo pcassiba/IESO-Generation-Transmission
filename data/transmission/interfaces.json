@@ -1,0 +1,39 @@
+{
+  "_about": "Mapping between IESO transmission interfaces (names used in the TxLimits reports) and the map's network. Only stations and circuits with a stated basis are listed; an interface with nothing here is shown in the Unmapped panel. 'stations' are matched to OSM substations by name (see station-aliases.json); 'circuits' to OSM line refs. Edit freely, but give every addition a basis.",
+  "_sources": {
+    "apo2026": "IESO, 2026 Annual Planning Outlook: Ontario's Transmission Interfaces and Interties (March 2026), pp. 5-9. https://ieso.ca/-/media/Files/IESO/Document-Library/planning-forecasts/apo/2026/2026-APO-Ontario-Transmission-Interfaces-and-Interties-Overview.pdf",
+    "name": "The station or circuit is named in the IESO interface name itself.",
+    "osm": "OpenStreetMap line name/ref (e.g. the K21W/K22W ways are named 'Kenora - Whiteshell')."
+  },
+  "interfaces": [
+    { "code": "BLIP", "names": ["Buchanan Longwood Input"], "zones": "West / Southwest", "stations": ["BUCHANAN TS", "LONGWOOD TS"], "circuits": [], "basis": "apo2026 p.5: three 500 kV circuits into Longwood TS and five 230 kV circuits into Buchanan TS" },
+    { "code": "NBLIP", "names": ["Negative Buchanan Longwood Input"], "zones": "West / Southwest", "stations": ["BUCHANAN TS", "LONGWOOD TS"], "circuits": [], "basis": "apo2026 p.5 (same circuits as BLIP, opposite direction)" },
+    { "code": "FABCW", "names": ["Flow Away From Bruce Complex and Wind"], "zones": "Bruce", "stations": ["BRUCE A SS", "BRUCE B SS"], "circuits": [], "basis": "apo2026 p.5: six 230 kV and six 500 kV circuits at the Bruce stations" },
+    { "code": "QFW", "names": ["Queenston Flow West"], "zones": "Niagara / Southwest", "stations": ["BECK 2 TS", "MIDDLEPORT TS"], "circuits": [], "basis": "apo2026 p.5: four 230 kV circuits out of Beck 2 TS, three into Middleport TS" },
+    { "code": "FETT", "names": ["Flow East To Toronto"], "zones": "West / Toronto", "stations": ["CLAIREVILLE TS", "ORANGEVILLE TS", "ESSA TS", "TRAFALGAR TS", "RICHVIEW TS", "HURONTARIO SS"], "circuits": [], "basis": "apo2026 pp.5-6" },
+    { "code": "FIO", "names": ["Flow Into Ottawa"], "zones": "East / Ottawa", "stations": ["LENNOX TS", "ST. ISIDORE TS", "ST. LAWRENCE TS", "MERIVALE TS"], "circuits": [], "basis": "apo2026 p.6 (Chats Falls also listed; not on the map)" },
+    { "code": "CLAN", "names": ["Claireville North"], "zones": "Toronto / Essa", "stations": ["CLAIREVILLE TS"], "circuits": [], "basis": "apo2026 p.6" },
+    { "code": "FN", "names": ["Flow North"], "zones": "Essa / Northeast", "stations": ["ESSA TS", "OTTO HOLDEN TS"], "circuits": [], "basis": "apo2026 p.7" },
+    { "code": "FS", "names": ["Flow South"], "zones": "Essa / Northeast", "stations": ["ESSA TS", "OTTO HOLDEN TS"], "circuits": [], "basis": "apo2026 p.7" },
+    { "code": "EWTW", "names": ["East-West Transfer West"], "zones": "Northeast / Northwest", "stations": ["MARATHON TS", "WAWA TS"], "circuits": [], "basis": "apo2026 p.7: four 230 kV circuits Marathon - Wawa" },
+    { "code": "EWTE", "names": ["East-West Transfer East"], "zones": "Northeast / Northwest", "stations": ["MARATHON TS", "WAWA TS"], "circuits": [], "basis": "apo2026 p.7" },
+    { "code": "MISSW", "names": ["Transfer West of Mississagi", "Mississagi Flow West"], "zones": "Northeast", "stations": ["MISSISSAGI TS", "ALGOMA TS", "HANMER TS"], "circuits": [], "basis": "apo2026 p.7" },
+    { "code": "MISSE", "names": ["Transfer East of Mississagi", "Mississagi Flow East"], "zones": "Northeast", "stations": ["MISSISSAGI TS", "ALGOMA TS", "HANMER TS"], "circuits": [], "basis": "apo2026 p.7" },
+    { "code": "FID", "names": ["Flow into Dobbin"], "zones": "East", "stations": ["DOBBIN TS"], "circuits": [], "basis": "name" },
+    { "code": "DOBBIN-115", "names": ["115 kV Dobbin Area Load"], "zones": "East", "stations": ["DOBBIN TS"], "circuits": [], "basis": "name" },
+    { "code": "X1P-FID", "names": ["X1P Flow Into Dobbin"], "zones": "East", "stations": ["DOBBIN TS"], "circuits": ["X1P"], "basis": "name" },
+    { "code": "P33C", "names": ["P33C Chats Falls Inflow"], "zones": "Ottawa", "stations": [], "circuits": ["P33C"], "basis": "name" },
+    { "code": "P502X", "names": ["P502X"], "zones": "Southwest", "stations": [], "circuits": ["P502X"], "basis": "name" },
+    { "code": "TEM", "names": ["Transfer East of Mackenzie"], "zones": "Northwest", "stations": ["MACKENZIE TS"], "circuits": [], "basis": "name" },
+    { "code": "MMW", "names": ["Mackenzie Moose Lake Flow West"], "zones": "Northwest", "stations": ["MACKENZIE TS"], "circuits": [], "basis": "name (Moose Lake not on the map)" },
+    { "code": "SLW", "names": ["St. Lawrence West"], "zones": "East", "stations": ["ST. LAWRENCE TS"], "circuits": [], "basis": "name" },
+    { "code": "DAI", "names": ["Dryden Area Inflow"], "zones": "Northwest", "stations": ["DRYDEN TS"], "circuits": [], "basis": "name" },
+    { "code": "FAI", "names": ["Fort Frances Area Inflow"], "zones": "Northwest", "stations": ["FORT FRANCES TS"], "circuits": [], "basis": "name" },
+    { "code": "WMFE-230", "names": ["Wawa MacKay Flow East-230"], "zones": "Northeast", "stations": ["WAWA TS"], "circuits": [], "basis": "name (MacKay not on the map)" },
+    { "code": "CHIP", "names": ["Chatham Input"], "zones": "West", "stations": ["CHATHAM SS"], "circuits": [], "basis": "name" },
+    { "code": "KAO", "names": ["Kenora Area Outflow"], "zones": "Northwest", "stations": [], "circuits": [], "basis": "no Kenora station on the map; listed as unmapped unless a comment names mapped equipment" },
+    { "code": "TEK", "names": ["Transfer East of Kenora"], "zones": "Northwest", "stations": [], "circuits": [], "basis": "as KAO" },
+    { "code": "ON-NY", "names": ["Ontario-New York Import", "Ontario-New York Export"], "zones": "Niagara / East", "stations": ["ST. LAWRENCE TS"], "circuits": ["L33P", "L34P"], "basis": "apo2026 p.8: St. Lawrence ties are L33P and L34P; the Niagara tie points are not named, so the interface is only partly drawn" },
+    { "code": "ON-MB", "names": ["Ontario-Manitoba Import", "Ontario-Manitoba Export", "Manitoba-Ontario Import", "Manitoba X Ontario Import", "Ontario-Manitoba Transfer East", "Ontario-Manitoba Transfer West"], "zones": "Northwest", "stations": [], "circuits": ["K21W", "K22W"], "basis": "apo2026 p.8 (two 230 kV circuits plus one 115 kV); osm: K21W/K22W ways named 'Kenora - Whiteshell'. The 115 kV tie is not identified" }
+  ]
+}

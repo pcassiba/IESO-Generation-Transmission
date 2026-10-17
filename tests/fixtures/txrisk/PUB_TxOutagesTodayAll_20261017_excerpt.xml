@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://reports.ieso.ca/docrefs/stylesheet/TxOutagesTodayAll_HTML_t1-1.xsl"?>
+<!-- Excerpt of the live report published 2026-10-17T11:03:33 (EST): structure and records copied from it, a subset of the 69+ requests. -->
+<Document xmlns="http://www.ieso.ca/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ieso.ca/schema TxOutagesTodayAll_r1.xsd" docID="TxOutagesTodayAll">
+  <DocHeader>
+    <DocTitle>All Transmission Outages Occurring Today</DocTitle>
+    <DocRevision>1</DocRevision>
+    <DocConfidentiality><DocConfClass>PUB</DocConfClass></DocConfidentiality>
+    <CreatedAt>2026-10-17T11:03:33</CreatedAt>
+  </DocHeader>
+  <DocBody>
+    <OutageRangeStart>2026-10-17T00:00:00</OutageRangeStart>
+    <OutageRangeEnd>2026-10-17T23:59:59</OutageRangeEnd>
+    <OutageRequest>
+      <OutageID>1-00018154</OutageID>
+      <PlannedStart>2017-02-07T11:05:00</PlannedStart>
+      <PlannedEnd>2026-12-31T22:59:00</PlannedEnd>
+      <Priority>FE</Priority>
+      <Recurrence>C</Recurrence>
+      <EquipmentRequested><EquipmentName>B5D-B31L SS JCT 93B5D-Q</EquipmentName><EquipmentType>Disconnect</EquipmentType><EquipmentVoltage>230 kV</EquipmentVoltage><ConstraintType>IS</ConstraintType></EquipmentRequested>
+      <EquipmentRequested><EquipmentName>BEAUHARNOIS GS L4B11</EquipmentName><EquipmentType>Disconnect</EquipmentType><EquipmentVoltage>230 kV</EquipmentVoltage><ConstraintType>IS</ConstraintType></EquipmentRequested>
+      <EquipmentRecallTime>2 Hour(s)</EquipmentRecallTime>
+      <OutageRequestStatus>IMPL</OutageRequestStatus>
+    </OutageRequest>
+    <OutageRequest>
+      <OutageID>1-00225094</OutageID>
+      <PlannedStart>2019-11-08T08:00:00</PlannedStart>
+      <PlannedEnd>2026-12-03T16:00:00</PlannedEnd>
+      <Priority>F</Priority>
+      <Recurrence>C</Recurrence>
+      <EquipmentRequested><EquipmentName>C20R: CHERRYWOOD TS x RICHVIEW TS</EquipmentName><EquipmentType>Line</EquipmentType><EquipmentVoltage>230 kV</EquipmentVoltage><ConstraintType>PROT OOS</ConstraintType></EquipmentRequested>
+      <EquipmentRecallTime>Non-recallable</EquipmentRecallTime>
+      <OutageRequestStatus>IMPL</OutageRequestStatus>
+    </OutageRequest>
+    <OutageRequest>
+      <OutageID>1-00254393</OutageID>
+      <PlannedStart>2024-05-14T13:00:00</PlannedStart>
+      <PlannedEnd>2027-12-30T16:00:00</PlannedEnd>
+      <Priority>F</Priority>
+      <Recurrence>C</Recurrence>
+      <EquipmentRequested><EquipmentName>K21W.WHXKE</EquipmentName><EquipmentType>LineSection</EquipmentType><EquipmentVoltage>230 kV</EquipmentVoltage><ConstraintType>OOS</ConstraintType></EquipmentRequested>
+      <EquipmentRecallTime>Non-recallable</EquipmentRecallTime>
+      <OutageRequestStatus>IMPL</OutageRequestStatus>
+    </OutageRequest>
+    <OutageRequest>
+      <OutageID>1-00269611</OutageID>
+      <PlannedStart>2024-10-27T08:00:00</PlannedStart>
+      <PlannedEnd>2026-12-31T16:00:00</PlannedEnd>
+      <Priority>F</Priority>
+      <Recurrence>C</Recurrence>
+      <EquipmentRequested><EquipmentName>NANTICOKE TS T13</EquipmentName><EquipmentType>PowerTransformer</EquipmentType><EquipmentVoltage>500 kV</EquipmentVoltage><ConstraintType>OOS</ConstraintType></EquipmentRequested>
+      <EquipmentRecallTime>Non-recallable</EquipmentRecallTime>
+      <OutageRequestStatus>IMPL</OutageRequestStatus>
+    </OutageRequest>
+    <OutageRequest>
+      <OutageID>1-00275116</OutageID>
+      <PlannedStart>2026-10-17T08:00:00</PlannedStart>
+      <PlannedEnd>2026-10-17T16:00:00</PlannedEnd>
+      <Priority>P</Priority>
+      <Recurrence>RE</Recurrence>
+      <EquipmentRequested><EquipmentName>L33P.ROXLA</EquipmentName><EquipmentType>LineSection</EquipmentType><EquipmentVoltage>230 kV</EquipmentVoltage><ConstraintType>HOLDOFF</ConstraintType></EquipmentRequested>
+      <EquipmentRecallTime>Immediate</EquipmentRecallTime>
+      <OutageRequestStatus>STDY</OutageRequestStatus>
+    </OutageRequest>
+    <OutageRequest>
+      <OutageID>1-00289214</OutageID>
+      <PlannedStart>2026-10-15T08:15:00</PlannedStart>
+      <PlannedEnd>2026-10-28T16:00:00</PlannedEnd>
+      <Priority>P</Priority>
+      <Recurrence>C</Recurrence>
+      <EquipmentRequested><EquipmentName>Q28A.ALXAB</EquipmentName><EquipmentType>LineSection</EquipmentType><EquipmentVoltage>230 kV</EquipmentVoltage><ConstraintType>OOS</ConstraintType></EquipmentRequested>
+      <EquipmentRecallTime>4 Hour(s)</EquipmentRecallTime>
+      <OutageRequestStatus>AA</OutageRequestStatus>
+    </OutageRequest>
+    <OutageRequest>
+      <OutageID>1-00290050</OutageID>
+      <PlannedStart>2026-09-30T03:30:00</PlannedStart>
+      <PlannedEnd>2026-10-23T12:30:00</PlannedEnd>
+      <Priority>P</Priority>
+      <Recurrence>C</Recurrence>
+      <EquipmentRequested><EquipmentName>M30A.AJXEJ</EquipmentName><EquipmentType>LineSection</EquipmentType><EquipmentVoltage>230 kV</EquipmentVoltage><ConstraintType>OOS</ConstraintType></EquipmentRequested>
+      <EquipmentRequested><EquipmentName>M30A.ALXME</EquipmentName><EquipmentType>LineSection</EquipmentType><EquipmentVoltage>230 kV</EquipmentVoltage><ConstraintType>OOS</ConstraintType></EquipmentRequested>
+      <EquipmentRecallTime>8 Hour(s)</EquipmentRecallTime>
+      <OutageRequestStatus>IMPL</OutageRequestStatus>
+    </OutageRequest>
+    <OutageRequest>
+      <OutageID>1-00295577</OutageID>
+      <PlannedStart>2026-10-04T07:00:00</PlannedStart>
+      <PlannedEnd>2026-10-17T16:00:00</PlannedEnd>
+      <Priority>P</Priority>
+      <Recurrence>C</Recurrence>
+      <EquipmentRequested><EquipmentName>CLAIREVILLE TS HT16_BUS</EquipmentName><EquipmentType>Bus</EquipmentType><EquipmentVoltage>230 kV</EquipmentVoltage><ConstraintType>OOS</ConstraintType></EquipmentRequested>
+      <EquipmentRequested><EquipmentName>CLAIREVILLE TS T16</EquipmentName><EquipmentType>PowerTransformer</EquipmentType><EquipmentVoltage>500 kV</EquipmentVoltage><ConstraintType>OOS</ConstraintType></EquipmentRequested>
+      <EquipmentRecallTime>1 Day(s)</EquipmentRecallTime>
+      <OutageRequestStatus>FA</OutageRequestStatus>
+    </OutageRequest>
+    <OutageRequest>
+      <OutageID>1-00103070</OutageID>
+      <PlannedStart>2018-12-03T18:27:00</PlannedStart>
+      <PlannedEnd>2026-12-31T22:00:00</PlannedEnd>
+      <Priority>FE</Priority>
+      <Recurrence>C</Recurrence>
+      <EquipmentRequested><EquipmentName>MAJESTIC CTS T1B</EquipmentName><EquipmentType>Breaker</EquipmentType><EquipmentVoltage>50 kV</EquipmentVoltage><ConstraintType>INFO</ConstraintType></EquipmentRequested>
+      <EquipmentRequested><EquipmentName>MAJESTIC CTS T2B</EquipmentName><EquipmentType>Breaker</EquipmentType><EquipmentVoltage>50 kV</EquipmentVoltage><ConstraintType>INFO</ConstraintType></EquipmentRequested>
+      <EquipmentRecallTime>Non-recallable</EquipmentRecallTime>
+      <OutageRequestStatus>IMPL</OutageRequestStatus>
+    </OutageRequest>
+  </DocBody>
+</Document>

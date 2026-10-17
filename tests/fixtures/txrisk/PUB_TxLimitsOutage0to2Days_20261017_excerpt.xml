@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://reports.ieso.ca/docrefs/stylesheet/TxLimitsOutage0to2Days_HTML_t1-1.xsl"?>
+<!-- Excerpt of the live report published 2026-10-17T11:45:01 (EST): 5 of its 22 records. -->
+<Document xmlns="http://www.ieso.ca/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ieso.ca/schema TxLimitsOutage0to2Days_r1.xsd" docID="TxLimitsOutage0to2Days">
+  <DocHeader>
+    <DocTitle>Transmission Facility Outage Limits Report (Days 0 to 2)</DocTitle>
+    <DocRevision>1</DocRevision>
+    <DocConfidentiality><DocConfClass>PUB</DocConfClass></DocConfidentiality>
+    <CreatedAt>2026-10-17T11:45:01</CreatedAt>
+  </DocHeader>
+  <DocBody>
+    <DateRangeStart>2026-10-17</DateRangeStart>
+    <DateRangeEnd>2026-10-19</DateRangeEnd>
+    <TransmissionFacilityData>
+      <TransmissionFacility>Internal</TransmissionFacility>
+      <InterfaceData><InterfaceName>East-West Transfer East [EWTE]</InterfaceName><IssueDate>2026-04-07T08:23:13</IssueDate><StartDate>2026-04-02T20:43:00</StartDate><EndDate>2027-12-30T16:00:00</EndDate><OperatingLimit>475</OperatingLimit><Comments>K21W O/S</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>Kenora Area Outflow [KAO]</InterfaceName><IssueDate>2026-10-13T11:40:55</IssueDate><StartDate>2026-10-09T06:45:00</StartDate><EndDate>2026-10-20T07:00:00</EndDate><OperatingLimit>120</OperatingLimit><Comments>Mackenzie PL30 O/S</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>St. Lawrence West [SLW]</InterfaceName><IssueDate>2026-10-06T09:14:56</IssueDate><StartDate>2026-10-13T23:01:00</StartDate><EndDate>2026-10-28T23:59:00</EndDate><OperatingLimit>1120</OperatingLimit><Comments>NYISO - MSU1 O/S</Comments></InterfaceData>
+    </TransmissionFacilityData>
+    <TransmissionFacilityData>
+      <TransmissionFacility>Intertie</TransmissionFacility>
+      <InterfaceData><InterfaceName>Ontario-Quebec Bryson 115 kV Import Winter or Summer</InterfaceName><IssueDate>2026-03-02T10:20:39</IssueDate><StartDate>2025-10-27T07:00:00</StartDate><EndDate>2026-12-31T09:00:00</EndDate><OperatingLimit>0</OperatingLimit><Comments>X2Y O/S at Bryson</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>Ontario-New York Import </InterfaceName><IssueDate>2026-10-13T11:25:09</IssueDate><StartDate>2026-09-15T04:00:00</StartDate><EndDate>2026-11-17T23:30:00</EndDate><OperatingLimit>1250</OperatingLimit><Comments>PA27 O/S</Comments></InterfaceData>
+    </TransmissionFacilityData>
+  </DocBody>
+</Document>

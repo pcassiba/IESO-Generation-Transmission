@@ -59,3 +59,12 @@ to use an external PostgreSQL / Supabase instance instead.
   `data/transmission/pricing-locations.json`. Unlinked generator locations are listed in the Congestion panel.
 - Settings: `CONGESTION_ENABLED=0` turns fetching off; `CONGESTION_LMP_DAYS`, `CONGESTION_CONSTRAINT_DAYS`,
   `CONGESTION_THRESHOLD` (default 2 $/MWh) tune it.
+
+## Transmission outages and congestion risk
+
+Toggle **Show Outages & Congestion Risk** above the map (or the ⚡ toolbar button). It reads four IESO
+public reports through the app's backend, highlights matched equipment (red = confirmed outage,
+orange = published restriction, yellow = potential congestion, purple = scheduled, pink = binding
+constraint), and adds a time selector and a searchable table. Full notes on the report schemas,
+matching rules, scoring and known gaps: [docs/transmission-outages.md](docs/transmission-outages.md).
+`npm run txrisk:check` downloads the live reports and prints what parses and what matches the map.

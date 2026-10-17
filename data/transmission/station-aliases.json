@@ -1,0 +1,7 @@
+{
+  "_about": "IESO station name → OpenStreetMap substation name, for stations whose names differ beyond the automatic normalisation (Transformer Station → TS, Switching Station/Switchyard → SS, punctuation removed). Only add pairs that are certainly the same station.",
+  "BUCHANAN TS": "E. V. Buchanan Transformer Station",
+  "WINDSOR LAUZON TS": "Lauzon Transformer Station",
+  "ELLIOTT LAKE TS": "Elliot Lake TS",
+  "CHATHAM SS": "Chatham Switching Station"
+}

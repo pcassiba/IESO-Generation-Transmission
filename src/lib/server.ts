@@ -5,6 +5,7 @@ import { getDb, type Db } from "./db";
 import { facilitiesDir, loadFacilityFiles, seedFacilities, validateFacilities, type MetadataIssue } from "./facilities";
 import { syncCongestion } from "./ieso/congestion-ingest";
 import { backfill, ingestDaily, ingestLatest, missingDailyDates } from "./ieso/ingest";
+import { refreshAll as refreshTxRisk } from "./txrisk/store";
 
 /**
  * Process-wide bootstrap: DB schema, facility metadata seeding, and the polling
@@ -94,6 +95,8 @@ export async function pollOnce(db: Db): Promise<void> {
     /* non-fatal */
   }
   void pollCongestion(db);
+  // Transmission outage and limit reports; each is re-checked on its own publication cadence.
+  if (process.env.TXRISK_ENABLED !== "0") void refreshTxRisk().catch((e) => console.warn(`[txrisk] ${(e as Error).message}`));
 }
 
 /** Price and constraint reports: runs in the background, never blocks the generator poll. */
