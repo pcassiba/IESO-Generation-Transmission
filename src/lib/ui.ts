@@ -20,6 +20,10 @@ export const STATUS_COLOR: Record<OperationalStatus, string> = {
   unknown: "#6b7280",
 };
 
+/** Congestion halos: negative = generation held back, positive = import-constrained. */
+export const CONGESTION_NEG = "#22d3ee";
+export const CONGESTION_POS = "#f43f5e";
+
 export const STORAGE_MODE_COLOR: Record<StorageMode, string> = {
   discharging: "#22c55e",
   charging: "#06b6d4",

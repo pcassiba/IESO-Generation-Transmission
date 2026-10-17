@@ -2,13 +2,17 @@
 
 import type { Map as MLMap } from "maplibre-gl";
 import dynamic from "next/dynamic";
-import { AlertTriangle, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling } from "lucide-react";
+import { Activity, AlertTriangle, Cable, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CongestionResponse } from "@/lib/congestion";
+import { DEFAULT_VISIBLE, VOLTAGE_CLASSES, VOLTAGE_COLOR, VOLTAGE_LABEL, type VoltageClass } from "@/lib/transmission";
 import type { FacilityState, StateResponse } from "@/lib/types";
 import { STATUSES, STATUS_LABEL, STORAGE_MODE_LABEL, TECHNOLOGIES, TECHNOLOGY_LABEL } from "@/lib/types";
 import { toCsv } from "@/lib/csv";
 import { hourEndingLabel } from "@/lib/time";
+import { CONGESTION_NEG, CONGESTION_POS } from "@/lib/ui";
 import ComparePanel from "./ComparePanel";
+import CongestionPanel from "./CongestionPanel";
 import Dashboard from "./Dashboard";
 import DetailPanel from "./DetailPanel";
 import Header from "./Header";
@@ -43,6 +47,12 @@ export default function Explorer() {
   const [modal, setModal] = useState<"methodology" | "coverage" | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(true);
+  const [showLines, setShowLines] = useState(true);
+  const [lineClasses, setLineClasses] = useState<Record<VoltageClass, boolean>>(DEFAULT_VISIBLE);
+  const [txStatus, setTxStatus] = useState<"ok" | "missing" | null>(null);
+  const [showCongestion, setShowCongestion] = useState(false);
+  const [congestion, setCongestion] = useState<CongestionResponse | null>(null);
+  const [congestionError, setCongestionError] = useState<string | null>(null);
   const mapRef = useRef<MLMap | null>(null);
 
   const load = useCallback(async (ts: string | null) => {
@@ -68,6 +78,35 @@ export default function Explorer() {
     document.documentElement.classList.toggle("dark", theme === "dark");
     document.documentElement.classList.toggle("light", theme === "light");
   }, [theme]);
+
+  // Congestion follows the selected hour (or the latest hour, refreshed with the rest of the state).
+  const congestionTs = state?.meta.mode === "historical" ? state.meta.selectedTsUtc : null;
+  const stateKey = state?.meta.latestTsUtc;
+  useEffect(() => {
+    if (!showCongestion) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/congestion${congestionTs ? `?ts=${encodeURIComponent(congestionTs)}` : ""}`, { cache: "no-store" });
+        const j = await res.json();
+        if (!res.ok || j.error) throw new Error(j.error ?? `HTTP ${res.status}`);
+        if (!cancelled) {
+          setCongestion(j);
+          setCongestionError(null);
+        }
+      } catch (e) {
+        if (!cancelled) setCongestionError((e as Error).message);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [showCongestion, congestionTs, stateKey]);
+
+  const lineVisibility = useMemo(
+    () => Object.fromEntries(VOLTAGE_CLASSES.map((c) => [c, showLines && lineClasses[c]])) as Record<VoltageClass, boolean>,
+    [showLines, lineClasses],
+  );
 
   const all = useMemo(() => state?.facilities ?? [], [state]);
   const filtered = useMemo(() => applyFilters(all, filters), [all, filters]);
@@ -196,6 +235,9 @@ export default function Explorer() {
             scaleByCapacity={scaleByCapacity}
             command={command}
             onMapReady={(m) => (mapRef.current = m)}
+            lineVisibility={lineVisibility}
+            congestion={showCongestion ? congestion : null}
+            onTransmissionStatus={setTxStatus}
           />
 
           {/* Map toolbar */}
@@ -204,6 +246,8 @@ export default function Explorer() {
               { icon: <Home size={15} />, title: "Reset to full province", on: () => setCommand({ kind: "reset", nonce: Date.now() }) },
               { icon: <Expand size={15} />, title: "Fit all plotted facilities", on: () => setCommand({ kind: "fitAll", nonce: Date.now() }) },
               { icon: <Scaling size={15} />, title: `Marker size by installed capacity: ${scaleByCapacity ? "on" : "off"}`, on: () => setScaleByCapacity((s) => !s), active: scaleByCapacity },
+              { icon: <Cable size={15} />, title: `Transmission lines: ${showLines ? "on" : "off"}`, on: () => setShowLines((s) => !s), active: showLines },
+              { icon: <Activity size={15} />, title: `Congestion (IESO nodal prices): ${showCongestion ? "on" : "off"}`, on: () => setShowCongestion((s) => !s), active: showCongestion },
               { icon: <Layers size={15} />, title: "Toggle legend", on: () => setLegendOpen((s) => !s), active: legendOpen },
               { icon: <Download size={15} />, title: "Export", on: () => setExportOpen((s) => !s), active: exportOpen },
             ].map((b) => (
@@ -213,7 +257,7 @@ export default function Explorer() {
             ))}
           </div>
           {exportOpen && (
-            <div className="absolute left-12 top-[132px] z-20 w-60 rounded border border-[var(--border)] bg-[var(--panel)] p-1 text-xs shadow-xl">
+            <div className="absolute left-12 top-[196px] z-20 w-60 rounded border border-[var(--border)] bg-[var(--panel)] p-1 text-xs shadow-xl">
               <button onClick={exportFacilities} className="flex w-full items-center gap-2 rounded px-2 py-1.5 hover:bg-[var(--hover)]">
                 <FileSpreadsheet size={13} /> Filtered facilities (CSV)
               </button>
@@ -246,6 +290,38 @@ export default function Explorer() {
                   </span>
                 ))}
               </div>
+              {showLines && (
+                <>
+                  <div className="mb-1 mt-2 font-semibold uppercase tracking-wide text-[var(--muted)]">Transmission</div>
+                  {txStatus === "missing" ? (
+                    <div className="max-w-56 text-amber-400">
+                      Line data not built yet. Run <span className="font-mono">npm run build:transmission</span> once, then reload.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-0.5">
+                      {VOLTAGE_CLASSES.map((c) => (
+                        <label key={c} className="flex cursor-pointer items-center gap-1.5">
+                          <input type="checkbox" className="h-3 w-3" checked={lineClasses[c]} onChange={() => setLineClasses((v) => ({ ...v, [c]: !v[c] }))} />
+                          <span className="inline-block h-[3px] w-5 rounded" style={{ background: VOLTAGE_COLOR[c], opacity: c === "unknown" ? 0.6 : 1 }} />
+                          {VOLTAGE_LABEL[c]}
+                        </label>
+                      ))}
+                      <span className="text-[10px] text-[var(--muted)]">Lines © OpenStreetMap contributors</span>
+                    </div>
+                  )}
+                </>
+              )}
+              {showCongestion && (
+                <>
+                  <div className="mb-1 mt-2 font-semibold uppercase tracking-wide text-[var(--muted)]">Congestion (halo)</div>
+                  <span className="flex items-center gap-1.5">
+                    <span className="inline-block h-3 w-3 rounded-full border-2" style={{ borderColor: CONGESTION_NEG, background: `${CONGESTION_NEG}55` }} /> Output held back (negative)
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="inline-block h-3 w-3 rounded-full border-2" style={{ borderColor: CONGESTION_POS, background: `${CONGESTION_POS}55` }} /> Import-constrained (positive)
+                  </span>
+                </>
+              )}
               {unplottedFiltered > 0 && (
                 <button className="mt-2 text-amber-400 hover:underline" onClick={() => setModal("coverage")}>
                   {unplottedFiltered} matching facilit{unplottedFiltered === 1 ? "y" : "ies"} not plotted (unverified location)
@@ -253,6 +329,7 @@ export default function Explorer() {
               )}
             </div>
           )}
+          {showCongestion && <CongestionPanel data={congestion} error={congestionError} facilities={all} onPick={pick} onClose={() => setShowCongestion(false)} />}
         </main>
 
         {selected && meta && (

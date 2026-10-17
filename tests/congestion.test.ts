@@ -17,6 +17,7 @@ describe("pricing location matching", () => {
     expect(nodeOf("BUCHANAN-230:LMP")).toBe("BUCHANAN");
     expect(resourceBase("BRUCEB-G5")).toBe("BRUCEB");
     expect(resourceBase("BECK2 PGS")).toBe("BECK2PGS");
+    expect(resourceBase("SANDUSK-LT.AG_T1")).toBe("SANDUSK");
   });
 
   it("links facilities by exact name, node, and manual override", () => {

@@ -3,9 +3,11 @@
 import * as maplibregl from "maplibre-gl";
 import type { GeoJSONSource, Map as MLMap, MapLayerMouseEvent } from "maplibre-gl";
 import { useEffect, useRef } from "react";
+import type { CongestionResponse } from "@/lib/congestion";
+import { VOLTAGE_CLASSES, VOLTAGE_COLOR, type VoltageClass } from "@/lib/transmission";
 import type { FacilityState, OperationalStatus, Technology } from "@/lib/types";
 import { STATUSES, STATUS_LABEL, TECHNOLOGIES, TECHNOLOGY_LABEL, STORAGE_MODE_LABEL } from "@/lib/types";
-import { MAP_STYLES, ONTARIO_BOUNDS, TECH_COLOR, fmtMW, markerSvg } from "@/lib/ui";
+import { CONGESTION_NEG, CONGESTION_POS, MAP_STYLES, ONTARIO_BOUNDS, TECH_COLOR, fmtMW, markerSvg } from "@/lib/ui";
 
 export interface MapCommand {
   kind: "reset" | "fitAll" | "flyTo";
@@ -21,6 +23,11 @@ interface Props {
   scaleByCapacity: boolean;
   command: MapCommand | null;
   onMapReady?: (map: MLMap) => void;
+  /** Voltage classes to draw; all false hides the transmission layer. */
+  lineVisibility: Record<VoltageClass, boolean>;
+  /** Congestion for the selected hour; null hides the congestion halos. */
+  congestion: CongestionResponse | null;
+  onTransmissionStatus?: (s: "ok" | "missing") => void;
 }
 
 const CLUSTER_MAX_ZOOM = 8;
@@ -122,7 +129,51 @@ function spreadFeatures(map: MLMap, facilities: FacilityState[]) {
   };
 }
 
-function tooltipHtml(f: FacilityState): string {
+const esc = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+
+function lineTooltipHtml(p: Record<string, unknown>): string {
+  const rows = [
+    ["Voltage", p.voltages],
+    ...(p.ref ? [["Circuit", p.ref]] : []),
+    ...(p.operator ? [["Operator", p.operator]] : []),
+    ...(p.circuits ? [["Circuits", p.circuits]] : []),
+    ["Source", `OSM way ${p.osmId}`],
+  ];
+  return `<div class="oge-tip"><div class="oge-tip-title">${esc(p.name ?? (p.cable === true || p.cable === "true" ? "Transmission cable" : "Transmission line"))}</div>${rows
+    .map(([k, v]) => `<div class="oge-tip-row"><span>${k}</span><b>${esc(v)}</b></div>`)
+    .join("")}</div>`;
+}
+
+/** Filter for one transmission layer: visible voltage classes, plus the layer's own condition. */
+function txFilter(vis: Record<VoltageClass, boolean>, part: "known" | "unknown" | "subs" | "labels"): maplibregl.FilterSpecification {
+  const visible = ["in", ["get", "vclass"], ["literal", VOLTAGE_CLASSES.filter((c) => vis[c])]];
+  const extra =
+    part === "known" ? ["!=", ["get", "vclass"], "unknown"] : part === "unknown" ? ["==", ["get", "vclass"], "unknown"] : part === "labels" ? ["has", "name"] : null;
+  return (extra ? ["all", visible, extra] : visible) as unknown as maplibregl.FilterSpecification;
+}
+
+const TX_LAYERS: [string, Parameters<typeof txFilter>[1]][] = [
+  ["tx-casing", "known"],
+  ["tx-lines", "known"],
+  ["tx-unknown", "unknown"],
+  ["tx-subs", "subs"],
+  ["tx-subs-label", "labels"],
+];
+
+function congestionFeatures(facilities: FacilityState[], c: CongestionResponse | null) {
+  const features: GeoJSON.Feature[] = [];
+  if (c) {
+    const byId = new Map(facilities.map((f) => [f.id, f]));
+    for (const fc of c.facilities) {
+      const f = byId.get(fc.facilityId);
+      if (!f || f.lat === null || f.lon === null || fc.congestion === null || Math.abs(fc.congestion) < c.thresholdPerMWh) continue;
+      features.push({ type: "Feature", geometry: { type: "Point", coordinates: [f.lon, f.lat] }, properties: { id: f.id, cong: fc.congestion, mag: Math.abs(fc.congestion) } });
+    }
+  }
+  return { type: "FeatureCollection" as const, features };
+}
+
+function tooltipHtml(f: FacilityState, cong?: { congestion: number | null; lmp: number | null }): string {
   const vg = f.technology === "wind" || f.technology === "solar";
   const rows = [
     ["Type", `${TECHNOLOGY_LABEL[f.technology]}${f.subtype ? ` · ${f.subtype}` : ""}`],
@@ -130,13 +181,14 @@ function tooltipHtml(f: FacilityState): string {
     [vg ? "Available capacity" : "Reported capability", fmtMW(f.capabilityMW)],
     ...(vg ? [["IESO forecast", fmtMW(f.forecastMW)]] : []),
     ["Status", f.storageMode ? `${STATUS_LABEL[f.status]} (${STORAGE_MODE_LABEL[f.storageMode]})` : STATUS_LABEL[f.status]],
+    ...(cong && cong.congestion !== null ? [["Congestion price", `${cong.congestion.toFixed(2)} $/MWh`], ["Nodal price (LMP)", cong.lmp === null ? "—" : `${cong.lmp.toFixed(2)} $/MWh`]] : []),
   ];
   return `<div class="oge-tip"><div class="oge-tip-title">${f.name}</div>${rows
     .map(([k, v]) => `<div class="oge-tip-row"><span>${k}</span><b>${v}</b></div>`)
     .join("")}</div>`;
 }
 
-export default function MapView({ facilities, selectedId, onSelect, theme, scaleByCapacity, command, onMapReady }: Props) {
+export default function MapView({ facilities, selectedId, onSelect, theme, scaleByCapacity, command, onMapReady, lineVisibility, congestion, onTransmissionStatus }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const facRef = useRef<FacilityState[]>(facilities);
@@ -146,6 +198,10 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
   const themeRef = useRef(theme);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
+  const lineVisRef = useRef(lineVisibility);
+  const congRef = useRef(congestion);
+  const txStatusRef = useRef(onTransmissionStatus);
+  txStatusRef.current = onTransmissionStatus;
 
   const refreshData = () => {
     const map = mapRef.current;
@@ -159,6 +215,7 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     (map.getSource("fac-points") as GeoJSONSource).setData(spread.points);
     (map.getSource("fac-lines") as GeoJSONSource).setData(spread.lines);
     (map.getSource("fac-anchors") as GeoJSONSource).setData(spread.anchors);
+    (map.getSource("cong") as GeoJSONSource | undefined)?.setData(congestionFeatures(located, congRef.current));
     const sel = located.find((f) => f.id === selRef.current);
     const selPt = sel ? spread.points.features.find((p) => p.properties.id === sel.id) : null;
     (map.getSource("fac-selected") as GeoJSONSource).setData({
@@ -171,6 +228,50 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     scaleRef.current
       ? ["case", ["<", ["get", "cap"], 0], 0.62, ["interpolate", ["linear"], ["sqrt", ["get", "cap"]], 0, 0.5, 10, 0.68, 30, 0.9, 60, 1.2]]
       : 0.72;
+
+  const addTransmission = async (map: MLMap) => {
+    if (map.getSource("tx")) return;
+    let lines: GeoJSON.FeatureCollection | null = null;
+    let subs: GeoJSON.FeatureCollection | null = null;
+    try {
+      const [l, s] = await Promise.all([fetch("/geo/transmission.geojson"), fetch("/geo/substations.geojson")]);
+      if (l.ok) lines = await l.json();
+      if (s.ok) subs = await s.json();
+    } catch {
+      /* handled below */
+    }
+    txStatusRef.current?.(lines ? "ok" : "missing");
+    if (!lines || map.getSource("tx")) return;
+    const dark = themeRef.current === "dark";
+    const vis = lineVisRef.current;
+    map.addSource("tx", { type: "geojson", data: lines });
+    const color = ["match", ["get", "vclass"], ...VOLTAGE_CLASSES.flatMap((c) => [c, VOLTAGE_COLOR[c]]), "#64748b"] as unknown as maplibregl.ExpressionSpecification;
+    const width = (k: number): maplibregl.ExpressionSpecification =>
+      ["interpolate", ["linear"], ["zoom"], 4, ["*", k, ["match", ["get", "vclass"], "500", 1.6, "230", 0.9, "115", 0.55, 0.4]], 10, ["*", k, ["match", ["get", "vclass"], "500", 4, "230", 2.6, "115", 1.7, 1.1]]];
+    map.addLayer({ id: "tx-casing", type: "line", source: "tx", filter: txFilter(vis, "known"), layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": dark ? "#020617" : "#ffffff", "line-width": width(1.9), "line-opacity": 0.55 } });
+    map.addLayer({ id: "tx-lines", type: "line", source: "tx", filter: txFilter(vis, "known"), layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": color, "line-width": width(1), "line-opacity": 0.9 } });
+    map.addLayer({ id: "tx-unknown", type: "line", source: "tx", filter: txFilter(vis, "unknown"), paint: { "line-color": color, "line-width": width(1), "line-dasharray": [2, 2], "line-opacity": 0.8 } });
+    if (subs) {
+      map.addSource("tx-subs", { type: "geojson", data: subs });
+      map.addLayer({
+        id: "tx-subs",
+        type: "circle",
+        source: "tx-subs",
+        minzoom: 7,
+        filter: txFilter(vis, "subs"),
+        paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 7, 2, 11, 5], "circle-color": dark ? "#0f172a" : "#ffffff", "circle-stroke-color": color, "circle-stroke-width": 1.5 },
+      });
+      map.addLayer({
+        id: "tx-subs-label",
+        type: "symbol",
+        source: "tx-subs",
+        minzoom: 9.5,
+        filter: txFilter(vis, "labels"),
+        layout: { "text-field": ["get", "name"], "text-size": 10, "text-offset": [0, 0.9], "text-anchor": "top", "text-optional": true, "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"] },
+        paint: { "text-color": dark ? "#94a3b8" : "#475569", "text-halo-color": dark ? "#0b1220" : "#ffffff", "text-halo-width": 1.2 },
+      });
+    }
+  };
 
   const addLayers = async (map: MLMap) => {
     const theme = themeRef.current;
@@ -187,6 +288,21 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
       /* boundary overlay is optional; basemap already shows provincial borders */
     }
     const empty = { type: "FeatureCollection" as const, features: [] };
+    await addTransmission(map);
+    map.addSource("cong", { type: "geojson", data: empty });
+    map.addLayer({
+      id: "cong-halo",
+      type: "circle",
+      source: "cong",
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["get", "mag"], 2, 12, 20, 22, 100, 36],
+        "circle-color": ["case", ["<", ["get", "cong"], 0], CONGESTION_NEG, CONGESTION_POS],
+        "circle-opacity": 0.28,
+        "circle-stroke-color": ["case", ["<", ["get", "cong"], 0], CONGESTION_NEG, CONGESTION_POS],
+        "circle-stroke-width": 2,
+        "circle-blur": 0.15,
+      },
+    });
     map.addSource("fac-cluster", {
       type: "geojson",
       data: empty,
@@ -319,7 +435,8 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
       const id = e.features?.[0]?.properties?.id as string | undefined;
       const f = facRef.current.find((x) => x.id === id);
       if (!f) return;
-      popup.setLngLat((e.features![0].geometry as GeoJSON.Point).coordinates as [number, number]).setHTML(tooltipHtml(f)).addTo(map);
+      const cong = congRef.current?.facilities.find((c) => c.facilityId === id);
+      popup.setLngLat((e.features![0].geometry as GeoJSON.Point).coordinates as [number, number]).setHTML(tooltipHtml(f, cong)).addTo(map);
     };
     const leave = () => {
       map.getCanvas().style.cursor = "";
@@ -328,6 +445,16 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     for (const l of ["unclustered", "points"]) {
       map.on("mousemove", l, hover);
       map.on("mouseleave", l, leave);
+    }
+    const lineHover = (e: MapLayerMouseEvent) => {
+      if (map.queryRenderedFeatures(e.point, { layers: ["unclustered", "points", "clusters"].filter((l) => map.getLayer(l)) }).length) return;
+      const p = e.features?.[0]?.properties;
+      if (!p) return;
+      popup.setLngLat(e.lngLat).setHTML(lineTooltipHtml(p)).addTo(map);
+    };
+    for (const l of ["tx-lines", "tx-unknown"]) {
+      map.on("mousemove", l, lineHover);
+      map.on("mouseleave", l, () => popup.remove());
     }
     map.on("mouseenter", "clusters", () => (map.getCanvas().style.cursor = "pointer"));
     map.on("mouseleave", "clusters", () => (map.getCanvas().style.cursor = ""));
@@ -359,6 +486,19 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     refreshData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
+
+  useEffect(() => {
+    lineVisRef.current = lineVisibility;
+    const map = mapRef.current;
+    if (!map) return;
+    for (const [id, part] of TX_LAYERS) if (map.getLayer(id)) map.setFilter(id, txFilter(lineVisibility, part));
+  }, [lineVisibility]);
+
+  useEffect(() => {
+    congRef.current = congestion;
+    refreshData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [congestion]);
 
   useEffect(() => {
     scaleRef.current = scaleByCapacity;

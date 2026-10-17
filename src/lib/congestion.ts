@@ -36,6 +36,7 @@ export function resourceBase(resource: string): string {
   return resource
     .toUpperCase()
     .replace(/\s+/g, "")
+    .replace(/-LT[._].*$/, "")
     .replace(/-G\d.*$/, "")
     .replace(/-T\d+$/, "");
 }
