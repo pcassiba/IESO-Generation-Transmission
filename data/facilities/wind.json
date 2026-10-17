@@ -1,0 +1,1149 @@
+[
+  {
+    "id": "nextera-adelaide-wind",
+    "name": "Adelaide Wind Energy Centre (NextEra)",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "NextEra Energy Canada",
+    "owner": null,
+    "municipality": "Adelaide Metcalfe",
+    "region": "West",
+    "lat": 42.99509,
+    "lon": -81.71377,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap relation 10810796 (power=plant)",
+    "installedCapacityMW": 59.9,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": 2014,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/10810796"
+    ],
+    "resources": [
+      {
+        "ieso": "ADELAIDE"
+      }
+    ],
+    "notes": "Two Adelaide wind projects exist (NextEra 60 MW and Suncor 40 MW, ~4 km apart). ADELAIDE assigned to NextEra because LANDON is reported to be the Suncor project.",
+    "reviewFlag": true
+  },
+  {
+    "id": "suncor-adelaide-wind",
+    "name": "Adelaide Wind Power Project (Suncor)",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "Suncor Adelaide Wind LP",
+    "owner": null,
+    "municipality": "Adelaide Metcalfe",
+    "region": "West",
+    "lat": 43.02475,
+    "lon": -81.68769,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap relation 10810541 (power=plant)",
+    "installedCapacityMW": 40,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": 2015,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/10810541"
+    ],
+    "resources": [
+      {
+        "ieso": "LANDON"
+      }
+    ],
+    "notes": "IESO resource name → wind project identification taken from a secondary web summary (not an official IESO mapping); verify.",
+    "reviewFlag": true
+  },
+  {
+    "id": "melancthon-wind",
+    "name": "Melancthon Wind Farm",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "TransAlta",
+    "owner": null,
+    "municipality": "Melancthon / Amaranth",
+    "region": "West",
+    "lat": 44.09356,
+    "lon": -80.31285,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap relation 15445684 (power=plant)",
+    "installedCapacityMW": 200,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15445684"
+    ],
+    "resources": [
+      {
+        "ieso": "AMARANTH"
+      }
+    ],
+    "notes": "IESO resource 'AMARANTH' matched to Melancthon Wind (TransAlta), which spans Amaranth and Melancthon townships.",
+    "reviewFlag": true
+  },
+  {
+    "id": "amherst-island-wind",
+    "name": "Amherst Island Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Loyalist",
+    "region": "East",
+    "lat": 44.15177,
+    "lon": -76.69771,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 13623357 (power=plant)",
+    "installedCapacityMW": 75,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": 2017,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/13623357"
+    ],
+    "resources": [
+      {
+        "ieso": "AMHERST ISLAND"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "armow-wind",
+    "name": "Armow Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Kincardine",
+    "region": "Bruce",
+    "lat": 44.19665,
+    "lon": -81.4686,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15411261 (power=plant)",
+    "installedCapacityMW": 179,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15411261"
+    ],
+    "resources": [
+      {
+        "ieso": "ARMOW"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "belle-river-wind",
+    "name": "Belle River Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Lakeshore",
+    "region": "West",
+    "lat": 42.25255,
+    "lon": -82.66895,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15442463 (power=plant)",
+    "installedCapacityMW": 100,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15442463"
+    ],
+    "resources": [
+      {
+        "ieso": "BELLE RIVER"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "bluewater-wind",
+    "name": "Bluewater Wind Energy Centre",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Bluewater (Huron County)",
+    "region": "West",
+    "lat": 43.49023,
+    "lon": -81.52595,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap relation 14448145 (power=plant)",
+    "installedCapacityMW": 60,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/14448145"
+    ],
+    "resources": [
+      {
+        "ieso": "BLAKE"
+      }
+    ],
+    "notes": "IESO resource name → wind project identification taken from a secondary web summary (not an official IESO mapping); verify.",
+    "reviewFlag": true
+  },
+  {
+    "id": "bornish-wind",
+    "name": "Bornish Wind Energy Centre",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "NextEra Energy Canada",
+    "owner": null,
+    "municipality": "North Middlesex",
+    "region": "West",
+    "lat": 43.11364,
+    "lon": -81.69999,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 14487514 (power=plant)",
+    "installedCapacityMW": 73.5,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/14487514"
+    ],
+    "resources": [
+      {
+        "ieso": "BORNISH"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "bow-lake-wind",
+    "name": "Bow Lake Wind Farm",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "Nodin Kitagan LP",
+    "owner": null,
+    "municipality": "Algoma District",
+    "region": "Northeast",
+    "lat": 47.20953,
+    "lon": -84.52596,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 10809959 (power=plant)",
+    "installedCapacityMW": 58.32,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": 2015,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/10809959"
+    ],
+    "resources": [
+      {
+        "ieso": "BOW LAKE",
+        "units": "Phase 1 (inferred)"
+      },
+      {
+        "ieso": "BOW LAKE 2",
+        "units": "Phase 2 (inferred)"
+      }
+    ],
+    "notes": "Two IESO resources for the two phases of the same physical wind farm.",
+    "reviewFlag": false
+  },
+  {
+    "id": "cedar-point-wind",
+    "name": "Cedar Point II Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Lambton Shores",
+    "region": "West",
+    "lat": 43.10679,
+    "lon": -82.03549,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15445763 (power=plant)",
+    "installedCapacityMW": 100,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15445763"
+    ],
+    "resources": [
+      {
+        "ieso": "CEDAR POINT 2"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "comber-wind",
+    "name": "Comber Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Lakeshore",
+    "region": "West",
+    "lat": 42.215,
+    "lon": -82.58287,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15442454 (power=plant)",
+    "installedCapacityMW": 165,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15442454"
+    ],
+    "resources": [
+      {
+        "ieso": "COMBER"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "nation-rise-wind",
+    "name": "Nation Rise Wind Farm",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "EDP Renewables",
+    "owner": null,
+    "municipality": "North Stormont",
+    "region": "East",
+    "lat": 45.20179,
+    "lon": -75.2294,
+    "geocodeConfidence": "low",
+    "geocodeSource": "OpenStreetMap relation 15475258 (power=plant)",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15475258"
+    ],
+    "resources": [
+      {
+        "ieso": "CRYSLER"
+      }
+    ],
+    "notes": "CRYSLER (a hamlet in North Stormont) is assumed to refer to Nation Rise Wind; unverified.",
+    "reviewFlag": true
+  },
+  {
+    "id": "raleigh-wind",
+    "name": "Raleigh Wind Energy Centre",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Chatham-Kent",
+    "region": "West",
+    "lat": 42.26845,
+    "lon": -82.18034,
+    "geocodeConfidence": "low",
+    "geocodeSource": "OpenStreetMap relation 4713806 (power=plant)",
+    "installedCapacityMW": 78,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/4713806"
+    ],
+    "resources": [
+      {
+        "ieso": "DILLON"
+      }
+    ],
+    "notes": "IESO resource name → wind project identification taken from a secondary web summary (not an official IESO mapping); verify.",
+    "reviewFlag": true
+  },
+  {
+    "id": "east-lake-st-clair-wind",
+    "name": "East Lake St. Clair Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Chatham-Kent",
+    "region": "West",
+    "lat": 42.49979,
+    "lon": -82.38466,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15445728 (power=plant)",
+    "installedCapacityMW": 99,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15445728"
+    ],
+    "resources": [
+      {
+        "ieso": "EAST LAKE"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "erieau-wind",
+    "name": "Erieau Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Chatham-Kent",
+    "region": "West",
+    "lat": 42.31373,
+    "lon": -82.00091,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 14459825 (power=plant)",
+    "installedCapacityMW": 99,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/14459825"
+    ],
+    "resources": [
+      {
+        "ieso": "ERIEAU"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "gosfield-wind",
+    "name": "Gosfield Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Kingsville",
+    "region": "West",
+    "lat": 42.1372,
+    "lon": -82.68904,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15445828 (power=plant)",
+    "installedCapacityMW": 50.6,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15445828"
+    ],
+    "resources": [
+      {
+        "ieso": "GOSFIELDWGS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "goshen-wind",
+    "name": "Goshen Wind Energy Centre",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Bluewater / South Huron",
+    "region": "West",
+    "lat": 43.32106,
+    "lon": -81.66332,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15445697 (power=plant)",
+    "installedCapacityMW": 102,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15445697"
+    ],
+    "resources": [
+      {
+        "ieso": "GOSHEN"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "goulais-wind",
+    "name": "Goulais Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Algoma District",
+    "region": "Northeast",
+    "lat": 46.66655,
+    "lon": -84.3678,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 14442302 (power=plant)",
+    "installedCapacityMW": 25,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/14442302"
+    ],
+    "resources": [
+      {
+        "ieso": "GOULAIS"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "grand-valley-wind",
+    "name": "Grand Valley Wind Farm (Phase 3)",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Grand Valley",
+    "region": "West",
+    "lat": 43.96423,
+    "lon": -80.3672,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap relation 15445685 (power=plant)",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15445685"
+    ],
+    "resources": [
+      {
+        "ieso": "GRAND VALLEY 3"
+      }
+    ],
+    "notes": "OSM polygon covers the Grand Valley wind farms; IESO resource is phase 3.",
+    "reviewFlag": false
+  },
+  {
+    "id": "grand-renewable-wind",
+    "name": "Grand Renewable Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Haldimand County",
+    "region": "Southwest",
+    "lat": 42.90013,
+    "lon": -79.7574,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15445663 (power=plant)",
+    "installedCapacityMW": 154.1,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15445663"
+    ],
+    "resources": [
+      {
+        "ieso": "GRANDWF"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "greenwich-wind",
+    "name": "Greenwich Wind (Dorion)",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Dorion",
+    "region": "Northwest",
+    "lat": 48.76778,
+    "lon": -88.77383,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 13623525 (power=plant)",
+    "installedCapacityMW": 99,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": 2012,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/13623525"
+    ],
+    "resources": [
+      {
+        "ieso": "GREENWICH"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "henvey-inlet-wind",
+    "name": "Henvey Inlet Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "Henvey Inlet Wind LP (Pattern / Nigig Power)",
+    "owner": null,
+    "municipality": "Henvey Inlet First Nation",
+    "region": "Essa",
+    "lat": 45.84676,
+    "lon": -80.65221,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15445649 (power=plant)",
+    "installedCapacityMW": 300,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15445649"
+    ],
+    "resources": [
+      {
+        "ieso": "HENVEY NORTH",
+        "units": "North collector section (inferred)"
+      },
+      {
+        "ieso": "HENVEY SOUTH",
+        "units": "South collector section (inferred)"
+      }
+    ],
+    "notes": "One physical wind farm reported as two IESO resources.",
+    "reviewFlag": false
+  },
+  {
+    "id": "jericho-wind",
+    "name": "Jericho Wind Energy Centre",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Lambton Shores",
+    "region": "West",
+    "lat": 43.13399,
+    "lon": -81.88632,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15445829 (power=plant)",
+    "installedCapacityMW": 149,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15445829"
+    ],
+    "resources": [
+      {
+        "ieso": "JERICHO"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "k2-wind",
+    "name": "K2 Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Ashfield-Colborne-Wawanosh",
+    "region": "West",
+    "lat": 43.91526,
+    "lon": -81.63178,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 14444245 (power=plant)",
+    "installedCapacityMW": 270,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/14444245"
+    ],
+    "resources": [
+      {
+        "ieso": "K2WIND"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "kingsbridge-wind",
+    "name": "Kingsbridge Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "Capital Power",
+    "owner": null,
+    "municipality": "Ashfield-Colborne-Wawanosh",
+    "region": "West",
+    "lat": 43.85276,
+    "lon": -81.66801,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 4713815 (power=plant)",
+    "installedCapacityMW": 39.6,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/4713815"
+    ],
+    "resources": [
+      {
+        "ieso": "KINGSBRIDGE"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "mcleans-mountain-wind",
+    "name": "McLean's Mountain Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Northeastern Manitoulin",
+    "region": "Northeast",
+    "lat": 45.92091,
+    "lon": -82.01675,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 14495337 (power=plant)",
+    "installedCapacityMW": 60,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/14495337"
+    ],
+    "resources": [
+      {
+        "ieso": "MCLEANSMTNWF-LT.AG_T1"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "north-kent-wind",
+    "name": "North Kent Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Chatham-Kent",
+    "region": "West",
+    "lat": 42.50192,
+    "lon": -82.26034,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15442523 (power=plant)",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15442523"
+    ],
+    "resources": [
+      {
+        "ieso": "NORTH KENT"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "pointe-aux-roches-wind",
+    "name": "Pointe-aux-Roches Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Lakeshore",
+    "region": "West",
+    "lat": 42.28504,
+    "lon": -82.53855,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15419666 (power=plant)",
+    "installedCapacityMW": 48.6,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15419666"
+    ],
+    "resources": [
+      {
+        "ieso": "PAROCHES"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "erie-shores-wind",
+    "name": "Erie Shores Wind Farm (Port Burwell)",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "Erie Shores Wind",
+    "owner": null,
+    "municipality": "Bayham / Malahide",
+    "region": "West",
+    "lat": 42.62976,
+    "lon": -80.76741,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap relation 4732854 (power=plant)",
+    "installedCapacityMW": 99,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/4732854"
+    ],
+    "resources": [
+      {
+        "ieso": "PORT BURWELL"
+      }
+    ],
+    "notes": "PORT BURWELL matched to Erie Shores Wind Farm (located around Port Burwell).",
+    "reviewFlag": true
+  },
+  {
+    "id": "port-alma-wind",
+    "name": "Port Alma Wind (I & II)",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "Kruger Energy",
+    "owner": null,
+    "municipality": "Chatham-Kent",
+    "region": "West",
+    "lat": 42.20912,
+    "lon": -82.2285,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap relation 15419657 (power=plant)",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15419657"
+    ],
+    "resources": [
+      {
+        "ieso": "PORTALMA-T1",
+        "units": "Transformer/collector T1 (inferred)"
+      },
+      {
+        "ieso": "PORTALMA-T3",
+        "units": "Transformer/collector T3 (inferred)"
+      }
+    ],
+    "notes": "OSM polygon tagged 101.2 MW; Kruger operates Port Alma I and II. Installed capacity left unverified.",
+    "reviewFlag": false
+  },
+  {
+    "id": "prince-wind",
+    "name": "Prince Wind Energy Project",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "Brookfield Renewable",
+    "owner": null,
+    "municipality": "Prince Township",
+    "region": "Northeast",
+    "lat": 46.61267,
+    "lon": -84.49147,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15419795 (power=plant)",
+    "installedCapacityMW": 189,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15419795"
+    ],
+    "resources": [
+      {
+        "ieso": "PRINCEFARM"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "railbeds-wind",
+    "name": "Railbeds Wind (unlocated)",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": null,
+    "region": null,
+    "lat": null,
+    "lon": null,
+    "geocodeConfidence": "unverified",
+    "geocodeSource": null,
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [],
+    "resources": [
+      {
+        "ieso": "RAILBEDWF-LT.AG_SR"
+      }
+    ],
+    "notes": "Project could not be identified/located from public sources; not plotted.",
+    "reviewFlag": true
+  },
+  {
+    "id": "ripley-wind",
+    "name": "Ripley Wind Farm",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Huron-Kinloss",
+    "region": "Bruce",
+    "lat": 44.06142,
+    "lon": -81.64214,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15419454 (power=plant)",
+    "installedCapacityMW": 76,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15419454"
+    ],
+    "resources": [
+      {
+        "ieso": "RIPLEY SOUTH"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "romney-wind",
+    "name": "Romney Wind Energy Centre",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Chatham-Kent",
+    "region": "West",
+    "lat": 42.14445,
+    "lon": -82.43923,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15475397 (power=plant)",
+    "installedCapacityMW": 60,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": 2019,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15475397"
+    ],
+    "resources": [
+      {
+        "ieso": "ROMNEY"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "port-dover-nanticoke-wind",
+    "name": "Port Dover & Nanticoke Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "Capital Power",
+    "owner": null,
+    "municipality": "Haldimand / Norfolk",
+    "region": "Southwest",
+    "lat": 42.8266,
+    "lon": -80.05426,
+    "geocodeConfidence": "low",
+    "geocodeSource": "OpenStreetMap relation 15442335 (power=plant)",
+    "installedCapacityMW": 104.4,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15442335"
+    ],
+    "resources": [
+      {
+        "ieso": "SANDUSK-LT.AG_T1"
+      }
+    ],
+    "notes": "SANDUSK refers to the Sandusk switching station; assigned to Port Dover & Nanticoke Wind which connects there per a secondary source. Grand Renewable Wind also connects in the area. Verify.",
+    "reviewFlag": true
+  },
+  {
+    "id": "dufferin-wind",
+    "name": "Dufferin Wind Power",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Melancthon / Amaranth",
+    "region": "West",
+    "lat": 44.21658,
+    "lon": -80.2769,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap relation 15420364 (power=plant)",
+    "installedCapacityMW": 91.4,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15420364"
+    ],
+    "resources": [
+      {
+        "ieso": "SHANNON"
+      }
+    ],
+    "notes": "IESO resource name → wind project identification taken from a secondary web summary (not an official IESO mapping); verify.",
+    "reviewFlag": true
+  },
+  {
+    "id": "talbot-wind",
+    "name": "Talbot Wind Farm",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Chatham-Kent",
+    "region": "West",
+    "lat": 42.43355,
+    "lon": -81.78882,
+    "geocodeConfidence": "medium",
+    "geocodeSource": "OpenStreetMap relation 15419353 (power=plant)",
+    "installedCapacityMW": 98.9,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15419353"
+    ],
+    "resources": [
+      {
+        "ieso": "SPENCE"
+      }
+    ],
+    "notes": "IESO resource name → wind project identification taken from a secondary web summary (not an official IESO mapping); verify.",
+    "reviewFlag": true
+  },
+  {
+    "id": "summerhaven-wind",
+    "name": "Summerhaven Wind Energy Centre",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Haldimand County",
+    "region": "Southwest",
+    "lat": 42.8659,
+    "lon": -79.96249,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15442336 (power=plant)",
+    "installedCapacityMW": 124,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15442336"
+    ],
+    "resources": [
+      {
+        "ieso": "SUMMERHAVEN"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "underwood-wind",
+    "name": "Enbridge Ontario Wind (Underwood)",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": "Enbridge",
+    "owner": null,
+    "municipality": "Kincardine",
+    "region": "Bruce",
+    "lat": 44.32131,
+    "lon": -81.45832,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15442057 (power=plant)",
+    "installedCapacityMW": 181.5,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15442057"
+    ],
+    "resources": [
+      {
+        "ieso": "UNDERWOOD"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "niagara-region-wind",
+    "name": "Niagara Region Wind Farm",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "West Lincoln / Wainfleet",
+    "region": "Niagara",
+    "lat": 42.98109,
+    "lon": -79.49794,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15442776 (power=plant)",
+    "installedCapacityMW": 230,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15442776"
+    ],
+    "resources": [
+      {
+        "ieso": "WEST LINCOLN NRWF"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "wolfe-island-wind",
+    "name": "Wolfe Island Wind",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Frontenac Islands",
+    "region": "East",
+    "lat": 44.15586,
+    "lon": -76.43328,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 15403267 (power=plant)",
+    "installedCapacityMW": 197.8,
+    "capacitySource": "OpenStreetMap plant:output:electricity tag",
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/15403267"
+    ],
+    "resources": [
+      {
+        "ieso": "WOLFE ISLAND"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  },
+  {
+    "id": "zurich-wind",
+    "name": "Zurich Wind Farm",
+    "technology": "wind",
+    "subtype": "Onshore wind",
+    "operator": null,
+    "owner": null,
+    "municipality": "Bluewater (Huron County)",
+    "region": "West",
+    "lat": 43.42393,
+    "lon": -81.65634,
+    "geocodeConfidence": "high",
+    "geocodeSource": "OpenStreetMap relation 14477646 (power=plant)",
+    "installedCapacityMW": null,
+    "capacitySource": null,
+    "commissioningYear": null,
+    "sourceUrls": [
+      "https://www.openstreetmap.org/relation/14477646"
+    ],
+    "resources": [
+      {
+        "ieso": "ZURICH"
+      }
+    ],
+    "notes": null,
+    "reviewFlag": false
+  }
+]
