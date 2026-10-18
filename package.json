@@ -11,6 +11,7 @@
     "ingest": "tsx scripts/ingest.ts",
     "build:boundary": "tsx scripts/build-boundary.ts",
     "build:transmission": "tsx scripts/build-transmission.ts",
+    "txrisk:check": "tsx scripts/txrisk-check.ts",
     "validate:facilities": "tsx scripts/validate-facilities.ts",
     "copy:worker": "node scripts/copy-worker.js",
     "predev": "node scripts/copy-worker.js",

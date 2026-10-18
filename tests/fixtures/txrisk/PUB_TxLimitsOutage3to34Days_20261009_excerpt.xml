@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://reports.ieso.ca/docrefs/stylesheet/TxLimitsOutage3to34Days_HTML_t1-1.xsl"?>
+<!-- Excerpt of the live report published 2026-10-09T17:07:01 (EST): 4 of its 38 records. -->
+<Document xmlns="http://www.ieso.ca/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ieso.ca/schema TxLimitsOutage3to34Days_r1.xsd" docID="TxLimitsOutage3to34Days">
+  <DocHeader>
+    <DocTitle>Transmission Facility Outage Limits Report (Days 3 to 34)</DocTitle>
+    <DocRevision>1</DocRevision>
+    <DocConfidentiality><DocConfClass>PUB</DocConfClass></DocConfidentiality>
+    <CreatedAt>2026-10-09T17:07:01</CreatedAt>
+  </DocHeader>
+  <DocBody>
+    <DateRangeStart>2026-10-12</DateRangeStart>
+    <DateRangeEnd>2026-11-12</DateRangeEnd>
+    <TransmissionFacilityData>
+      <TransmissionFacility>Internal</TransmissionFacility>
+      <InterfaceData><InterfaceName>East-West Transfer West [EWTW]</InterfaceName><IssueDate>2026-04-07T08:23:13</IssueDate><StartDate>2026-04-02T20:43:00</StartDate><EndDate>2027-12-30T16:00:00</EndDate><OperatingLimit>475</OperatingLimit><Comments>K21W O/S</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>East-West Transfer East [EWTE]</InterfaceName><IssueDate>2026-04-07T08:23:13</IssueDate><StartDate>2026-04-02T20:43:00</StartDate><EndDate>2027-12-30T16:00:00</EndDate><OperatingLimit>475</OperatingLimit><Comments>K21W O/S</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>115 kV Dobbin Area Load</InterfaceName><IssueDate>2026-10-06T10:09:38</IssueDate><StartDate>2026-10-16T11:30:00</StartDate><EndDate>2026-10-16T16:30:00</EndDate><OperatingLimit>170</OperatingLimit><Comments>Dobbin A Bus O/S</Comments></InterfaceData>
+    </TransmissionFacilityData>
+    <TransmissionFacilityData>
+      <TransmissionFacility>Intertie</TransmissionFacility>
+      <InterfaceData><InterfaceName>Manitoba X Ontario Import</InterfaceName><IssueDate>2026-10-08T17:24:57</IssueDate><StartDate>2026-10-08T16:00:00</StartDate><EndDate>2026-12-18T23:59:00</EndDate><OperatingLimit>125</OperatingLimit><Comments>Whiteshell R15 O/S</Comments></InterfaceData>
+    </TransmissionFacilityData>
+  </DocBody>
+</Document>

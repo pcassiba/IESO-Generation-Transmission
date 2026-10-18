@@ -8,11 +8,21 @@ import { VOLTAGE_CLASSES, VOLTAGE_COLOR, type VoltageClass } from "@/lib/transmi
 import type { FacilityState, OperationalStatus, Technology } from "@/lib/types";
 import { STATUSES, STATUS_LABEL, TECHNOLOGIES, TECHNOLOGY_LABEL, STORAGE_MODE_LABEL } from "@/lib/types";
 import { CONGESTION_NEG, CONGESTION_POS, MAP_STYLES, ONTARIO_BOUNDS, TECH_COLOR, fmtMW, markerSvg } from "@/lib/ui";
+import type { TxRiskItem } from "@/lib/txrisk/types";
+import type { OverlayOptions } from "@/lib/txrisk/ui";
+import { TXR_CLICK_LAYERS, addOverlayLayers, overlayItemAt, startAnimation, updateOverlay, type OverlayHandle } from "./txrisk/overlay";
 
 export interface MapCommand {
-  kind: "reset" | "fitAll" | "flyTo";
+  kind: "reset" | "fitAll" | "flyTo" | "fitBounds";
   id?: string;
+  bbox?: [number, number, number, number];
   nonce: number;
+}
+
+export interface TxRiskOverlay {
+  items: TxRiskItem[];
+  options: OverlayOptions;
+  selectedId: string | null;
 }
 
 interface Props {
@@ -28,6 +38,9 @@ interface Props {
   /** Congestion for the selected hour; null hides the congestion halos. */
   congestion: CongestionResponse | null;
   onTransmissionStatus?: (s: "ok" | "missing") => void;
+  /** Outages & congestion risk overlay; null or options.enabled=false hides it. */
+  txRisk?: TxRiskOverlay | null;
+  onTxRiskPick?: (itemId: string) => void;
 }
 
 const CLUSTER_MAX_ZOOM = 8;
@@ -188,7 +201,7 @@ function tooltipHtml(f: FacilityState, cong?: { congestion: number | null; lmp: 
     .join("")}</div>`;
 }
 
-export default function MapView({ facilities, selectedId, onSelect, theme, scaleByCapacity, command, onMapReady, lineVisibility, congestion, onTransmissionStatus }: Props) {
+export default function MapView({ facilities, selectedId, onSelect, theme, scaleByCapacity, command, onMapReady, lineVisibility, congestion, onTransmissionStatus, txRisk, onTxRiskPick }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const facRef = useRef<FacilityState[]>(facilities);
@@ -202,6 +215,17 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
   const congRef = useRef(congestion);
   const txStatusRef = useRef(onTransmissionStatus);
   txStatusRef.current = onTransmissionStatus;
+  const txrRef = useRef(txRisk ?? null);
+  txrRef.current = txRisk ?? null;
+  const txrPickRef = useRef(onTxRiskPick);
+  txrPickRef.current = onTxRiskPick;
+  const overlayRef = useRef<OverlayHandle | null>(null);
+  const applyOverlay = () => {
+    const map = mapRef.current;
+    const o = txrRef.current;
+    if (!map) return;
+    updateOverlay(map, overlayRef.current, o?.items ?? [], o?.options ?? { enabled: false, flashing: false, reducedMotion: true }, o?.selectedId ?? null);
+  };
 
   const refreshData = () => {
     const map = mapRef.current;
@@ -271,6 +295,8 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
         paint: { "text-color": dark ? "#94a3b8" : "#475569", "text-halo-color": dark ? "#0b1220" : "#ffffff", "text-halo-width": 1.2 },
       });
     }
+    overlayRef.current = addOverlayLayers(map, lines, subs);
+    applyOverlay();
   };
 
   const addLayers = async (map: MLMap) => {
@@ -456,6 +482,27 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
       map.on("mousemove", l, lineHover);
       map.on("mouseleave", l, () => popup.remove());
     }
+    const txrHover = (e: MapLayerMouseEvent) => {
+      map.getCanvas().style.cursor = "pointer";
+      const p = e.features?.[0]?.properties;
+      const item = txrRef.current?.items.find((i) => i.id === p?.itemId);
+      if (!item) return;
+      popup
+        .setLngLat(e.lngLat)
+        .setHTML(`<div class="oge-tip"><div class="oge-tip-title">${esc(item.title)}</div><div class="oge-tip-row"><span>${esc(item.categoryLabel)}</span></div><div class="oge-tip-row"><span>Click for IESO details</span></div></div>`)
+        .addTo(map);
+    };
+    for (const l of TXR_CLICK_LAYERS) {
+      map.on("click", l, (e) => {
+        const id = overlayItemAt(e);
+        if (id) txrPickRef.current?.(id);
+      });
+      map.on("mousemove", l, txrHover);
+      map.on("mouseleave", l, () => {
+        map.getCanvas().style.cursor = "";
+        popup.remove();
+      });
+    }
     map.on("mouseenter", "clusters", () => (map.getCanvas().style.cursor = "pointer"));
     map.on("mouseleave", "clusters", () => (map.getCanvas().style.cursor = ""));
     onMapReady?.(map);
@@ -501,6 +548,15 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
   }, [congestion]);
 
   useEffect(() => {
+    applyOverlay();
+    const map = mapRef.current;
+    const o = txRisk?.options;
+    if (!map || !o?.enabled || !o.flashing || o.reducedMotion || !txRisk?.items.some((i) => i.animate)) return;
+    return startAnimation(map);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [txRisk]);
+
+  useEffect(() => {
     scaleRef.current = scaleByCapacity;
     const map = mapRef.current;
     if (!map) return;
@@ -519,6 +575,10 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
         located.forEach((f) => b.extend([f.lon!, f.lat!]));
         map.fitBounds(b, { padding: 60, maxZoom: 11 });
       }
+    }
+    if (command.kind === "fitBounds" && command.bbox) {
+      const [x0, y0, x1, y1] = command.bbox;
+      map.fitBounds([[x0, y0], [x1, y1]], { padding: 80, maxZoom: 10, duration: 900 });
     }
     if (command.kind === "flyTo" && command.id) {
       const f = facRef.current.find((x) => x.id === command.id);

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="http://reports.ieso.ca/docrefs/stylesheet/TxLimitsAllInService0to34Days_HTML_t1-1.xsl"?>
+<!-- Excerpt of the live report published 2026-10-17T00:07:44 (EST): 8 of its 69 records. -->
+<Document xmlns="http://www.ieso.ca/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ieso.ca/schema TxLimitsAllInService0to34Days_r1.xsd" docID="TxLimitsAllInService0to34Days">
+  <DocHeader>
+    <DocTitle>Transmission Facility All in Service Limits Report (Days 0 to 34)</DocTitle>
+    <DocRevision>1</DocRevision>
+    <DocConfidentiality><DocConfClass>PUB</DocConfClass></DocConfidentiality>
+    <CreatedAt>2026-10-17T00:07:44</CreatedAt>
+  </DocHeader>
+  <DocBody>
+    <DateRangeStart>2026-10-17</DateRangeStart>
+    <DateRangeEnd>2026-11-20</DateRangeEnd>
+    <TransmissionFacilityData>
+      <TransmissionFacility>Internal</TransmissionFacility>
+      <InterfaceData><InterfaceName>East-West Transfer East [EWTE]</InterfaceName><IssueDate>2024-12-23T14:38:32</IssueDate><StartDate>2001-01-01T00:00:00</StartDate><EndDate>2026-12-31T23:59:00</EndDate><OperatingLimit>500</OperatingLimit><Comments>All In Service or 601 O/S</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>East-West Transfer West [EWTW]</InterfaceName><IssueDate>2024-12-23T14:38:32</IssueDate><StartDate>2001-01-01T00:00:00</StartDate><EndDate>2026-12-31T23:59:00</EndDate><OperatingLimit>500</OperatingLimit><Comments>All In Service or 601 O/S</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>Kenora Area Outflow [KAO]</InterfaceName><IssueDate>2019-01-11T12:45:31</IssueDate><StartDate>2001-01-01T00:00:00</StartDate><EndDate>2026-12-31T23:59:00</EndDate><OperatingLimit>123</OperatingLimit><Comments>All In Service</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>St. Lawrence West [SLW]</InterfaceName><IssueDate>2019-02-21T11:47:44</IssueDate><StartDate>2001-01-01T00:00:00</StartDate><EndDate>2026-12-31T23:59:00</EndDate><OperatingLimit>1350</OperatingLimit><Comments>All In Service</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>Wawa MacKay Flow East-230 [WMFE-230]</InterfaceName><IssueDate>2019-01-11T12:45:31</IssueDate><StartDate>2001-01-01T00:00:00</StartDate><EndDate>2026-12-31T23:59:00</EndDate><OperatingLimit>590</OperatingLimit><Comments>All In Service</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>Wawa MacKay Flow East-230 [WMFE-230]</InterfaceName><IssueDate>2019-01-11T12:45:31</IssueDate><StartDate>2001-01-01T00:00:00</StartDate><EndDate>2026-12-31T23:59:00</EndDate><OperatingLimit>600</OperatingLimit><Comments>All In Service</Comments></InterfaceData>
+    </TransmissionFacilityData>
+    <TransmissionFacilityData>
+      <TransmissionFacility>Intertie</TransmissionFacility>
+      <InterfaceData><InterfaceName>Ontario-New York Import Winter</InterfaceName><IssueDate>2024-10-29T11:06:05</IssueDate><StartDate>2001-01-01T00:00:00</StartDate><EndDate>2026-12-31T23:59:00</EndDate><OperatingLimit>1550</OperatingLimit><Comments>All In Service</Comments></InterfaceData>
+      <InterfaceData><InterfaceName>Ontario-New York Import Summer</InterfaceName><IssueDate>2026-06-04T21:59:48</IssueDate><StartDate>2001-01-01T00:00:00</StartDate><EndDate>2026-12-31T23:59:00</EndDate><OperatingLimit>1250</OperatingLimit><Comments>All In Service</Comments></InterfaceData>
+    </TransmissionFacilityData>
+  </DocBody>
+</Document>

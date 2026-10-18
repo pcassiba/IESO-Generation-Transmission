@@ -2,7 +2,7 @@
 
 import type { Map as MLMap } from "maplibre-gl";
 import dynamic from "next/dynamic";
-import { Activity, AlertTriangle, Cable, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling } from "lucide-react";
+import { Activity, AlertTriangle, Cable, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CongestionResponse } from "@/lib/congestion";
 import { DEFAULT_VISIBLE, VOLTAGE_CLASSES, VOLTAGE_COLOR, VOLTAGE_LABEL, type VoltageClass } from "@/lib/transmission";
@@ -11,6 +11,7 @@ import { STATUSES, STATUS_LABEL, STORAGE_MODE_LABEL, TECHNOLOGIES, TECHNOLOGY_LA
 import { toCsv } from "@/lib/csv";
 import { hourEndingLabel } from "@/lib/time";
 import { CONGESTION_NEG, CONGESTION_POS } from "@/lib/ui";
+import { LEGEND as TXR_LEGEND, RISK_COLOR } from "@/lib/txrisk/ui";
 import ComparePanel from "./ComparePanel";
 import CongestionPanel from "./CongestionPanel";
 import Dashboard from "./Dashboard";
@@ -20,6 +21,9 @@ import { StatusDot, TechIcon } from "./Icons";
 import type { MapCommand } from "./MapView";
 import { CoverageModal, MethodologyModal } from "./Modals";
 import Sidebar, { applyFilters, defaultFilters, type Filters } from "./Sidebar";
+import TimeBar from "./txrisk/TimeBar";
+import TxRiskPanel from "./txrisk/TxRiskPanel";
+import { useTxRisk } from "./txrisk/useTxRisk";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <div className="absolute inset-0 flex items-center justify-center text-xs text-[var(--muted)]">Loading map…</div> });
 
@@ -54,6 +58,16 @@ export default function Explorer() {
   const [congestion, setCongestion] = useState<CongestionResponse | null>(null);
   const [congestionError, setCongestionError] = useState<string | null>(null);
   const mapRef = useRef<MLMap | null>(null);
+  const tx = useTxRisk();
+  const txOverlay = useMemo(
+    () => ({ items: tx.data?.items ?? [], options: { enabled: tx.enabled, flashing: tx.flashing, reducedMotion: tx.reducedMotion }, selectedId: tx.selectedId }),
+    [tx.data, tx.enabled, tx.flashing, tx.reducedMotion, tx.selectedId],
+  );
+  const pickTx = (id: string | null) => {
+    tx.setSelectedId(id);
+    const bbox = id ? tx.data?.items.find((i) => i.id === id)?.bbox : null;
+    if (bbox) setCommand({ kind: "fitBounds", bbox, nonce: Date.now() });
+  };
 
   const load = useCallback(async (ts: string | null) => {
     try {
@@ -238,7 +252,38 @@ export default function Explorer() {
             lineVisibility={lineVisibility}
             congestion={showCongestion ? congestion : null}
             onTransmissionStatus={setTxStatus}
+            txRisk={txOverlay}
+            onTxRiskPick={(id) => tx.setSelectedId(id)}
           />
+
+          {/* Outages & congestion risk: prominent toggle, flashing toggle and time selector */}
+          <div className="pointer-events-none absolute left-14 right-14 top-3 z-10 flex flex-col items-start gap-1">
+            <div className="pointer-events-auto flex flex-wrap items-center gap-1 rounded border border-[var(--border)] bg-[var(--panel)]/95 px-2 py-1 text-[11px] shadow">
+              <button
+                onClick={() => tx.setEnabled((v) => !v)}
+                aria-pressed={tx.enabled}
+                className={`flex items-center gap-1 rounded px-2 py-0.5 font-semibold ${tx.enabled ? "bg-red-500/25 text-red-200" : "hover:bg-[var(--hover)]"}`}
+              >
+                <Zap size={13} /> Show Outages & Congestion Risk: {tx.enabled ? "ON" : "OFF"}
+              </button>
+              {tx.enabled && (
+                <button
+                  onClick={() => tx.setFlashing((v) => !v)}
+                  aria-pressed={tx.flashing}
+                  disabled={tx.reducedMotion}
+                  title={tx.reducedMotion ? "Your system asks for reduced motion, so highlights stay static" : undefined}
+                  className={`rounded px-2 py-0.5 disabled:opacity-50 ${tx.flashing && !tx.reducedMotion ? "bg-sky-500/20 text-sky-200" : "hover:bg-[var(--hover)]"}`}
+                >
+                  Enable Flashing Animations: {tx.flashing && !tx.reducedMotion ? "ON" : "OFF"}
+                </button>
+              )}
+            </div>
+            {tx.enabled && (
+              <div className="w-full max-w-2xl">
+                <TimeBar preset={tx.preset} setPreset={tx.setPreset} tUtc={tx.tUtc} setT={tx.setT} nowUtc={tx.data?.nowUtc ?? new Date().toISOString()} items={tx.data?.items ?? []} />
+              </div>
+            )}
+          </div>
 
           {/* Map toolbar */}
           <div className="absolute left-3 top-3 z-10 flex flex-col gap-1">
@@ -248,6 +293,7 @@ export default function Explorer() {
               { icon: <Scaling size={15} />, title: `Marker size by installed capacity: ${scaleByCapacity ? "on" : "off"}`, on: () => setScaleByCapacity((s) => !s), active: scaleByCapacity },
               { icon: <Cable size={15} />, title: `Transmission lines: ${showLines ? "on" : "off"}`, on: () => setShowLines((s) => !s), active: showLines },
               { icon: <Activity size={15} />, title: `Congestion (IESO nodal prices): ${showCongestion ? "on" : "off"}`, on: () => setShowCongestion((s) => !s), active: showCongestion },
+              { icon: <Zap size={15} />, title: `Outages & congestion risk: ${tx.enabled ? "on" : "off"}`, on: () => tx.setEnabled((v) => !v), active: tx.enabled },
               { icon: <Layers size={15} />, title: "Toggle legend", on: () => setLegendOpen((s) => !s), active: legendOpen },
               { icon: <Download size={15} />, title: "Export", on: () => setExportOpen((s) => !s), active: exportOpen },
             ].map((b) => (
@@ -311,6 +357,24 @@ export default function Explorer() {
                   )}
                 </>
               )}
+              {tx.enabled && (
+                <>
+                  <div className="mb-1 mt-2 font-semibold uppercase tracking-wide text-[var(--muted)]">Outages & congestion risk</div>
+                  <div className="grid grid-cols-1 gap-0.5">
+                    {TXR_LEGEND.map((l) => (
+                      <span key={l.cat} className="flex items-center gap-1.5" title={l.hint}>
+                        {l.cat === "normal" ? (
+                          <span className="inline-block h-[3px] w-5 rounded" style={{ background: "linear-gradient(90deg,#ef4444,#f59e0b,#3b82f6)" }} />
+                        ) : (
+                          <span className="inline-block h-[7px] w-5 rounded" style={{ background: `${RISK_COLOR[l.cat]}88`, boxShadow: `inset 0 0 0 1px ${RISK_COLOR[l.cat]}` }} />
+                        )}
+                        {l.label}
+                      </span>
+                    ))}
+                    <span className="text-[10px] text-[var(--muted)]">Rings mark stations; dotted = section of a circuit (approximate)</span>
+                  </div>
+                </>
+              )}
               {showCongestion && (
                 <>
                   <div className="mb-1 mt-2 font-semibold uppercase tracking-wide text-[var(--muted)]">Congestion (halo)</div>
@@ -328,6 +392,19 @@ export default function Explorer() {
                 </button>
               )}
             </div>
+          )}
+          {tx.enabled && (
+            <TxRiskPanel
+              data={tx.data}
+              error={tx.error}
+              loading={tx.loading}
+              selectedId={tx.selectedId}
+              onSelect={pickTx}
+              onRefresh={tx.refresh}
+              refreshing={tx.refreshing}
+              refreshMsg={tx.refreshMsg}
+              onClose={() => tx.setEnabled(false)}
+            />
           )}
           {showCongestion && <CongestionPanel data={congestion} error={congestionError} facilities={all} onPick={pick} onClose={() => setShowCongestion(false)} />}
         </main>
