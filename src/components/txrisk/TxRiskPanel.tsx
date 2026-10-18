@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertTriangle, ArrowLeft, ChevronDown, ChevronRight, ExternalLink, MapPinOff, RefreshCw, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatOntario } from "@/lib/time";
 import type { TxRiskItem, TxRiskResponse } from "@/lib/txrisk/types";
 import { RISK_COLOR, defaultTableFilters, matchesFilters, sortItems, type SortKey, type TableFilters } from "@/lib/txrisk/ui";
@@ -167,7 +167,11 @@ function Detail({ item, onBack }: { item: TxRiskItem; onBack: () => void }) {
 export default function TxRiskPanel({ data, error, loading, selectedId, onSelect, onRefresh, refreshing, refreshMsg, onClose }: Props) {
   const [filters, setFilters] = useState<TableFilters>(defaultTableFilters);
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: "category", dir: 1 });
-  const [collapsed, setCollapsed] = useState(false);
+  // Starts collapsed so turning the layer on leaves the map clear; picking an item on the map opens it.
+  const [collapsed, setCollapsed] = useState(true);
+  useEffect(() => {
+    if (selectedId) setCollapsed(false);
+  }, [selectedId]);
   const [showStatus, setShowStatus] = useState(false);
   const [showUnmapped, setShowUnmapped] = useState(false);
   const items = useMemo(() => data?.items ?? [], [data]);
@@ -188,7 +192,7 @@ export default function TxRiskPanel({ data, error, loading, selectedId, onSelect
   if (collapsed)
     return (
       <button onClick={() => setCollapsed(false)} className="absolute right-12 top-28 z-10 flex items-center gap-1 rounded border border-[var(--border)] bg-[var(--panel)] px-2 py-1 text-[11px] shadow">
-        <ChevronDown size={12} /> Outages & congestion ({rows.length})
+        <ChevronDown size={12} /> Show outages & congestion list ({rows.length})
       </button>
     );
 
@@ -205,7 +209,12 @@ export default function TxRiskPanel({ data, error, loading, selectedId, onSelect
           <button onClick={onRefresh} disabled={refreshing} className="flex items-center gap-1 rounded border border-[var(--border)] px-1.5 py-0.5 hover:bg-[var(--hover)] disabled:opacity-50" title="Re-check all four IESO reports now">
             <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} /> Refresh IESO data
           </button>
-          <button onClick={() => setCollapsed(true)} title="Collapse" className="rounded p-1 hover:bg-[var(--hover)]">
+          <button
+            onClick={() => {
+              setCollapsed(true);
+              onSelect(null); // so clicking the same line again reopens the panel
+            }}
+            title="Hide the list (the map layer stays on)" className="rounded p-1 hover:bg-[var(--hover)]">
             <ChevronRight size={13} />
           </button>
           <button onClick={onClose} title="Turn off the layer" className="rounded p-1 hover:bg-[var(--hover)]">
