@@ -205,7 +205,10 @@ export function getDb(): Promise<Db> {
   const g = globalThis as Global;
   if (!g.__ogeDb) {
     g.__ogeDb = (async () => {
-      const db = process.env.DATABASE_URL ? await createPg(process.env.DATABASE_URL) : await createPglite();
+      // Vercel's Neon/Postgres integrations may expose the connection string as POSTGRES_URL.
+      const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+      if (!url && process.env.VERCEL) throw new Error("No database configured: on Vercel, connect a Postgres database (e.g. Neon) so DATABASE_URL is set.");
+      const db = url ? await createPg(url) : await createPglite();
       await db.exec(SCHEMA);
       return db;
     })();
