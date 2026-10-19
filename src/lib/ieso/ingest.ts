@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { config } from "../config";
 import type { Db } from "../db";
@@ -52,7 +53,7 @@ export async function fetchReport(
 }
 
 function cacheDir(): string {
-  const d = process.env.IESO_CACHE_DIR ?? path.join(process.cwd(), "data", "cache");
+  const d = process.env.IESO_CACHE_DIR ?? (process.env.VERCEL ? path.join(os.tmpdir(), "oge-cache") : path.join(process.cwd(), "data", "cache"));
   fs.mkdirSync(d, { recursive: true });
   return d;
 }

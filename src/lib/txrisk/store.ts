@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import type { Db } from "../db";
 import { readFacilitiesFromDb } from "../facilities";
@@ -71,7 +72,7 @@ function rt(): TxRuntime {
 }
 
 const cacheDir = () => {
-  const d = path.join(process.env.IESO_CACHE_DIR ?? path.join(process.cwd(), "data", "cache"), "txrisk");
+  const d = path.join(process.env.IESO_CACHE_DIR ?? (process.env.VERCEL ? path.join(os.tmpdir(), "oge-cache") : path.join(process.cwd(), "data", "cache")), "txrisk");
   fs.mkdirSync(d, { recursive: true });
   return d;
 };

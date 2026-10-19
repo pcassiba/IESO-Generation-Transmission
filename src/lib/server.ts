@@ -143,3 +143,22 @@ export function startScheduler(): void {
     }
   }, config.pollMinutes * 60_000);
 }
+
+/**
+ * Serverless (Vercel) polling: there is no long-running process, so each call does one bounded
+ * slice of work and awaits it all. Repeated calls fill the backfill a few days at a time.
+ */
+export async function pollServerless(opts: { minIntervalMinutes?: number; dailyPerRun?: number } = {}): Promise<{ skipped: boolean }> {
+  const db = await ensureInitialized();
+  const minutes = opts.minIntervalMinutes ?? config.pollMinutes;
+  const missing = await missingDailyDates(db, Math.max(config.backfillDays, 1));
+  if (minutes > 0 && missing.length === 0) {
+    const last = await db.query<{ at: string }>("SELECT at FROM ingest_log WHERE kind = 'latest' ORDER BY id DESC LIMIT 1");
+    if (last[0] && Date.now() - new Date(last[0].at).getTime() < minutes * 60_000) return { skipped: true };
+  }
+  await ingestLatest(db).catch((e) => console.warn(`[ingest] latest report failed: ${(e as Error).message}`));
+  for (const d of missing.slice(0, opts.dailyPerRun ?? 2)) await ingestDaily(db, d).catch(() => undefined);
+  if (process.env.TXRISK_ENABLED !== "0") await refreshTxRisk().catch((e) => console.warn(`[txrisk] ${(e as Error).message}`));
+  await pollCongestion(db);
+  return { skipped: false };
+}
