@@ -2,13 +2,14 @@
 
 import type { Map as MLMap } from "maplibre-gl";
 import dynamic from "next/dynamic";
-import { Activity, AlertTriangle, Cable, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling, Zap } from "lucide-react";
+import { Activity, AlertTriangle, Cable, DollarSign, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CongestionResponse } from "@/lib/congestion";
 import { DEFAULT_VISIBLE, VOLTAGE_CLASSES, VOLTAGE_COLOR, VOLTAGE_LABEL, type VoltageClass } from "@/lib/transmission";
 import type { FacilityState, StateResponse } from "@/lib/types";
 import { STATUSES, STATUS_LABEL, STORAGE_MODE_LABEL, TECHNOLOGIES, TECHNOLOGY_LABEL } from "@/lib/types";
 import { toCsv } from "@/lib/csv";
+import { LMP_GRADIENT_CSS, facilityLmps, formatLmpShort, lmpScale } from "@/lib/lmp";
 import { hourEndingLabel } from "@/lib/time";
 import { CONGESTION_NEG, CONGESTION_POS } from "@/lib/ui";
 import { LEGEND as TXR_LEGEND, RISK_COLOR } from "@/lib/txrisk/ui";
@@ -18,7 +19,7 @@ import Dashboard from "./Dashboard";
 import DetailPanel from "./DetailPanel";
 import Header from "./Header";
 import { StatusDot, TechIcon } from "./Icons";
-import type { MapCommand } from "./MapView";
+import type { LmpOverlay, MapCommand } from "./MapView";
 import { CoverageModal, MethodologyModal } from "./Modals";
 import Sidebar, { applyFilters, defaultFilters, type Filters } from "./Sidebar";
 import TimeBar from "./txrisk/TimeBar";
@@ -57,6 +58,7 @@ export default function Explorer() {
   const [showCongestion, setShowCongestion] = useState(false);
   const [congestion, setCongestion] = useState<CongestionResponse | null>(null);
   const [congestionError, setCongestionError] = useState<string | null>(null);
+  const [showLmp, setShowLmp] = useState(false);
   const mapRef = useRef<MLMap | null>(null);
   const tx = useTxRisk();
   const txOverlay = useMemo(
@@ -97,7 +99,7 @@ export default function Explorer() {
   const congestionTs = state?.meta.mode === "historical" ? state.meta.selectedTsUtc : null;
   const stateKey = state?.meta.latestTsUtc;
   useEffect(() => {
-    if (!showCongestion) return;
+    if (!showCongestion && !showLmp) return;
     let cancelled = false;
     (async () => {
       try {
@@ -115,7 +117,7 @@ export default function Explorer() {
     return () => {
       cancelled = true;
     };
-  }, [showCongestion, congestionTs, stateKey]);
+  }, [showCongestion, showLmp, congestionTs, stateKey]);
 
   const lineVisibility = useMemo(
     () => Object.fromEntries(VOLTAGE_CLASSES.map((c) => [c, showLines && lineClasses[c]])) as Record<VoltageClass, boolean>,
@@ -123,6 +125,15 @@ export default function Explorer() {
   );
 
   const all = useMemo(() => state?.facilities ?? [], [state]);
+
+  // LMP view: one averaged price per mapped facility, coloured relative to this hour's spread.
+  const lmpView = useMemo(() => {
+    if (!showLmp || !congestion) return null;
+    const mapped = new Set(all.filter((f) => f.lat !== null && f.lon !== null).map((f) => f.id));
+    const priced = congestion.facilities.filter((f) => mapped.has(f.facilityId));
+    const scale = lmpScale(priced.map((f) => f.lmp));
+    return { scale, overlay: { byFacility: facilityLmps(priced, scale), hourTsUtc: congestion.hourTsUtc } satisfies LmpOverlay };
+  }, [showLmp, congestion, all]);
   const filtered = useMemo(() => applyFilters(all, filters), [all, filters]);
   const selected = all.find((f) => f.id === selectedId) ?? null;
   const compareFacilities = compare.map((id) => all.find((f) => f.id === id)).filter((f): f is FacilityState => !!f);
@@ -254,11 +265,21 @@ export default function Explorer() {
             onTransmissionStatus={setTxStatus}
             txRisk={txOverlay}
             onTxRiskPick={(id) => tx.setSelectedId(id)}
+            lmp={lmpView?.overlay ?? null}
           />
 
           {/* Outages & congestion risk: prominent toggle, flashing toggle and time selector */}
           <div className="pointer-events-none absolute left-14 right-14 top-3 z-10 flex flex-col items-start gap-1">
             <div className="pointer-events-auto flex flex-wrap items-center gap-1 rounded border border-[var(--border)] bg-[var(--panel)]/95 px-2 py-1 text-[11px] shadow">
+              <button
+                onClick={() => setShowLmp((v) => !v)}
+                aria-pressed={showLmp}
+                title="Replace facility icons with each facility's real-time LMP (average of its units)"
+                className={`flex items-center gap-1 rounded px-2 py-0.5 font-semibold ${showLmp ? "bg-red-500/25 text-red-200" : "hover:bg-[var(--hover)]"}`}
+              >
+                <DollarSign size={13} /> LMP: {showLmp ? "ON" : "OFF"}
+              </button>
+              <span className="mx-0.5 h-4 w-px bg-[var(--border)]" />
               <button
                 onClick={() => tx.setEnabled((v) => !v)}
                 aria-pressed={tx.enabled}
@@ -278,6 +299,28 @@ export default function Explorer() {
                 </button>
               )}
             </div>
+            {showLmp && (
+              <div className="pointer-events-auto flex flex-wrap items-center gap-2 rounded border border-[var(--border)] bg-[var(--panel)]/95 px-2 py-1 text-[11px] shadow">
+                {congestionError ? (
+                  <span className="text-red-300">Could not load prices: {congestionError}</span>
+                ) : !congestion ? (
+                  <span className="text-[var(--muted)]">Loading prices…</span>
+                ) : !lmpView?.scale ? (
+                  <span className="text-amber-300">No IESO real-time prices stored yet for this hour. They load with the next data refresh.</span>
+                ) : (
+                  <>
+                    <span className="font-semibold">Real-time LMP</span>
+                    <span className="text-[var(--muted)]">{hourEndingLabel(congestion.hourTsUtc)}</span>
+                    <span className="flex items-center gap-1 font-mono">
+                      ≤ {formatLmpShort(lmpView.scale.low)}
+                      <span className="inline-block h-2.5 w-28 rounded-sm border border-[var(--border)]" style={{ background: LMP_GRADIENT_CSS }} />≥ {formatLmpShort(lmpView.scale.high)}
+                    </span>
+                    {congestion.medianLmp !== null && <span className="text-[var(--muted)]">Ontario median ${congestion.medianLmp.toFixed(2)}/MWh</span>}
+                    <span className="text-[var(--muted)]">· {lmpView.overlay.byFacility.size} facilities priced, grey = no pricing link</span>
+                  </>
+                )}
+              </div>
+            )}
             {tx.enabled && (
               <div className="w-full max-w-2xl">
                 <TimeBar preset={tx.preset} setPreset={tx.setPreset} tUtc={tx.tUtc} setT={tx.setT} nowUtc={tx.data?.nowUtc ?? new Date().toISOString()} items={tx.data?.items ?? []} />
@@ -320,22 +363,26 @@ export default function Explorer() {
 
           {legendOpen && (
             <div className="absolute bottom-8 left-3 z-10 rounded border border-[var(--border)] bg-[var(--panel)]/95 p-2 text-[11px] shadow">
-              <div className="mb-1 font-semibold uppercase tracking-wide text-[var(--muted)]">Technology</div>
-              <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
-                {TECHNOLOGIES.map((t) => (
-                  <span key={t} className="flex items-center gap-1.5">
-                    <TechIcon tech={t} size={10} boxed /> {TECHNOLOGY_LABEL[t]}
-                  </span>
-                ))}
-              </div>
-              <div className="mb-1 mt-2 font-semibold uppercase tracking-wide text-[var(--muted)]">Status (marker corner)</div>
-              <div className="grid grid-cols-1 gap-0.5">
-                {STATUSES.map((s) => (
-                  <span key={s} className="flex items-center gap-1.5">
-                    <StatusDot status={s} size={11} /> {STATUS_LABEL[s]}
-                  </span>
-                ))}
-              </div>
+              {!showLmp && (
+                <>
+                  <div className="mb-1 font-semibold uppercase tracking-wide text-[var(--muted)]">Technology</div>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
+                    {TECHNOLOGIES.map((t) => (
+                      <span key={t} className="flex items-center gap-1.5">
+                        <TechIcon tech={t} size={10} boxed /> {TECHNOLOGY_LABEL[t]}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mb-1 mt-2 font-semibold uppercase tracking-wide text-[var(--muted)]">Status (marker corner)</div>
+                  <div className="grid grid-cols-1 gap-0.5">
+                    {STATUSES.map((s) => (
+                      <span key={s} className="flex items-center gap-1.5">
+                        <StatusDot status={s} size={11} /> {STATUS_LABEL[s]}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
               {showLines && (
                 <>
                   <div className="mb-1 mt-2 font-semibold uppercase tracking-wide text-[var(--muted)]">Transmission</div>
