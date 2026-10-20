@@ -2,13 +2,15 @@ import { config } from "../config";
 import type { Db } from "../db";
 import { addDays, compactDate, hourEndingToUtc, marketDateNow, utcToMarketHour } from "../time";
 import { fetchReport, IesoFetchError, sha256 } from "./ingest";
-import { parseConstraintShadowPrices, parseRealtimeLmpCsv, type ParsedConstraints, type ParsedLmp } from "./market";
+import { parseConstraintShadowPrices, parseRealtimeIntertieLmp, parseRealtimeLmpCsv, type ParsedConstraints, type ParsedIntertieLmp, type ParsedLmp } from "./market";
 
 /**
  * Ingestion of the congestion reports (nodal LMP components and constraint shadow prices).
  *
  *  - LMP: one archived CSV per delivery hour (PUB_RealtimeEnergyLMP_YYYYMMDDHH.csv) plus a
  *    rolling file for the hour in progress. Each hour is stored once complete (12 intervals).
+ *  - Intertie LMP: one archived XML per delivery hour (PUB_RealTimeIntertieLMP_YYYYMMDDHH.xml)
+ *    plus a rolling file, handled the same way as the nodal prices.
  *  - Constraints: one archived XML per delivery day (PUB_RealtimeConstrShadowPrices_YYYYMMDD.xml).
  *    IESO publishes these several days after the fact, so recent days 404 for a while; a missing
  *    day is retried at most once an hour.
@@ -19,6 +21,7 @@ import { parseConstraintShadowPrices, parseRealtimeLmpCsv, type ParsedConstraint
 const HOUR = 3_600_000;
 const LMP = "lmp";
 const CONSTRAINTS = "constraints";
+const INTERTIE = "intertie";
 
 const hourPeriod = (date: string, hour: number) => `${date} ${String(hour).padStart(2, "0")}`;
 
@@ -67,6 +70,24 @@ export async function storeLmp(db: Db, parsed: ParsedLmp, url: string, sha: stri
   return { hours: [...byHour.keys()].map((h) => hourPeriod(parsed.deliveryDate, h)), rows: parsed.rows.length };
 }
 
+/** Store one hour of intertie prices and record its coverage. */
+export async function storeIntertieLmp(db: Db, parsed: ParsedIntertieLmp, url: string, sha: string): Promise<{ rows: number }> {
+  const ints = Math.max(0, ...parsed.rows.map((r) => r.intervals));
+  await db.transaction(async (tx) => {
+    for (const r of parsed.rows) {
+      await tx.query(
+        `INSERT INTO intertie_lmp_hourly (location, ts_utc, intervals, lmp, loss, congestion, external_congestion, nisl) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+         ON CONFLICT (location, ts_utc) DO UPDATE SET intervals = EXCLUDED.intervals, lmp = EXCLUDED.lmp, loss = EXCLUDED.loss,
+           congestion = EXCLUDED.congestion, external_congestion = EXCLUDED.external_congestion, nisl = EXCLUDED.nisl
+         WHERE EXCLUDED.intervals >= intertie_lmp_hourly.intervals`,
+        [r.location, r.tsUtc, r.intervals, r.lmp, r.loss, r.congestion, r.externalCongestion, r.nisl],
+      );
+    }
+    await markFile(tx, INTERTIE, hourPeriod(parsed.deliveryDate, parsed.hour), url, sha, ints >= 12, parsed.rows.length);
+  });
+  return { rows: parsed.rows.length };
+}
+
 export async function storeConstraints(db: Db, parsed: ParsedConstraints, url: string, sha: string): Promise<{ binding: number }> {
   const binding = parsed.rows.filter((r) => r.bindingIntervals > 0);
   const hours = new Set(parsed.rows.map((r) => r.hour));
@@ -91,6 +112,26 @@ export async function ingestLmpHour(db: Db, date: string, hour: number): Promise
   return storeLmp(db, parseRealtimeLmpCsv(res.body, date), url, sha256(res.body));
 }
 
+export async function ingestIntertieHour(db: Db, date: string, hour: number): Promise<{ rows: number }> {
+  const url = `${config.congestion.intertieLmpBaseUrl}PUB_RealTimeIntertieLMP_${compactDate(date)}${String(hour).padStart(2, "0")}.xml`;
+  const res = await fetchReport(url);
+  if (res.kind !== "ok") return { rows: 0 };
+  return storeIntertieLmp(db, parseRealtimeIntertieLmp(res.body), url, sha256(res.body));
+}
+
+let lastIntertieSha: string | null = null;
+
+export async function ingestIntertieLatest(db: Db): Promise<{ rows: number; skipped?: boolean }> {
+  const url = `${config.congestion.intertieLmpBaseUrl}PUB_RealTimeIntertieLMP.xml`;
+  const res = await fetchReport(url);
+  if (res.kind !== "ok") return { rows: 0, skipped: true };
+  const sha = sha256(res.body);
+  if (sha === lastIntertieSha) return { rows: 0, skipped: true };
+  const r = await storeIntertieLmp(db, parseRealtimeIntertieLmp(res.body), url, sha);
+  lastIntertieSha = sha;
+  return r;
+}
+
 let lastRollingSha: string | null = null;
 
 /** The rolling file holds the delivery hour in progress. */
@@ -112,9 +153,9 @@ export async function ingestConstraintsDay(db: Db, date: string): Promise<{ bind
   return storeConstraints(db, parseConstraintShadowPrices(res.body), url, sha256(res.body));
 }
 
-/** Completed market hours in the last `hours` hours without a complete LMP file, newest first. */
-export async function missingLmpHours(db: Db, hours: number, now = new Date()): Promise<{ date: string; hour: number }[]> {
-  const have = await db.query<{ period: string }>("SELECT period FROM market_files WHERE report = $1 AND complete", [LMP]);
+/** Completed market hours in the last `hours` hours without a complete file of `report`, newest first. */
+export async function missingLmpHours(db: Db, hours: number, now = new Date(), report = LMP): Promise<{ date: string; hour: number }[]> {
+  const have = await db.query<{ period: string }>("SELECT period FROM market_files WHERE report = $1 AND complete", [report]);
   const haveSet = new Set(have.map((h) => h.period));
   const current = utcToMarketHour(new Date(Math.ceil(now.getTime() / HOUR) * HOUR));
   const currentTs = new Date(hourEndingToUtc(current.reportDate, current.hour)).getTime();
@@ -174,6 +215,19 @@ export async function ensureLmpHour(db: Db, tsUtc: string, now = new Date()): Pr
   return r === "ok" ? "fetched" : r;
 }
 
+/** Same as ensureLmpHour, for the intertie price report. */
+export async function ensureIntertieHour(db: Db, tsUtc: string, now = new Date()): Promise<"stored" | "fetched" | "skipped" | "missing"> {
+  const t = new Date(tsUtc);
+  if (Number.isNaN(t.getTime())) return "skipped";
+  const mh = utcToMarketHour(new Date(Math.ceil(t.getTime() / HOUR) * HOUR));
+  if (new Date(hourEndingToUtc(mh.reportDate, mh.hour)).getTime() > now.getTime()) return "skipped";
+  const period = hourPeriod(mh.reportDate, mh.hour);
+  const have = await db.query<{ n: number }>("SELECT count(*)::int AS n FROM market_files WHERE report = $1 AND period = $2 AND complete", [INTERTIE, period]);
+  if ((have[0]?.n ?? 0) > 0) return "stored";
+  const r = await throttled(`intertie:${mh.reportDate}:${mh.hour}`, () => ingestIntertieHour(db, mh.reportDate, mh.hour));
+  return r === "ok" ? "fetched" : r;
+}
+
 async function pool<T>(items: T[], concurrency: number, fn: (t: T) => Promise<void>) {
   let i = 0;
   await Promise.all(
@@ -209,6 +263,20 @@ export async function syncCongestion(db: Db, onProgress?: (msg: string) => void)
     await ingestLmpLatest(db);
   } catch (e) {
     errors.push(`LMP latest: ${(e as Error).message}`);
+  }
+
+  const tieHours = await missingLmpHours(db, config.congestion.intertieBackfillDays * 24, new Date(), INTERTIE);
+  await pool(tieHours, 3, async ({ date, hour }) => {
+    try {
+      await throttled(`intertie:${date}:${hour}`, () => ingestIntertieHour(db, date, hour));
+    } catch (e) {
+      errors.push(`Intertie ${hourPeriod(date, hour)}: ${(e as Error).message}`);
+    }
+  });
+  try {
+    await ingestIntertieLatest(db);
+  } catch (e) {
+    errors.push(`Intertie latest: ${(e as Error).message}`);
   }
 
   const days = await missingConstraintDays(db, config.congestion.constraintBackfillDays);

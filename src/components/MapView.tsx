@@ -4,7 +4,7 @@ import * as maplibregl from "maplibre-gl";
 import type { GeoJSONSource, Map as MLMap, MapLayerMouseEvent } from "maplibre-gl";
 import { useEffect, useRef } from "react";
 import type { CongestionResponse } from "@/lib/congestion";
-import type { FacilityLmp } from "@/lib/lmp";
+import type { FacilityLmp, IntertieMarker } from "@/lib/lmp";
 import { VOLTAGE_CLASSES, VOLTAGE_COLOR, type VoltageClass } from "@/lib/transmission";
 import type { FacilityState, OperationalStatus, Technology } from "@/lib/types";
 import { STATUSES, STATUS_LABEL, TECHNOLOGIES, TECHNOLOGY_LABEL, STORAGE_MODE_LABEL } from "@/lib/types";
@@ -45,6 +45,15 @@ interface Props {
   onTxRiskPick?: (itemId: string) => void;
   /** LMP heat view: when set, each facility icon is replaced by its price. */
   lmp?: LmpOverlay | null;
+  /** Intertie prices as yellow circles; null hides them. */
+  interties?: IntertieOverlay | null;
+}
+
+export interface IntertieOverlay {
+  markers: IntertieMarker[];
+  hourTsUtc: string | null;
+  /** Ontario median LMP for the hour, quoted in the tooltip for comparison. */
+  medianLmp: number | null;
 }
 
 export interface LmpOverlay {
@@ -55,6 +64,8 @@ export interface LmpOverlay {
 /** Icon layers hidden while the LMP view is on. */
 const ICON_LAYERS = ["clusters", "cluster-count", "unclustered", "points"];
 const LMP_LAYERS = ["lmp-glow", "lmp-dots", "lmp-labels"];
+/** Intertie layers, kept above everything else. */
+const INTERTIE_LAYERS = ["intertie-glow", "intertie-arrows", "intertie-dots", "intertie-labels"];
 
 const CLUSTER_MAX_ZOOM = 8;
 const SPREAD_PX = 30;
@@ -220,6 +231,73 @@ function lmpFeatures(map: MLMap, located: FacilityState[], spreadPoints: ReturnT
   return { type: "FeatureCollection" as const, features };
 }
 
+function intertieFeatures(o: IntertieOverlay | null) {
+  return {
+    type: "FeatureCollection" as const,
+    features: (o?.markers ?? []).map((m) => ({
+      type: "Feature" as const,
+      geometry: { type: "Point" as const, coordinates: [m.point.lon, m.point.lat] },
+      properties: { id: m.point.id, heat: m.heat, color: m.color, label: m.label, bearing: m.point.bearing },
+    })),
+  };
+}
+
+function intertieTooltipHtml(m: IntertieMarker, o: IntertieOverlay): string {
+  const p = m.point;
+  const head = p.prices.find((x) => x.location === p.location)!;
+  const diff = o.medianLmp === null ? null : p.lmp - o.medianLmp;
+  const rows: [string, string][] = [
+    ["Intertie LMP", money(p.lmp)],
+    ...(diff === null ? [] : ([["vs Ontario median", `${diff >= 0 ? "+" : "−"}${Math.abs(diff).toFixed(2)} $/MWh`]] as [string, string][])),
+    ["Congestion part", money(head.congestion)],
+    ["External congestion", money(head.externalCongestion)],
+    ["Intertie limit (NISL) part", money(head.nisl)],
+    ["Loss part", money(head.loss)],
+  ];
+  const others =
+    p.prices.length > 1
+      ? `<div class="oge-tip-row" style="margin-top:4px"><span>Pricing locations here</span></div>${p.prices.map((x) => `<div class="oge-tip-row"><span>${esc(x.location)}</span><b>${money(x.lmp)}</b></div>`).join("")}`
+      : `<div class="oge-tip-row"><span>Pricing location</span><b>${esc(p.location)}</b></div>`;
+  const flow = p.neighbour ? `<div class="oge-tip-row"><span>Ontario ⇄ ${esc(p.neighbour)}</span></div>` : "";
+  return `<div class="oge-tip"><div class="oge-tip-title">${esc(p.name)}</div>${flow}${rows
+    .map(([k, v]) => `<div class="oge-tip-row"><span>${k}</span><b>${v}</b></div>`)
+    .join("")}${others}<div class="oge-tip-row" style="margin-top:4px"><span>${esc(hourEndingLabel(o.hourTsUtc))} · IESO real-time · position approximate</span></div></div>`;
+}
+
+/**
+ * Two-way arrow drawn behind each intertie circle: one head points toward Ontario, the other
+ * toward the neighbouring system. Drawn pointing east and rotated by the tie's bearing.
+ */
+function intertieArrowImage(): ImageData {
+  const w = 150;
+  const h = 26;
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const g = c.getContext("2d")!;
+  const y = h / 2;
+  const head = 11;
+  g.beginPath();
+  g.moveTo(2, y);
+  g.lineTo(2 + head, y - 8);
+  g.lineTo(2 + head, y - 2.5);
+  g.lineTo(w - 2 - head, y - 2.5);
+  g.lineTo(w - 2 - head, y - 8);
+  g.lineTo(w - 2, y);
+  g.lineTo(w - 2 - head, y + 8);
+  g.lineTo(w - 2 - head, y + 2.5);
+  g.lineTo(2 + head, y + 2.5);
+  g.lineTo(2 + head, y + 8);
+  g.closePath();
+  g.fillStyle = "#eab308";
+  g.strokeStyle = "#422006";
+  g.lineWidth = 1.5;
+  g.lineJoin = "round";
+  g.fill();
+  g.stroke();
+  return g.getImageData(0, 0, w, h);
+}
+
 const money = (v: number | null) => (v === null ? "—" : `${v.toFixed(2)} $/MWh`);
 
 function lmpTooltipHtml(f: FacilityState, p: FacilityLmp | undefined, hourTsUtc: string | null): string {
@@ -256,7 +334,7 @@ function tooltipHtml(f: FacilityState, cong?: { congestion: number | null; lmp: 
     .join("")}</div>`;
 }
 
-export default function MapView({ facilities, selectedId, onSelect, theme, scaleByCapacity, command, onMapReady, lineVisibility, congestion, onTransmissionStatus, txRisk, onTxRiskPick, lmp }: Props) {
+export default function MapView({ facilities, selectedId, onSelect, theme, scaleByCapacity, command, onMapReady, lineVisibility, congestion, onTransmissionStatus, txRisk, onTxRiskPick, lmp, interties }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const facRef = useRef<FacilityState[]>(facilities);
@@ -269,6 +347,7 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
   const lineVisRef = useRef(lineVisibility);
   const congRef = useRef(congestion);
   const lmpRef = useRef(lmp ?? null);
+  const tieRef = useRef(interties ?? null);
   const txStatusRef = useRef(onTransmissionStatus);
   txStatusRef.current = onTransmissionStatus;
   const txrRef = useRef(txRisk ?? null);
@@ -297,6 +376,9 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     (map.getSource("fac-anchors") as GeoJSONSource).setData(spread.anchors);
     (map.getSource("cong") as GeoJSONSource | undefined)?.setData(congestionFeatures(located, congRef.current));
     (map.getSource("lmp") as GeoJSONSource | undefined)?.setData(lmpFeatures(map, located, spread.points.features, lmpRef.current));
+    (map.getSource("interties") as GeoJSONSource | undefined)?.setData(intertieFeatures(tieRef.current));
+    // Layers added later (transmission, outage overlay) would otherwise cover the intertie circles.
+    if (tieRef.current) for (const l of INTERTIE_LAYERS) if (map.getLayer(l)) map.moveLayer(l);
     const sel = located.find((f) => f.id === selRef.current);
     const selPt = sel ? spread.points.features.find((p) => p.properties.id === sel.id) : null;
     (map.getSource("fac-selected") as GeoJSONSource).setData({
@@ -528,6 +610,59 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
       paint: { "text-color": ["get", "textColor"] },
     });
     applyLmpVisibility();
+
+    // Interties: yellow circles with a yellow ring, deeper yellow and a wider glow when pricier than Ontario's generators.
+    map.addSource("interties", { type: "geojson", data: empty });
+    if (!map.hasImage("intertie-arrow")) map.addImage("intertie-arrow", intertieArrowImage(), { pixelRatio: 2 });
+    map.addLayer({
+      id: "intertie-arrows",
+      type: "symbol",
+      source: "interties",
+      layout: {
+        "icon-image": "intertie-arrow",
+        // The image points east; rotate it onto the tie's bearing so it spans the border.
+        "icon-rotate": ["-", ["get", "bearing"], 90],
+        "icon-rotation-alignment": "map",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true,
+        "icon-size": ["interpolate", ["linear"], ["zoom"], 4, 0.9, 9, 1.3],
+      },
+    });
+    map.addLayer({
+      id: "intertie-glow",
+      type: "circle",
+      source: "interties",
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, ["+", 12, ["*", 16, ["get", "heat"]]], 9, ["+", 24, ["*", 24, ["get", "heat"]]]],
+        "circle-color": "#facc15",
+        "circle-opacity": ["+", 0.08, ["*", 0.5, ["get", "heat"]]],
+        "circle-blur": 1,
+      },
+    });
+    map.addLayer({
+      id: "intertie-dots",
+      type: "circle",
+      source: "interties",
+      layout: { "circle-sort-key": ["get", "heat"] },
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 11, 6, 15, 9, 19],
+        "circle-color": ["get", "color"],
+        "circle-stroke-color": "#eab308",
+        "circle-stroke-width": 2.5,
+      },
+    });
+    map.addLayer({
+      id: "intertie-labels",
+      type: "symbol",
+      source: "interties",
+      layout: {
+        "text-field": ["get", "label"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 4, 9, 9, 11],
+        "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+        "text-allow-overlap": true,
+      },
+      paint: { "text-color": "#422006" },
+    });
     refreshData();
   };
 
@@ -596,8 +731,16 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
         .addTo(map);
     });
     map.on("mouseleave", "lmp-dots", leave);
+    map.on("mousemove", "intertie-dots", (e: MapLayerMouseEvent) => {
+      const id = e.features?.[0]?.properties?.id as string | undefined;
+      const o = tieRef.current;
+      const m = o?.markers.find((x) => x.point.id === id);
+      if (!o || !m) return;
+      popup.setLngLat([m.point.lon, m.point.lat]).setHTML(intertieTooltipHtml(m, o)).addTo(map);
+    });
+    map.on("mouseleave", "intertie-dots", () => popup.remove());
     const lineHover = (e: MapLayerMouseEvent) => {
-      if (map.queryRenderedFeatures(e.point, { layers: ["unclustered", "points", "clusters", "lmp-dots"].filter((l) => map.getLayer(l)) }).length) return;
+      if (map.queryRenderedFeatures(e.point, { layers: ["unclustered", "points", "clusters", "lmp-dots", "intertie-dots"].filter((l) => map.getLayer(l)) }).length) return;
       const p = e.features?.[0]?.properties;
       if (!p) return;
       popup.setLngLat(e.lngLat).setHTML(lineTooltipHtml(p)).addTo(map);
@@ -677,6 +820,12 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     refreshData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lmp]);
+
+  useEffect(() => {
+    tieRef.current = interties ?? null;
+    refreshData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [interties]);
 
   useEffect(() => {
     applyOverlay();

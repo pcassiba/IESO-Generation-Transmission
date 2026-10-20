@@ -20,9 +20,12 @@ export const config = {
     /** Set CONGESTION_ENABLED=0 to stop fetching the price and constraint reports. */
     enabled: process.env.CONGESTION_ENABLED !== "0",
     lmpBaseUrl: process.env.IESO_LMP_BASE_URL ?? "https://reports-public.ieso.ca/public/RealtimeEnergyLMP/",
+    intertieLmpBaseUrl: process.env.IESO_INTERTIE_LMP_BASE_URL ?? "https://reports-public.ieso.ca/public/RealTimeIntertieLMP/",
     constraintsBaseUrl: process.env.IESO_CONSTRAINTS_BASE_URL ?? "https://reports-public.ieso.ca/public/RealtimeConstrShadowPrices/",
     /** Days of hourly nodal prices to backfill (one file per hour, so keep this modest). */
     lmpBackfillDays: num("CONGESTION_LMP_DAYS", 7),
+    /** Days of hourly intertie prices to backfill; older hours are fetched when someone picks them. */
+    intertieBackfillDays: num("INTERTIE_LMP_DAYS", 2),
     /** Days of binding-constraint history to backfill (one file per day; IESO publishes these a few days late). */
     constraintBackfillDays: num("CONGESTION_CONSTRAINT_DAYS", 30),
     /** Congestion component (|$/MWh|) at or above which a location is shown as congested. */
