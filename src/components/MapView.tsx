@@ -4,9 +4,11 @@ import * as maplibregl from "maplibre-gl";
 import type { GeoJSONSource, Map as MLMap, MapLayerMouseEvent } from "maplibre-gl";
 import { useEffect, useRef } from "react";
 import type { CongestionResponse } from "@/lib/congestion";
+import type { FacilityLmp } from "@/lib/lmp";
 import { VOLTAGE_CLASSES, VOLTAGE_COLOR, type VoltageClass } from "@/lib/transmission";
 import type { FacilityState, OperationalStatus, Technology } from "@/lib/types";
 import { STATUSES, STATUS_LABEL, TECHNOLOGIES, TECHNOLOGY_LABEL, STORAGE_MODE_LABEL } from "@/lib/types";
+import { hourEndingLabel } from "@/lib/time";
 import { CONGESTION_NEG, CONGESTION_POS, MAP_STYLES, ONTARIO_BOUNDS, TECH_COLOR, fmtMW, markerSvg } from "@/lib/ui";
 import type { TxRiskItem } from "@/lib/txrisk/types";
 import type { OverlayOptions } from "@/lib/txrisk/ui";
@@ -41,7 +43,18 @@ interface Props {
   /** Outages & congestion risk overlay; null or options.enabled=false hides it. */
   txRisk?: TxRiskOverlay | null;
   onTxRiskPick?: (itemId: string) => void;
+  /** LMP heat view: when set, each facility icon is replaced by its price. */
+  lmp?: LmpOverlay | null;
 }
+
+export interface LmpOverlay {
+  byFacility: Map<string, FacilityLmp>;
+  hourTsUtc: string | null;
+}
+
+/** Icon layers hidden while the LMP view is on. */
+const ICON_LAYERS = ["clusters", "cluster-count", "unclustered", "points"];
+const LMP_LAYERS = ["lmp-glow", "lmp-dots", "lmp-labels"];
 
 const CLUSTER_MAX_ZOOM = 8;
 const SPREAD_PX = 30;
@@ -186,6 +199,48 @@ function congestionFeatures(facilities: FacilityState[], c: CongestionResponse |
   return { type: "FeatureCollection" as const, features };
 }
 
+/** One LMP marker per facility; spread positions are used once markers fan out at close zoom. */
+function lmpFeatures(map: MLMap, located: FacilityState[], spreadPoints: ReturnType<typeof toFeature>[], lmp: LmpOverlay | null) {
+  const features: GeoJSON.Feature[] = [];
+  if (lmp) {
+    const spreadAt = new Map(spreadPoints.map((p) => [p.properties.id, p.geometry.coordinates]));
+    const useSpread = map.getZoom() >= CLUSTER_MAX_ZOOM + 1;
+    for (const f of located) {
+      const p = lmp.byFacility.get(f.id);
+      const coordinates = (useSpread && spreadAt.get(f.id)) || [f.lon!, f.lat!];
+      features.push({
+        type: "Feature",
+        geometry: { type: "Point", coordinates },
+        properties: p
+          ? { id: f.id, priced: true, heat: p.heat, color: p.color, label: p.label, textColor: p.textColor }
+          : { id: f.id, priced: false, heat: -1, color: "#94a3b8", label: "", textColor: "#111827" },
+      });
+    }
+  }
+  return { type: "FeatureCollection" as const, features };
+}
+
+const money = (v: number | null) => (v === null ? "—" : `${v.toFixed(2)} $/MWh`);
+
+function lmpTooltipHtml(f: FacilityState, p: FacilityLmp | undefined, hourTsUtc: string | null): string {
+  if (!p) {
+    return `<div class="oge-tip"><div class="oge-tip-title">${esc(f.name)}</div><div class="oge-tip-row"><span>No IESO pricing location linked to this facility</span></div></div>`;
+  }
+  const d = p.detail;
+  const rows: [string, string][] = [
+    [d.units.length > 1 ? `LMP (average of ${d.units.length} units)` : "LMP", money(p.lmp)],
+    ["Congestion part", money(d.congestion)],
+    ["Loss part", money(d.loss)],
+  ];
+  const units =
+    d.units.length > 1
+      ? `<div class="oge-tip-row" style="margin-top:4px"><span>Units</span></div>${d.units.map((u) => `<div class="oge-tip-row"><span>${esc(u.location)}</span><b>${money(u.lmp)}</b></div>`).join("")}`
+      : `<div class="oge-tip-row"><span>Pricing location</span><b>${esc(d.units[0]?.location ?? "")}</b></div>`;
+  return `<div class="oge-tip"><div class="oge-tip-title">${esc(f.name)}</div>${rows
+    .map(([k, v]) => `<div class="oge-tip-row"><span>${k}</span><b>${v}</b></div>`)
+    .join("")}${units}<div class="oge-tip-row" style="margin-top:4px"><span>${esc(hourEndingLabel(hourTsUtc))} · IESO real-time</span></div></div>`;
+}
+
 function tooltipHtml(f: FacilityState, cong?: { congestion: number | null; lmp: number | null }): string {
   const vg = f.technology === "wind" || f.technology === "solar";
   const rows = [
@@ -201,7 +256,7 @@ function tooltipHtml(f: FacilityState, cong?: { congestion: number | null; lmp: 
     .join("")}</div>`;
 }
 
-export default function MapView({ facilities, selectedId, onSelect, theme, scaleByCapacity, command, onMapReady, lineVisibility, congestion, onTransmissionStatus, txRisk, onTxRiskPick }: Props) {
+export default function MapView({ facilities, selectedId, onSelect, theme, scaleByCapacity, command, onMapReady, lineVisibility, congestion, onTransmissionStatus, txRisk, onTxRiskPick, lmp }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const facRef = useRef<FacilityState[]>(facilities);
@@ -213,6 +268,7 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
   onSelectRef.current = onSelect;
   const lineVisRef = useRef(lineVisibility);
   const congRef = useRef(congestion);
+  const lmpRef = useRef(lmp ?? null);
   const txStatusRef = useRef(onTransmissionStatus);
   txStatusRef.current = onTransmissionStatus;
   const txrRef = useRef(txRisk ?? null);
@@ -240,12 +296,22 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     (map.getSource("fac-lines") as GeoJSONSource).setData(spread.lines);
     (map.getSource("fac-anchors") as GeoJSONSource).setData(spread.anchors);
     (map.getSource("cong") as GeoJSONSource | undefined)?.setData(congestionFeatures(located, congRef.current));
+    (map.getSource("lmp") as GeoJSONSource | undefined)?.setData(lmpFeatures(map, located, spread.points.features, lmpRef.current));
     const sel = located.find((f) => f.id === selRef.current);
     const selPt = sel ? spread.points.features.find((p) => p.properties.id === sel.id) : null;
     (map.getSource("fac-selected") as GeoJSONSource).setData({
       type: "FeatureCollection",
       features: selPt ? [selPt] : [],
     });
+  };
+
+  /** Swap facility icons for LMP markers (or back). */
+  const applyLmpVisibility = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    const on = !!lmpRef.current;
+    for (const l of ICON_LAYERS) if (map.getLayer(l)) map.setLayoutProperty(l, "visibility", on ? "none" : "visible");
+    for (const l of LMP_LAYERS) if (map.getLayer(l)) map.setLayoutProperty(l, "visibility", on ? "visible" : "none");
   };
 
   const iconSizeExpr = (): maplibregl.ExpressionSpecification | number =>
@@ -416,6 +482,52 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
         "text-halo-width": 1.4,
       },
     });
+
+    // LMP heat view: a soft red glow that grows with price, a coloured disc, and the price on top.
+    map.addSource("lmp", { type: "geojson", data: empty });
+    const hidden = { visibility: "none" as const };
+    map.addLayer({
+      id: "lmp-glow",
+      type: "circle",
+      source: "lmp",
+      filter: ["==", ["get", "priced"], true],
+      layout: { ...hidden, "circle-sort-key": ["get", "heat"] },
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, ["+", 10, ["*", 14, ["get", "heat"]]], 9, ["+", 22, ["*", 22, ["get", "heat"]]]],
+        "circle-color": ["get", "color"],
+        "circle-opacity": ["*", 0.55, ["get", "heat"]],
+        "circle-blur": 1,
+      },
+    });
+    map.addLayer({
+      id: "lmp-dots",
+      type: "circle",
+      source: "lmp",
+      layout: { ...hidden, "circle-sort-key": ["get", "heat"] },
+      paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, ["case", ["get", "priced"], 9, 3], 6, ["case", ["get", "priced"], 13, 4], 9, ["case", ["get", "priced"], 17, 5]],
+        "circle-color": ["get", "color"],
+        "circle-opacity": ["case", ["get", "priced"], 1, 0.6],
+        "circle-stroke-color": theme === "dark" ? "#0b1220" : "#475569",
+        "circle-stroke-width": 1,
+      },
+    });
+    map.addLayer({
+      id: "lmp-labels",
+      type: "symbol",
+      source: "lmp",
+      filter: ["==", ["get", "priced"], true],
+      layout: {
+        ...hidden,
+        "text-field": ["get", "label"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 4, 9, 9, 11],
+        "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+        "symbol-sort-key": ["-", 0, ["get", "heat"]],
+        "text-padding": 1,
+      },
+      paint: { "text-color": ["get", "textColor"] },
+    });
+    applyLmpVisibility();
     refreshData();
   };
 
@@ -453,6 +565,7 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     };
     map.on("click", "unclustered", clickFac);
     map.on("click", "points", clickFac);
+    map.on("click", "lmp-dots", clickFac);
 
     const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 18, className: "oge-popup", maxWidth: "300px" });
     popupRef.current = popup;
@@ -472,8 +585,19 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
       map.on("mousemove", l, hover);
       map.on("mouseleave", l, leave);
     }
+    map.on("mousemove", "lmp-dots", (e: MapLayerMouseEvent) => {
+      map.getCanvas().style.cursor = "pointer";
+      const id = e.features?.[0]?.properties?.id as string | undefined;
+      const f = facRef.current.find((x) => x.id === id);
+      if (!f) return;
+      popup
+        .setLngLat((e.features![0].geometry as GeoJSON.Point).coordinates as [number, number])
+        .setHTML(lmpTooltipHtml(f, lmpRef.current?.byFacility.get(f.id), lmpRef.current?.hourTsUtc ?? null))
+        .addTo(map);
+    });
+    map.on("mouseleave", "lmp-dots", leave);
     const lineHover = (e: MapLayerMouseEvent) => {
-      if (map.queryRenderedFeatures(e.point, { layers: ["unclustered", "points", "clusters"].filter((l) => map.getLayer(l)) }).length) return;
+      if (map.queryRenderedFeatures(e.point, { layers: ["unclustered", "points", "clusters", "lmp-dots"].filter((l) => map.getLayer(l)) }).length) return;
       const p = e.features?.[0]?.properties;
       if (!p) return;
       popup.setLngLat(e.lngLat).setHTML(lineTooltipHtml(p)).addTo(map);
@@ -546,6 +670,13 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     refreshData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [congestion]);
+
+  useEffect(() => {
+    lmpRef.current = lmp ?? null;
+    applyLmpVisibility();
+    refreshData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lmp]);
 
   useEffect(() => {
     applyOverlay();

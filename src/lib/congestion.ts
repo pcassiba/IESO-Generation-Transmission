@@ -87,7 +87,12 @@ export interface FacilityCongestion {
   locations: string[];
   /** Mean congestion component across the facility's locations for the selected hour ($/MWh). */
   congestion: number | null;
+  /** Mean LMP across the facility's locations (its units) for the selected hour ($/MWh). */
   lmp: number | null;
+  /** Mean loss component across the facility's locations ($/MWh). */
+  loss: number | null;
+  /** Each unit's prices for the selected hour, so the averaged LMP can be explained. */
+  units: { location: string; lmp: number | null; loss: number | null; congestion: number | null }[];
   /** Mean congestion over the 24 hours ending at the selected hour. */
   congestion24h: number | null;
   /** Hours (of the last 24) with |congestion| at or above the threshold. */
@@ -145,7 +150,7 @@ export async function getCongestion(db: Db, requestedTs?: string | null, constra
 
   const facilities = await readFacilitiesFromDb(db);
   const rows = hour
-    ? await db.query<{ location: string; lmp: number | null; congestion: number | null }>("SELECT location, lmp, congestion FROM lmp_hourly WHERE ts_utc = $1", [hour])
+    ? await db.query<{ location: string; lmp: number | null; loss: number | null; congestion: number | null }>("SELECT location, lmp, loss, congestion FROM lmp_hourly WHERE ts_utc = $1", [hour])
     : [];
   const locations = rows.map((r) => r.location);
   const matches = matchLocations(facilities, locations, loadOverrides());
@@ -169,6 +174,8 @@ export async function getCongestion(db: Db, requestedTs?: string | null, constra
       locations: locs,
       congestion: mean(locs.map((l) => byLoc.get(l)?.congestion ?? null)),
       lmp: mean(locs.map((l) => byLoc.get(l)?.lmp ?? null)),
+      loss: mean(locs.map((l) => byLoc.get(l)?.loss ?? null)),
+      units: locs.map((l) => ({ location: l, lmp: byLoc.get(l)?.lmp ?? null, loss: byLoc.get(l)?.loss ?? null, congestion: byLoc.get(l)?.congestion ?? null })),
       congestion24h: mean(locs.map((l) => (day.get(l)?.c === undefined ? null : Number(day.get(l)!.c)))),
       congestedHours24h: Math.max(0, ...locs.map((l) => day.get(l)?.n ?? 0)),
     });
