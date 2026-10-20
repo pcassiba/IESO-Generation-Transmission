@@ -157,6 +157,23 @@ async function throttled(key: string, fn: () => Promise<unknown>): Promise<"ok" 
   }
 }
 
+/**
+ * Make sure prices for one past hour are stored, fetching that hour's archive file on demand.
+ * Used when someone picks an hour older than the backfill window. The hour in progress comes
+ * from the rolling file instead, so it is left alone here.
+ */
+export async function ensureLmpHour(db: Db, tsUtc: string, now = new Date()): Promise<"stored" | "fetched" | "skipped" | "missing"> {
+  const t = new Date(tsUtc);
+  if (Number.isNaN(t.getTime())) return "skipped";
+  const mh = utcToMarketHour(new Date(Math.ceil(t.getTime() / HOUR) * HOUR));
+  if (new Date(hourEndingToUtc(mh.reportDate, mh.hour)).getTime() > now.getTime()) return "skipped";
+  const period = hourPeriod(mh.reportDate, mh.hour);
+  const have = await db.query<{ n: number }>("SELECT count(*)::int AS n FROM market_files WHERE report = $1 AND period = $2 AND complete", [LMP, period]);
+  if ((have[0]?.n ?? 0) > 0) return "stored";
+  const r = await throttled(`lmp:${mh.reportDate}:${mh.hour}`, () => ingestLmpHour(db, mh.reportDate, mh.hour));
+  return r === "ok" ? "fetched" : r;
+}
+
 async function pool<T>(items: T[], concurrency: number, fn: (t: T) => Promise<void>) {
   let i = 0;
   await Promise.all(

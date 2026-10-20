@@ -58,6 +58,8 @@ export default function Explorer() {
   const [showCongestion, setShowCongestion] = useState(false);
   const [congestion, setCongestion] = useState<CongestionResponse | null>(null);
   const [congestionError, setCongestionError] = useState<string | null>(null);
+  /** The hour the stored congestion response was asked for (null = latest), to tell loading apart from a gap. */
+  const [congestionFor, setCongestionFor] = useState<string | null | undefined>(undefined);
   const [showLmp, setShowLmp] = useState(false);
   const mapRef = useRef<MLMap | null>(null);
   const tx = useTxRisk();
@@ -108,6 +110,7 @@ export default function Explorer() {
         if (!res.ok || j.error) throw new Error(j.error ?? `HTTP ${res.status}`);
         if (!cancelled) {
           setCongestion(j);
+          setCongestionFor(congestionTs);
           setCongestionError(null);
         }
       } catch (e) {
@@ -224,9 +227,9 @@ export default function Explorer() {
       />
       {meta?.mode === "historical" && (
         <div className="bg-fuchsia-600/20 px-3 py-1 text-center text-xs text-fuchsia-200">
-          HISTORICAL MODE — showing IESO-reported values for {hourEndingLabel(meta.selectedTsUtc)}. Map, statuses and totals reflect that hour.{" "}
-          <button className="underline" onClick={() => setSelectedTs(null)}>
-            Return to latest
+          HISTORICAL MODE — showing IESO-reported values for {hourEndingLabel(meta.selectedTsUtc)}. Map, LMP prices, statuses and totals reflect that hour.{" "}
+          <button className="ml-1 rounded bg-green-500/25 px-2 py-0.5 font-semibold text-green-200 hover:bg-green-500/40" onClick={() => setSelectedTs(null)}>
+            Back to live
           </button>
         </div>
       )}
@@ -246,7 +249,7 @@ export default function Explorer() {
           </button>
         </div>
       )}
-      {state && <Dashboard filtered={filtered} state={state} refreshKey={meta?.selectedTsUtc} />}
+      {state && <Dashboard filtered={filtered} state={state} refreshKey={meta?.latestTsUtc} onSelectTs={setSelectedTs} />}
 
       <div className="flex min-h-0 flex-1">
         <Sidebar all={all} filtered={filtered} filters={filters} setFilters={setFilters} onPick={pick} collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -303,14 +306,19 @@ export default function Explorer() {
               <div className="pointer-events-auto flex flex-wrap items-center gap-2 rounded border border-[var(--border)] bg-[var(--panel)]/95 px-2 py-1 text-[11px] shadow">
                 {congestionError ? (
                   <span className="text-red-300">Could not load prices: {congestionError}</span>
-                ) : !congestion ? (
-                  <span className="text-[var(--muted)]">Loading prices…</span>
+                ) : !congestion || congestionFor !== congestionTs ? (
+                  <span className="text-[var(--muted)]">Loading prices{congestionTs ? ` for ${hourEndingLabel(congestionTs)}` : ""}… (older hours are fetched from IESO the first time)</span>
                 ) : !lmpView?.scale ? (
-                  <span className="text-amber-300">No IESO real-time prices stored yet for this hour. They load with the next data refresh.</span>
+                  <span className="text-amber-300">
+                    {congestionTs ? "IESO has no real-time prices for this hour." : "No IESO real-time prices stored yet for this hour. They load with the next data refresh."}
+                  </span>
                 ) : (
                   <>
                     <span className="font-semibold">Real-time LMP</span>
                     <span className="text-[var(--muted)]">{hourEndingLabel(congestion.hourTsUtc)}</span>
+                    {congestionTs && congestion.hourTsUtc !== congestionTs && (
+                      <span className="text-amber-300">IESO prices for {hourEndingLabel(congestionTs)} aren&apos;t available, showing the nearest earlier hour</span>
+                    )}
                     <span className="flex items-center gap-1 font-mono">
                       ≤ {formatLmpShort(lmpView.scale.low)}
                       <span className="inline-block h-2.5 w-28 rounded-sm border border-[var(--border)]" style={{ background: LMP_GRADIENT_CSS }} />≥ {formatLmpShort(lmpView.scale.high)}

@@ -1,8 +1,10 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { getCongestion, isGeneratorLocation, matchLocations, nodeOf, resourceBase } from "../src/lib/congestion";
 import { createMemoryDb, type Db } from "../src/lib/db";
 import { normaliseFacility, seedFacilities } from "../src/lib/facilities";
-import { missingConstraintDays, missingLmpHours, storeConstraints, storeLmp } from "../src/lib/ieso/congestion-ingest";
+import { ensureLmpHour, missingConstraintDays, missingLmpHours, storeConstraints, storeLmp } from "../src/lib/ieso/congestion-ingest";
 import { parseConstraintShadowPrices, parseRealtimeLmpCsv } from "../src/lib/ieso/market";
 
 describe("pricing location matching", () => {
@@ -97,5 +99,30 @@ describe("congestion end to end (PGlite in-memory)", () => {
     ]);
     const days = await missingConstraintDays(db, 3, new Date("2026-10-17T12:00:00Z"));
     expect(days).toEqual(["2026-10-16", "2026-10-14"]);
+  });
+
+  it("fetches an older hour on demand when someone picks it", async () => {
+    const body = fs.readFileSync(path.join(__dirname, "fixtures", "lmp", "PUB_RealtimeEnergyLMP_2026101915.csv"), "utf8");
+    const urls: string[] = [];
+    vi.stubGlobal("fetch", async (url: string) => {
+      urls.push(url);
+      return new Response(body, { status: 200 });
+    });
+    try {
+      const now = new Date("2026-10-20T12:00:00Z");
+      // Already stored: no request.
+      expect(await ensureLmpHour(db, "2026-10-16T06:00:00.000Z", now)).toBe("stored");
+      // HE15 EST on Oct 19 ends at 20:00Z.
+      expect(await ensureLmpHour(db, "2026-10-19T20:00:00.000Z", now)).toBe("fetched");
+      expect(urls).toHaveLength(1);
+      expect(urls[0]).toMatch(/PUB_RealtimeEnergyLMP_2026101915\.csv$/);
+      expect((await getCongestion(db, "2026-10-19T20:00:00.000Z")).hourTsUtc).toBe("2026-10-19T20:00:00.000Z");
+      expect(await ensureLmpHour(db, "2026-10-19T20:00:00.000Z", now)).toBe("stored");
+      // An hour that hasn't ended yet is left to the rolling file.
+      expect(await ensureLmpHour(db, "2026-10-20T13:00:00.000Z", now)).toBe("skipped");
+      expect(urls).toHaveLength(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
