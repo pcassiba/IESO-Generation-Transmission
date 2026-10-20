@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { getCongestion } from "../src/lib/congestion";
 import { createMemoryDb, type Db } from "../src/lib/db";
 import { normaliseFacility, seedFacilities } from "../src/lib/facilities";
-import { storeIntertieLmp, storeLmp } from "../src/lib/ieso/congestion-ingest";
+import { ensureRecentInterties, storeIntertieLmp, storeLmp } from "../src/lib/ieso/congestion-ingest";
 import { parseRealtimeIntertieLmp, parseRealtimeLmpCsv } from "../src/lib/ieso/market";
 import { groupIntertiePrices, loadIntertieLocations, pointFor } from "../src/lib/interties";
 import { INTERTIE_HEAT_STOPS, intertieMarkers, lmpScale } from "../src/lib/lmp";
@@ -27,6 +27,11 @@ describe("intertie LMP report", () => {
 
   it("rejects a document without a delivery hour", () => {
     expect(() => parseRealtimeIntertieLmp(XML.replace("<DeliveryHour>15</DeliveryHour>", ""))).toThrow(/delivery hour/);
+  });
+
+  it("says what it found when no intertie prices parse", () => {
+    const odd = XML.replace(/IntertieLMPrice>/g, "SomethingElse>");
+    expect(() => parseRealtimeIntertieLmp(odd)).toThrow(/No intertie prices found \(DocBody has: DeliveryDate, DeliveryHour, SomethingElse\)/);
   });
 });
 
@@ -71,6 +76,10 @@ describe("intertie prices for the selected hour", () => {
     await storeLmp(db, parseRealtimeLmpCsv(LMP_CSV), "fixture", "sha");
     await storeIntertieLmp(db, parseRealtimeIntertieLmp(XML), "fixture", "sha");
   }, 60_000);
+
+  it("does not refetch the rolling file while a recent hour is stored", async () => {
+    expect(await ensureRecentInterties(db, 2 * 3_600_000, new Date("2026-10-19T21:00:00Z"))).toBe("fresh");
+  });
 
   it("comes back with the congestion response for the same hour", async () => {
     const c = await getCongestion(db, "2026-10-19T20:00:00.000Z");

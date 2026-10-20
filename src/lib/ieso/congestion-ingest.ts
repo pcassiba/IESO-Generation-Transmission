@@ -114,16 +114,19 @@ export async function ingestLmpHour(db: Db, date: string, hour: number): Promise
 
 export async function ingestIntertieHour(db: Db, date: string, hour: number): Promise<{ rows: number }> {
   const url = `${config.congestion.intertieLmpBaseUrl}PUB_RealTimeIntertieLMP_${compactDate(date)}${String(hour).padStart(2, "0")}.xml`;
-  const res = await fetchReport(url);
+  const res = await fetchReport(url, { timeoutMs: INTERTIE_TIMEOUT_MS });
   if (res.kind !== "ok") return { rows: 0 };
   return storeIntertieLmp(db, parseRealtimeIntertieLmp(res.body), url, sha256(res.body));
 }
+
+/** Intertie files are small; a short timeout keeps a slow IESO server from using up a serverless call. */
+const INTERTIE_TIMEOUT_MS = 30_000;
 
 let lastIntertieSha: string | null = null;
 
 export async function ingestIntertieLatest(db: Db): Promise<{ rows: number; skipped?: boolean }> {
   const url = `${config.congestion.intertieLmpBaseUrl}PUB_RealTimeIntertieLMP.xml`;
-  const res = await fetchReport(url);
+  const res = await fetchReport(url, { timeoutMs: INTERTIE_TIMEOUT_MS });
   if (res.kind !== "ok") return { rows: 0, skipped: true };
   const sha = sha256(res.body);
   if (sha === lastIntertieSha) return { rows: 0, skipped: true };
@@ -215,6 +218,18 @@ export async function ensureLmpHour(db: Db, tsUtc: string, now = new Date()): Pr
   return r === "ok" ? "fetched" : r;
 }
 
+/**
+ * Fetch the rolling intertie file when nothing recent is stored, so the map does not have to wait
+ * for the next background refresh. Errors propagate so the caller can show them.
+ */
+export async function ensureRecentInterties(db: Db, maxAgeMs = 2 * HOUR, now = new Date()): Promise<"fresh" | "fetched"> {
+  const r = await db.query<{ ts: string | null }>("SELECT max(ts_utc) AS ts FROM intertie_lmp_hourly");
+  const ts = r[0]?.ts ? new Date(r[0].ts).getTime() : 0;
+  if (now.getTime() - ts < maxAgeMs) return "fresh";
+  await ingestIntertieLatest(db);
+  return "fetched";
+}
+
 /** Same as ensureLmpHour, for the intertie price report. */
 export async function ensureIntertieHour(db: Db, tsUtc: string, now = new Date()): Promise<"stored" | "fetched" | "skipped" | "missing"> {
   const t = new Date(tsUtc);
@@ -247,6 +262,24 @@ export async function syncCongestion(db: Db, onProgress?: (msg: string) => void)
   let lmpHours = 0;
   let constraintDays = 0;
 
+  // The hour in progress first: on Vercel a call can run out of time partway through a backfill.
+  for (const [what, fn] of [["LMP latest", () => ingestLmpLatest(db)], ["Intertie latest", () => ingestIntertieLatest(db)]] as const) {
+    try {
+      await fn();
+    } catch (e) {
+      errors.push(`${what}: ${(e as Error).message}`);
+    }
+  }
+
+  const tieHours = await missingLmpHours(db, config.congestion.intertieBackfillDays * 24, new Date(), INTERTIE);
+  await pool(tieHours, 3, async ({ date, hour }) => {
+    try {
+      await throttled(`intertie:${date}:${hour}`, () => ingestIntertieHour(db, date, hour));
+    } catch (e) {
+      errors.push(`Intertie ${hourPeriod(date, hour)}: ${(e as Error).message}`);
+    }
+  });
+
   const hours = await missingLmpHours(db, config.congestion.lmpBackfillDays * 24);
   await pool(hours, 3, async ({ date, hour }) => {
     try {
@@ -259,26 +292,6 @@ export async function syncCongestion(db: Db, onProgress?: (msg: string) => void)
       errors.push(`LMP ${hourPeriod(date, hour)}: ${(e as Error).message}`);
     }
   });
-  try {
-    await ingestLmpLatest(db);
-  } catch (e) {
-    errors.push(`LMP latest: ${(e as Error).message}`);
-  }
-
-  const tieHours = await missingLmpHours(db, config.congestion.intertieBackfillDays * 24, new Date(), INTERTIE);
-  await pool(tieHours, 3, async ({ date, hour }) => {
-    try {
-      await throttled(`intertie:${date}:${hour}`, () => ingestIntertieHour(db, date, hour));
-    } catch (e) {
-      errors.push(`Intertie ${hourPeriod(date, hour)}: ${(e as Error).message}`);
-    }
-  });
-  try {
-    await ingestIntertieLatest(db);
-  } catch (e) {
-    errors.push(`Intertie latest: ${(e as Error).message}`);
-  }
-
   const days = await missingConstraintDays(db, config.congestion.constraintBackfillDays);
   await pool(days, 2, async (date) => {
     try {

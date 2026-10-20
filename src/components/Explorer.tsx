@@ -360,7 +360,11 @@ export default function Explorer() {
                   <span className="text-[var(--muted)]">Loading intertie prices{congestionTs ? ` for ${hourEndingLabel(congestionTs)}` : ""}…</span>
                 ) : !congestion.interties?.points.length ? (
                   <span className="text-amber-300">
-                    {congestionTs ? "IESO has no intertie prices for this hour." : "No IESO intertie prices stored yet. They load with the next data refresh."}
+                    {congestion.interties?.fetchError
+                      ? `Could not load the IESO intertie price report: ${congestion.interties.fetchError}`
+                      : congestionTs
+                        ? "IESO has no intertie prices for this hour."
+                        : "No IESO intertie prices stored yet. They load with the next data refresh."}
                   </span>
                 ) : !priceScale?.scale ? (
                   <span className="text-amber-300">No Ontario facility prices for this hour to compare the interties against.</span>

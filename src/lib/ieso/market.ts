@@ -297,6 +297,8 @@ export function parseRealtimeIntertieLmp(body: string): ParsedIntertieLmp {
       nisl: round2(avg(vals.nisl)),
     });
   }
+  // An empty result almost always means the layout differs from what this parser expects; say what was there.
+  if (!rows.length) throw new ReportParseError(`No intertie prices found (DocBody has: ${Object.keys(docBody).join(", ") || "nothing"})`);
   const createdAt = field("CreatedAt");
   return { createdAt: createdAt ? String(createdAt) : null, deliveryDate, hour, rows };
 }
