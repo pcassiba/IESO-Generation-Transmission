@@ -1,8 +1,8 @@
 "use client";
 
-import { ChevronDown, Info } from "lucide-react";
+import { ChevronDown, Info, Radio } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, Legend, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { FacilityState, StateResponse, Technology } from "@/lib/types";
 import { TECHNOLOGIES, TECHNOLOGY_LABEL } from "@/lib/types";
 import { TECH_COLOR, fmtMW, fmtNum } from "@/lib/ui";
@@ -30,7 +30,21 @@ function Kpi({ label, value, sub, tone }: { label: string; value: React.ReactNod
   );
 }
 
-export default function Dashboard({ filtered, state, refreshKey }: { filtered: FacilityState[]; state: StateResponse; refreshKey: unknown }) {
+const HOUR = 3_600_000;
+const RANGE_HOURS: Record<Range, number> = { "24h": 24, "7d": 168, "30d": 720 };
+
+export default function Dashboard({
+  filtered,
+  state,
+  refreshKey,
+  onSelectTs,
+}: {
+  filtered: FacilityState[];
+  state: StateResponse;
+  refreshKey: unknown;
+  /** Called with an hour clicked on the trend chart, or null to go back to live. */
+  onSelectTs: (ts: string | null) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
   const [showDisclosure, setShowDisclosure] = useState(false);
   const [range, setRange] = useState<Range>("24h");
@@ -64,15 +78,28 @@ export default function Dashboard({ filtered, state, refreshKey }: { filtered: F
     return { mapped, unmatched, total: mapped + unmatched };
   }, [state]);
 
+  // The trend stays anchored on the latest hour so clicking an hour doesn't slide the chart
+  // under the cursor; it only shifts back when the selected hour falls off the left edge.
+  const historical = meta.mode === "historical" && !!meta.selectedTsUtc;
+  const selectedOffChart =
+    historical && !!meta.latestTsUtc && new Date(meta.latestTsUtc).getTime() - new Date(meta.selectedTsUtc!).getTime() >= RANGE_HOURS[range] * HOUR;
+  const chartEnd = selectedOffChart ? meta.selectedTsUtc : null;
+
   useEffect(() => {
     if (!expanded) return;
     const qs = new URLSearchParams({ fuel: "1", range });
-    if (meta.mode === "historical" && meta.selectedTsUtc) qs.set("end", meta.selectedTsUtc);
+    if (chartEnd) qs.set("end", chartEnd);
     fetch(`/api/history?${qs}`)
       .then((r) => r.json())
       .then((j) => setFuelHist(j.points ?? []))
       .catch(() => setFuelHist([]));
-  }, [expanded, range, meta.mode, meta.selectedTsUtc, refreshKey]);
+  }, [expanded, range, chartEnd, refreshKey]);
+
+  const pickHour = (index: unknown) => {
+    const ts = typeof index === "number" || typeof index === "string" ? fuelHist[Number(index)]?.ts : undefined;
+    if (typeof ts !== "string") return;
+    onSelectTs(meta.latestTsUtc && ts >= meta.latestTsUtc ? null : ts);
+  };
 
   const maxTech = Math.max(1, ...stats.byTech.values());
   const plotted = filtered.filter((f) => f.lat !== null).length;
@@ -128,12 +155,25 @@ export default function Dashboard({ filtered, state, refreshKey }: { filtered: F
 
       {expanded && (
         <div className="border-t border-[var(--border)] px-3 py-2">
-          <div className="mb-1 flex items-center justify-between text-[11px] text-[var(--muted)]">
-            <span>All resources in the IESO report, by IESO fuel category (incl. unmatched) — hourly, MW</span>
-            <RangeTabs value={range} onChange={setRange} />
+          <div className="mb-1 flex items-center justify-between gap-2 text-[11px] text-[var(--muted)]">
+            <span>
+              All resources in the IESO report, by IESO fuel category (incl. unmatched) — hourly, MW.{" "}
+              <span className="text-sky-300">Click an hour to show it on the map and LMP view.</span>
+            </span>
+            <span className="flex shrink-0 items-center gap-2">
+              {historical && (
+                <>
+                  <span className="text-fuchsia-300">Showing {hourEndingLabel(meta.selectedTsUtc)}</span>
+                  <button onClick={() => onSelectTs(null)} className="flex items-center gap-1 rounded bg-green-500/20 px-2 py-0.5 font-semibold text-green-300 hover:bg-green-500/30">
+                    <Radio size={12} /> Back to live
+                  </button>
+                </>
+              )}
+              <RangeTabs value={range} onChange={setRange} />
+            </span>
           </div>
           <ResponsiveContainer width="100%" height={170}>
-            <AreaChart data={fuelHist} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
+            <AreaChart data={fuelHist} margin={{ top: 4, right: 8, left: -8, bottom: 0 }} onClick={(e) => pickHour(e?.activeIndex)} style={{ cursor: "pointer" }}>
               <CartesianGrid stroke="var(--grid)" strokeDasharray="3 3" />
               <XAxis
                 dataKey="ts"
@@ -146,13 +186,14 @@ export default function Dashboard({ filtered, state, refreshKey }: { filtered: F
               <YAxis tick={{ fontSize: 10, fill: "var(--muted)" }} width={52} />
               <Tooltip
                 contentStyle={{ background: "var(--panel)", border: "1px solid var(--border)", fontSize: 11 }}
-                labelFormatter={(ts) => formatOntario(String(ts))}
+                labelFormatter={(ts) => `${formatOntario(String(ts))} · click to view on map`}
                 formatter={(v, n) => [`${Math.round(Number(v)).toLocaleString()} MW`, n]}
               />
               <Legend wrapperStyle={{ fontSize: 10 }} />
               {Object.keys(FUEL_COLORS).map((k) => (
                 <Area key={k} type="stepAfter" dataKey={k} stackId="1" stroke={FUEL_COLORS[k]} fill={FUEL_COLORS[k]} fillOpacity={0.55} isAnimationActive={false} />
               ))}
+              {historical && <ReferenceLine x={meta.selectedTsUtc!} stroke="#e879f9" strokeWidth={2} strokeDasharray="3 2" label={{ value: "Selected", position: "insideTopRight", fill: "#e879f9", fontSize: 10 }} />}
             </AreaChart>
           </ResponsiveContainer>
         </div>
