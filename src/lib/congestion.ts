@@ -133,7 +133,7 @@ export interface CongestionResponse {
   constraintDataThroughUtc: string | null;
   coverage: { locations: number; generatorLocations: number; matchedGeneratorLocations: number; unmatchedGeneratorNodes: string[] };
   /** Intertie prices for the same hour (or the nearest earlier hour IESO has published). */
-  interties: { hourTsUtc: string | null; points: IntertiePoint[]; unplaced: string[] };
+  interties: { hourTsUtc: string | null; points: IntertiePoint[]; unplaced: string[]; fetchError?: string };
 }
 
 const iso = (v: unknown): string | null => (v === null || v === undefined ? null : new Date(v as string).toISOString());
