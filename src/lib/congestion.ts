@@ -4,6 +4,7 @@ import { config } from "./config";
 import type { Db } from "./db";
 import { readFacilitiesFromDb } from "./facilities";
 import { describeConstraint } from "./ieso/market";
+import { groupIntertiePrices, loadIntertieLocations, type IntertiePoint } from "./interties";
 import { hourEndingToUtc } from "./time";
 import type { FacilityMeta } from "./types";
 
@@ -131,6 +132,8 @@ export interface CongestionResponse {
   constraintWindow: { fromUtc: string; toUtc: string } | null;
   constraintDataThroughUtc: string | null;
   coverage: { locations: number; generatorLocations: number; matchedGeneratorLocations: number; unmatchedGeneratorNodes: string[] };
+  /** Intertie prices for the same hour (or the nearest earlier hour IESO has published). */
+  interties: { hourTsUtc: string | null; points: IntertiePoint[]; unplaced: string[] };
 }
 
 const iso = (v: unknown): string | null => (v === null || v === undefined ? null : new Date(v as string).toISOString());
@@ -215,6 +218,8 @@ export async function getCongestion(db: Db, requestedTs?: string | null, constra
     }));
   }
 
+  const interties = await getIntertiePrices(db, hour ?? (requestedTs ? new Date(requestedTs).toISOString() : null));
+
   const gen = locations.filter(isGeneratorLocation);
   const unmatchedNodes = [...new Set(gen.filter((l) => !facilityOf.has(l)).map(nodeOf))].sort();
   return {
@@ -229,5 +234,21 @@ export async function getCongestion(db: Db, requestedTs?: string | null, constra
     constraintWindow,
     constraintDataThroughUtc: through,
     coverage: { locations: locations.length, generatorLocations: gen.length, matchedGeneratorLocations: gen.filter((l) => facilityOf.has(l)).length, unmatchedGeneratorNodes: unmatchedNodes },
+    interties,
   };
+}
+
+/** Intertie prices at or before `atUtc` (latest when null), placed on their map points. */
+export async function getIntertiePrices(db: Db, atUtc: string | null): Promise<CongestionResponse["interties"]> {
+  const r = atUtc
+    ? await db.query<{ ts: string | null }>("SELECT max(ts_utc) AS ts FROM intertie_lmp_hourly WHERE ts_utc <= $1", [atUtc])
+    : await db.query<{ ts: string | null }>("SELECT max(ts_utc) AS ts FROM intertie_lmp_hourly");
+  const ts = iso(r[0]?.ts);
+  if (!ts) return { hourTsUtc: null, points: [], unplaced: [] };
+  const rows = await db.query<{ location: string; lmp: number | null; loss: number | null; congestion: number | null; external_congestion: number | null; nisl: number | null }>(
+    "SELECT location, lmp, loss, congestion, external_congestion, nisl FROM intertie_lmp_hourly WHERE ts_utc = $1",
+    [ts],
+  );
+  const prices = rows.map((x) => ({ location: x.location, lmp: x.lmp, loss: x.loss, congestion: x.congestion, externalCongestion: x.external_congestion, nisl: x.nisl }));
+  return { hourTsUtc: ts, ...groupIntertiePrices(prices, loadIntertieLocations()) };
 }

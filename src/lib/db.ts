@@ -119,6 +119,20 @@ CREATE TABLE IF NOT EXISTS lmp_hourly (
 );
 CREATE INDEX IF NOT EXISTS lmp_hourly_ts_idx ON lmp_hourly (ts_utc);
 
+-- Intertie prices (RealTimeIntertieLMP), one row per intertie pricing location and hour.
+CREATE TABLE IF NOT EXISTS intertie_lmp_hourly (
+  location TEXT NOT NULL,
+  ts_utc TIMESTAMPTZ NOT NULL,
+  intervals SMALLINT NOT NULL,
+  lmp DOUBLE PRECISION,
+  loss DOUBLE PRECISION,
+  congestion DOUBLE PRECISION,
+  external_congestion DOUBLE PRECISION,
+  nisl DOUBLE PRECISION,
+  PRIMARY KEY (location, ts_utc)
+);
+CREATE INDEX IF NOT EXISTS intertie_lmp_hourly_ts_idx ON intertie_lmp_hourly (ts_utc);
+
 -- Only hours in which a constraint was binding are stored; market_files records coverage.
 CREATE TABLE IF NOT EXISTS constraint_hourly (
   constraint_name TEXT NOT NULL,

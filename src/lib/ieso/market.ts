@@ -187,6 +187,120 @@ export function parseConstraintShadowPrices(body: string): ParsedConstraints {
   return { createdAt: header.CreatedAt ? String(header.CreatedAt) : null, deliveryDate, rows, constraintCount: names.size };
 }
 
+export interface IntertieHourRow {
+  /** Intertie pricing location without the ":LMP" suffix, e.g. "MI.LUDINGTON_MISI". */
+  location: string;
+  tsUtc: string;
+  deliveryDate: string;
+  hour: number;
+  intervals: number;
+  lmp: number | null;
+  loss: number | null;
+  congestion: number | null;
+  /** Congestion on the neighbouring system's side of the tie. */
+  externalCongestion: number | null;
+  /** Net Interchange Scheduling Limit price: what the limit on total imports/exports added. */
+  nisl: number | null;
+}
+
+export interface ParsedIntertieLmp {
+  createdAt: string | null;
+  deliveryDate: string;
+  hour: number;
+  rows: IntertieHourRow[];
+}
+
+const intertieXml = new XMLParser({
+  ignoreAttributes: true,
+  removeNSPrefix: true,
+  parseTagValue: false,
+  trimValues: true,
+  isArray: (name) => name === "IntertieLMPrice" || name === "Components" || name === "IntervalLMP",
+});
+
+/** Every object under `key` at any depth (IESO sometimes wraps price lists in an extra element). */
+function findAll(node: unknown, key: string): Record<string, unknown>[] {
+  if (!node || typeof node !== "object") return [];
+  if (Array.isArray(node)) return node.flatMap((n) => findAll(n, key));
+  const out: Record<string, unknown>[] = [];
+  for (const [k, v] of Object.entries(node)) {
+    if (k === key) out.push(...(Array.isArray(v) ? v : [v]).filter((x): x is Record<string, unknown> => !!x && typeof x === "object"));
+    else out.push(...findAll(v, key));
+  }
+  return out;
+}
+
+const INTERTIE_COMPONENTS: Record<string, "lmp" | "loss" | "congestion" | "externalCongestion" | "nisl"> = {
+  "intertie lmp": "lmp",
+  "energy loss price": "loss",
+  "energy congestion price": "congestion",
+  "external congestion price": "externalCongestion",
+  "net interchange scheduling limit (nisl) price": "nisl",
+};
+
+/**
+ * RealTimeIntertieLMP (XML, one file per delivery hour, 12 five-minute intervals):
+ *   Document > DocBody > DeliveryDate, DeliveryHour, IntertieLMPrice* { IntertiePLName,
+ *   Components* { LMPComponent, IntervalLMP* { Interval, LMP } } }
+ * The intertie LMP = Ontario energy price + loss + congestion + external congestion + NISL.
+ */
+export function parseRealtimeIntertieLmp(body: string): ParsedIntertieLmp {
+  let doc: Record<string, unknown>;
+  try {
+    doc = intertieXml.parse(body);
+  } catch (e) {
+    throw new ReportParseError(`XML parse failure: ${(e as Error).message}`);
+  }
+  const root = doc.Document as Record<string, unknown> | undefined;
+  const docBody = root?.DocBody as Record<string, unknown> | undefined;
+  if (!docBody) throw new ReportParseError("Missing Document/DocBody");
+  const header = (root?.DocHeader ?? {}) as Record<string, unknown>;
+  // The date and hour sit in DocBody in the published samples; DocHeader is a fallback.
+  const field = (k: string) => docBody[k] ?? header[k];
+  const deliveryDate = String(field("DeliveryDate") ?? "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(deliveryDate)) throw new ReportParseError(`Invalid delivery date "${deliveryDate}"`);
+  const hour = parseNumber(field("DeliveryHour"));
+  if (hour === null || hour < 1 || hour > 24) throw new ReportParseError(`Invalid delivery hour "${String(field("DeliveryHour"))}"`);
+  const tsUtc = hourEndingToUtc(deliveryDate, hour);
+
+  const rows: IntertieHourRow[] = [];
+  for (const p of findAll(docBody, "IntertieLMPrice")) {
+    const location = String(p.IntertiePLName ?? "")
+      .trim()
+      .replace(/:LMP$/i, "");
+    if (!location) continue;
+    const vals: Record<string, number[]> = { lmp: [], loss: [], congestion: [], externalCongestion: [], nisl: [] };
+    const ints = new Set<number>();
+    for (const c of (p.Components as Record<string, unknown>[] | undefined) ?? []) {
+      const key = INTERTIE_COMPONENTS[String(c.LMPComponent ?? "").trim().toLowerCase()];
+      if (!key) continue;
+      for (const iv of (c.IntervalLMP as Record<string, unknown>[] | undefined) ?? []) {
+        const v = parseNumber(iv.LMP);
+        if (v === null) continue;
+        vals[key].push(v);
+        if (key === "lmp") {
+          const n = parseNumber(iv.Interval);
+          if (n !== null) ints.add(n);
+        }
+      }
+    }
+    rows.push({
+      location,
+      tsUtc,
+      deliveryDate,
+      hour,
+      intervals: ints.size,
+      lmp: round2(avg(vals.lmp)),
+      loss: round2(avg(vals.loss)),
+      congestion: round2(avg(vals.congestion)),
+      externalCongestion: round2(avg(vals.externalCongestion)),
+      nisl: round2(avg(vals.nisl)),
+    });
+  }
+  const createdAt = field("CreatedAt");
+  return { createdAt: createdAt ? String(createdAt) : null, deliveryDate, hour, rows };
+}
+
 /**
  * Ontario's named transmission interfaces (from the IESO TxLimits reports). Constraint names
  * often embed one of these codes, e.g. "S-FETT.TAB6…" or "NWL-KEN.ALL_I/S.KAO-dso".

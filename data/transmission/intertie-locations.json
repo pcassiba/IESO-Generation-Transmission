@@ -1,0 +1,35 @@
+{
+  "_comment": "Map positions for IESO intertie pricing locations (RealTimeIntertieLMP). Positions are approximate: the Ontario side of each tie, nudged apart where ties sit close together. 'locations' lists the pricing locations drawn at that point, the first priced one is the headline price. Locations not listed here are placed by their suffix (the Ontario scheduling interface, e.g. _MISI = Michigan) using 'suffixes'. Linked-wheeling proxies (EC., MD., WC.) sink at the Michigan or New York interface, so they are shown there. 'neighbour' names the system on the other side and 'bearing' (degrees clockwise from north) points from Ontario toward it; the map draws a two-way arrow along that bearing.",
+  "points": [
+    { "id": "michigan", "name": "Michigan intertie (Sarnia / Windsor)", "lat": 42.96, "lon": -82.4, "locations": [ "MI.LUDINGTON_MISI", "MD.CALVERTCLIFF_MISI", "WC.PRAIRERANGES_MISI" ], "neighbour": "MISO (Michigan)", "bearing": 270 },
+    { "id": "new-york", "name": "New York intertie (Niagara / St. Lawrence)", "lat": 43.1, "lon": -79.05, "locations": [ "NY.ROSETON_NYSI", "EC.MARITIMES_NYSI", "MD.CALVERTCLIFF_NYSI" ], "neighbour": "NYISO (New York)", "bearing": 90 },
+    { "id": "minnesota", "name": "Minnesota intertie (Fort Frances)", "lat": 48.61, "lon": -93.4, "locations": [ "MN.INTFALLS_MNSI" ], "neighbour": "MISO (Minnesota)", "bearing": 180 },
+    { "id": "manitoba-whiteshell", "name": "Manitoba intertie (Whiteshell)", "lat": 49.85, "lon": -95.15, "locations": [ "MB.WHITESHELL_MBSI" ], "neighbour": "Manitoba Hydro", "bearing": 270 },
+    { "id": "manitoba-seven-sisters", "name": "Manitoba intertie (Seven Sisters)", "lat": 50.25, "lon": -95.15, "locations": [ "MB.SEVENSISTERS_MBSK" ], "neighbour": "Manitoba Hydro", "bearing": 270 },
+    { "id": "quebec-beauharnois", "name": "Quebec intertie (Beauharnois, at Cornwall)", "lat": 45.03, "lon": -74.68, "locations": [ "PQ.BEAUHARNOIS_PQBE" ], "neighbour": "Hydro-Québec", "bearing": 80 },
+    { "id": "quebec-outaouais", "name": "Quebec intertie (Outaouais HVDC)", "lat": 45.47, "lon": -75.55, "locations": [ "PQ.OUTAOUAIS_PQAT" ], "neighbour": "Hydro-Québec", "bearing": 0 },
+    { "id": "quebec-masson", "name": "Quebec intertie (Masson)", "lat": 45.54, "lon": -75.38, "locations": [ "PQ.MASSON_PQHA" ], "neighbour": "Hydro-Québec", "bearing": 0 },
+    { "id": "quebec-maclaren", "name": "Quebec intertie (MacLaren)", "lat": 45.6, "lon": -75.2, "locations": [ "PQ.MACLAREN_PQDA" ], "neighbour": "Hydro-Québec", "bearing": 0 },
+    { "id": "quebec-paugan", "name": "Quebec intertie (Paugan)", "lat": 45.43, "lon": -75.86, "locations": [ "PQ.PAUGAN_PQPC" ], "neighbour": "Hydro-Québec", "bearing": 0 },
+    { "id": "quebec-quyon", "name": "Quebec intertie (Quyon)", "lat": 45.52, "lon": -76.23, "locations": [ "PQ.QUYON_PQQC" ], "neighbour": "Hydro-Québec", "bearing": 0 },
+    { "id": "quebec-bryson", "name": "Quebec intertie (Bryson)", "lat": 45.67, "lon": -76.62, "locations": [ "PQ.BRYSON_PQXY" ], "neighbour": "Hydro-Québec", "bearing": 0 },
+    { "id": "quebec-kipawa", "name": "Quebec intertie (Kipawa, near Témiscaming)", "lat": 46.7, "lon": -79.1, "locations": [ "PQ.KIPAWA_PQHZ" ], "neighbour": "Hydro-Québec", "bearing": 90 },
+    { "id": "quebec-rapides-des-iles", "name": "Quebec intertie (Rapides-des-Îles)", "lat": 47.55, "lon": -79.48, "locations": [ "PQ.RAPIDDESISLE_PQDZ" ], "neighbour": "Hydro-Québec", "bearing": 90 }
+  ],
+  "suffixes": {
+    "MISI": "michigan",
+    "NYSI": "new-york",
+    "MNSI": "minnesota",
+    "MBSI": "manitoba-whiteshell",
+    "MBSK": "manitoba-seven-sisters",
+    "PQBE": "quebec-beauharnois",
+    "PQAT": "quebec-outaouais",
+    "PQHA": "quebec-masson",
+    "PQDA": "quebec-maclaren",
+    "PQPC": "quebec-paugan",
+    "PQQC": "quebec-quyon",
+    "PQXY": "quebec-bryson",
+    "PQHZ": "quebec-kipawa",
+    "PQDZ": "quebec-rapides-des-iles"
+  }
+}

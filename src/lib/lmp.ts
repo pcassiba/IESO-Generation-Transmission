@@ -1,4 +1,5 @@
 import type { FacilityCongestion } from "./congestion";
+import type { IntertiePoint } from "./interties";
 
 /**
  * LMP heat view: one real-time price per facility, coloured from white (low) to deep red (high).
@@ -50,13 +51,13 @@ export function lmpHeat(value: number, scale: LmpScale): number {
 
 const hex = (c: string) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
 
-/** White → red colour for a heat value, interpolated between LMP_HEAT_STOPS. */
-export function heatColor(t: number): string {
+/** White → red colour for a heat value, interpolated between LMP_HEAT_STOPS (or other stops). */
+export function heatColor(t: number, stops: [number, string][] = LMP_HEAT_STOPS): string {
   const x = Math.min(1, Math.max(0, t));
   let i = 1;
-  while (i < LMP_HEAT_STOPS.length - 1 && LMP_HEAT_STOPS[i][0] < x) i++;
-  const [t0, c0] = LMP_HEAT_STOPS[i - 1];
-  const [t1, c1] = LMP_HEAT_STOPS[i];
+  while (i < stops.length - 1 && stops[i][0] < x) i++;
+  const [t0, c0] = stops[i - 1];
+  const [t1, c1] = stops[i];
   const f = (x - t0) / (t1 - t0);
   const a = hex(c0);
   const b = hex(c1);
@@ -95,4 +96,33 @@ export function facilityLmps(facilities: FacilityCongestion[], scale: LmpScale |
     out.set(f.facilityId, { lmp: f.lmp, heat, color: heatColor(heat), label: formatLmpShort(f.lmp), textColor: heat > 0.62 ? "#ffffff" : "#111827", detail: f });
   }
   return out;
+}
+
+/**
+ * Interties are drawn as yellow circles so they never read as a facility. Their intensity uses the
+ * same scale as the facility LMPs for that hour: at or below the facilities' 5th percentile the
+ * circle is pale, at or above the 95th it is a deep, saturated yellow.
+ */
+export const INTERTIE_HEAT_STOPS: [number, string][] = [
+  [0, "#fefce8"],
+  [0.35, "#fef08a"],
+  [0.65, "#facc15"],
+  [1, "#ca8a04"],
+];
+
+export const INTERTIE_GRADIENT_CSS = `linear-gradient(90deg, ${INTERTIE_HEAT_STOPS.map(([t, c]) => `${c} ${t * 100}%`).join(", ")})`;
+
+export interface IntertieMarker {
+  point: IntertiePoint;
+  heat: number;
+  color: string;
+  label: string;
+}
+
+export function intertieMarkers(points: IntertiePoint[], scale: LmpScale | null): IntertieMarker[] {
+  if (!scale) return [];
+  return points.map((point) => {
+    const heat = lmpHeat(point.lmp, scale);
+    return { point, heat, color: heatColor(heat, INTERTIE_HEAT_STOPS), label: formatLmpShort(point.lmp) };
+  });
 }

@@ -2,14 +2,14 @@
 
 import type { Map as MLMap } from "maplibre-gl";
 import dynamic from "next/dynamic";
-import { Activity, AlertTriangle, Cable, DollarSign, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling, Zap } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeftRight, Cable, DollarSign, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CongestionResponse } from "@/lib/congestion";
 import { DEFAULT_VISIBLE, VOLTAGE_CLASSES, VOLTAGE_COLOR, VOLTAGE_LABEL, type VoltageClass } from "@/lib/transmission";
 import type { FacilityState, StateResponse } from "@/lib/types";
 import { STATUSES, STATUS_LABEL, STORAGE_MODE_LABEL, TECHNOLOGIES, TECHNOLOGY_LABEL } from "@/lib/types";
 import { toCsv } from "@/lib/csv";
-import { LMP_GRADIENT_CSS, facilityLmps, formatLmpShort, lmpScale } from "@/lib/lmp";
+import { INTERTIE_GRADIENT_CSS, LMP_GRADIENT_CSS, facilityLmps, formatLmpShort, intertieMarkers, lmpScale } from "@/lib/lmp";
 import { hourEndingLabel } from "@/lib/time";
 import { CONGESTION_NEG, CONGESTION_POS } from "@/lib/ui";
 import { LEGEND as TXR_LEGEND, RISK_COLOR } from "@/lib/txrisk/ui";
@@ -19,7 +19,7 @@ import Dashboard from "./Dashboard";
 import DetailPanel from "./DetailPanel";
 import Header from "./Header";
 import { StatusDot, TechIcon } from "./Icons";
-import type { LmpOverlay, MapCommand } from "./MapView";
+import type { IntertieOverlay, LmpOverlay, MapCommand } from "./MapView";
 import { CoverageModal, MethodologyModal } from "./Modals";
 import Sidebar, { applyFilters, defaultFilters, type Filters } from "./Sidebar";
 import TimeBar from "./txrisk/TimeBar";
@@ -61,6 +61,7 @@ export default function Explorer() {
   /** The hour the stored congestion response was asked for (null = latest), to tell loading apart from a gap. */
   const [congestionFor, setCongestionFor] = useState<string | null | undefined>(undefined);
   const [showLmp, setShowLmp] = useState(false);
+  const [showInterties, setShowInterties] = useState(false);
   const mapRef = useRef<MLMap | null>(null);
   const tx = useTxRisk();
   const txOverlay = useMemo(
@@ -101,7 +102,7 @@ export default function Explorer() {
   const congestionTs = state?.meta.mode === "historical" ? state.meta.selectedTsUtc : null;
   const stateKey = state?.meta.latestTsUtc;
   useEffect(() => {
-    if (!showCongestion && !showLmp) return;
+    if (!showCongestion && !showLmp && !showInterties) return;
     let cancelled = false;
     (async () => {
       try {
@@ -120,7 +121,7 @@ export default function Explorer() {
     return () => {
       cancelled = true;
     };
-  }, [showCongestion, showLmp, congestionTs, stateKey]);
+  }, [showCongestion, showLmp, showInterties, congestionTs, stateKey]);
 
   const lineVisibility = useMemo(
     () => Object.fromEntries(VOLTAGE_CLASSES.map((c) => [c, showLines && lineClasses[c]])) as Record<VoltageClass, boolean>,
@@ -129,14 +130,27 @@ export default function Explorer() {
 
   const all = useMemo(() => state?.facilities ?? [], [state]);
 
-  // LMP view: one averaged price per mapped facility, coloured relative to this hour's spread.
-  const lmpView = useMemo(() => {
-    if (!showLmp || !congestion) return null;
+  // This hour's spread of facility prices; both the LMP view and the intertie circles are coloured against it.
+  const priceScale = useMemo(() => {
+    if (!congestion) return null;
     const mapped = new Set(all.filter((f) => f.lat !== null && f.lon !== null).map((f) => f.id));
     const priced = congestion.facilities.filter((f) => mapped.has(f.facilityId));
-    const scale = lmpScale(priced.map((f) => f.lmp));
-    return { scale, overlay: { byFacility: facilityLmps(priced, scale), hourTsUtc: congestion.hourTsUtc } satisfies LmpOverlay };
-  }, [showLmp, congestion, all]);
+    return { priced, scale: lmpScale(priced.map((f) => f.lmp)) };
+  }, [congestion, all]);
+
+  // LMP view: one averaged price per mapped facility, coloured relative to this hour's spread.
+  const lmpView = useMemo(() => {
+    if (!showLmp || !priceScale) return null;
+    const { priced, scale } = priceScale;
+    return { scale, overlay: { byFacility: facilityLmps(priced, scale), hourTsUtc: congestion!.hourTsUtc } satisfies LmpOverlay };
+  }, [showLmp, priceScale, congestion]);
+
+  // Interties: yellow circles, more intense the higher the intertie price sits against the facility prices.
+  const intertieView = useMemo(() => {
+    const tie = congestion?.interties;
+    if (!showInterties || !tie || !priceScale) return null;
+    return { overlay: { markers: intertieMarkers(tie.points, priceScale.scale), hourTsUtc: tie.hourTsUtc, medianLmp: congestion.medianLmp } satisfies IntertieOverlay };
+  }, [showInterties, congestion, priceScale]);
   const filtered = useMemo(() => applyFilters(all, filters), [all, filters]);
   const selected = all.find((f) => f.id === selectedId) ?? null;
   const compareFacilities = compare.map((id) => all.find((f) => f.id === id)).filter((f): f is FacilityState => !!f);
@@ -269,6 +283,7 @@ export default function Explorer() {
             txRisk={txOverlay}
             onTxRiskPick={(id) => tx.setSelectedId(id)}
             lmp={lmpView?.overlay ?? null}
+            interties={intertieView?.overlay ?? null}
           />
 
           {/* Outages & congestion risk: prominent toggle, flashing toggle and time selector */}
@@ -281,6 +296,14 @@ export default function Explorer() {
                 className={`flex items-center gap-1 rounded px-2 py-0.5 font-semibold ${showLmp ? "bg-red-500/25 text-red-200" : "hover:bg-[var(--hover)]"}`}
               >
                 <DollarSign size={13} /> LMP: {showLmp ? "ON" : "OFF"}
+              </button>
+              <button
+                onClick={() => setShowInterties((v) => !v)}
+                aria-pressed={showInterties}
+                title="Show IESO real-time intertie prices as yellow circles at each intertie; deeper yellow = pricier than Ontario's generators this hour"
+                className={`flex items-center gap-1 rounded px-2 py-0.5 font-semibold ${showInterties ? "bg-yellow-400/25 text-yellow-200" : "hover:bg-[var(--hover)]"}`}
+              >
+                <ArrowLeftRight size={13} /> Interties: {showInterties ? "ON" : "OFF"}
               </button>
               <span className="mx-0.5 h-4 w-px bg-[var(--border)]" />
               <button
@@ -325,6 +348,34 @@ export default function Explorer() {
                     </span>
                     {congestion.medianLmp !== null && <span className="text-[var(--muted)]">Ontario median ${congestion.medianLmp.toFixed(2)}/MWh</span>}
                     <span className="text-[var(--muted)]">· {lmpView.overlay.byFacility.size} facilities priced, grey = no pricing link</span>
+                  </>
+                )}
+              </div>
+            )}
+            {showInterties && (
+              <div className="pointer-events-auto flex flex-wrap items-center gap-2 rounded border border-[var(--border)] bg-[var(--panel)]/95 px-2 py-1 text-[11px] shadow">
+                {congestionError ? (
+                  <span className="text-red-300">Could not load intertie prices: {congestionError}</span>
+                ) : !congestion || congestionFor !== congestionTs ? (
+                  <span className="text-[var(--muted)]">Loading intertie prices{congestionTs ? ` for ${hourEndingLabel(congestionTs)}` : ""}…</span>
+                ) : !congestion.interties?.points.length ? (
+                  <span className="text-amber-300">
+                    {congestionTs ? "IESO has no intertie prices for this hour." : "No IESO intertie prices stored yet. They load with the next data refresh."}
+                  </span>
+                ) : !priceScale?.scale ? (
+                  <span className="text-amber-300">No Ontario facility prices for this hour to compare the interties against.</span>
+                ) : (
+                  <>
+                    <span className="font-semibold">Intertie LMP</span>
+                    <span className="text-[var(--muted)]">{hourEndingLabel(congestion.interties.hourTsUtc)}</span>
+                    {congestion.interties.hourTsUtc !== congestion.hourTsUtc && (
+                      <span className="text-amber-300">intertie prices for {hourEndingLabel(congestion.hourTsUtc)} aren&apos;t available, showing the nearest earlier hour</span>
+                    )}
+                    <span className="flex items-center gap-1 font-mono">
+                      ≤ {formatLmpShort(priceScale.scale.low)}
+                      <span className="inline-block h-2.5 w-28 rounded-sm border-2 border-yellow-500" style={{ background: INTERTIE_GRADIENT_CSS }} />≥ {formatLmpShort(priceScale.scale.high)}
+                    </span>
+                    <span className="text-[var(--muted)]">· scale = Ontario facility prices this hour · {congestion.interties.points.length} interties · positions approximate</span>
                   </>
                 )}
               </div>
