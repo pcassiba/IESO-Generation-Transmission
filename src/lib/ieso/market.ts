@@ -34,6 +34,8 @@ export interface LmpHourRow {
   congestionMin: number | null;
   /** Most positive 5-minute congestion component within the hour. */
   congestionMax: number | null;
+  /** The newest five-minute interval in the file, as published (not averaged). */
+  last: { interval: number; lmp: number | null; loss: number | null; congestion: number | null };
 }
 
 export interface ParsedLmp {
@@ -73,7 +75,7 @@ export function parseRealtimeLmpCsv(csv: string, fallbackDate?: string): ParsedL
   };
   if (Object.values(ix).some((i) => i < 0)) throw new ReportParseError(`LMP report columns not recognised: ${cols.join(",")}`);
 
-  type Acc = { hour: number; ints: Set<number>; lmp: number[]; loss: number[]; cong: number[] };
+  type Acc = { hour: number; ints: Set<number>; lmp: number[]; loss: number[]; cong: number[]; last: LmpHourRow["last"] };
   const acc = new Map<string, Acc>();
   for (let i = headerIdx + 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -88,7 +90,7 @@ export function parseRealtimeLmpCsv(csv: string, fallbackDate?: string): ParsedL
     }
     const key = `${loc}|${hour}`;
     let a = acc.get(key);
-    if (!a) acc.set(key, (a = { hour, ints: new Set(), lmp: [], loss: [], cong: [] }));
+    if (!a) acc.set(key, (a = { hour, ints: new Set(), lmp: [], loss: [], cong: [], last: { interval: 0, lmp: null, loss: null, congestion: null } }));
     if (a.ints.has(interval)) continue;
     a.ints.add(interval);
     const lmp = parseNumber(f[ix.lmp]);
@@ -97,6 +99,7 @@ export function parseRealtimeLmpCsv(csv: string, fallbackDate?: string): ParsedL
     if (lmp !== null) a.lmp.push(lmp);
     if (loss !== null) a.loss.push(loss);
     if (cong !== null) a.cong.push(cong);
+    if (interval > a.last.interval) a.last = { interval, lmp, loss, congestion: cong };
   }
 
   const rows: LmpHourRow[] = [];
@@ -113,6 +116,7 @@ export function parseRealtimeLmpCsv(csv: string, fallbackDate?: string): ParsedL
       congestion: round2(avg(a.cong)),
       congestionMin: a.cong.length ? Math.min(...a.cong) : null,
       congestionMax: a.cong.length ? Math.max(...a.cong) : null,
+      last: a.last,
     });
   }
   return { createdAt, deliveryDate, rows, warnings };

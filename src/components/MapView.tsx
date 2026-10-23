@@ -59,6 +59,8 @@ export interface IntertieOverlay {
 export interface LmpOverlay {
   byFacility: Map<string, FacilityLmp>;
   hourTsUtc: string | null;
+  /** What the prices are, for the tooltip, e.g. "hourly average" or "5-min price, interval 7". */
+  basisLabel: string;
 }
 
 /** Icon layers hidden while the LMP view is on. */
@@ -300,7 +302,7 @@ function intertieArrowImage(): ImageData {
 
 const money = (v: number | null) => (v === null ? "—" : `${v.toFixed(2)} $/MWh`);
 
-function lmpTooltipHtml(f: FacilityState, p: FacilityLmp | undefined, hourTsUtc: string | null): string {
+function lmpTooltipHtml(f: FacilityState, p: FacilityLmp | undefined, hourTsUtc: string | null, basisLabel: string): string {
   if (!p) {
     return `<div class="oge-tip"><div class="oge-tip-title">${esc(f.name)}</div><div class="oge-tip-row"><span>No IESO pricing location linked to this facility</span></div></div>`;
   }
@@ -316,7 +318,7 @@ function lmpTooltipHtml(f: FacilityState, p: FacilityLmp | undefined, hourTsUtc:
       : `<div class="oge-tip-row"><span>Pricing location</span><b>${esc(d.units[0]?.location ?? "")}</b></div>`;
   return `<div class="oge-tip"><div class="oge-tip-title">${esc(f.name)}</div>${rows
     .map(([k, v]) => `<div class="oge-tip-row"><span>${k}</span><b>${v}</b></div>`)
-    .join("")}${units}<div class="oge-tip-row" style="margin-top:4px"><span>${esc(hourEndingLabel(hourTsUtc))} · IESO real-time</span></div></div>`;
+    .join("")}${units}<div class="oge-tip-row" style="margin-top:4px"><span>${esc(hourEndingLabel(hourTsUtc))} · IESO real-time · ${esc(basisLabel)}</span></div></div>`;
 }
 
 function tooltipHtml(f: FacilityState, cong?: { congestion: number | null; lmp: number | null }): string {
@@ -727,7 +729,7 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
       if (!f) return;
       popup
         .setLngLat((e.features![0].geometry as GeoJSON.Point).coordinates as [number, number])
-        .setHTML(lmpTooltipHtml(f, lmpRef.current?.byFacility.get(f.id), lmpRef.current?.hourTsUtc ?? null))
+        .setHTML(lmpTooltipHtml(f, lmpRef.current?.byFacility.get(f.id), lmpRef.current?.hourTsUtc ?? null, lmpRef.current?.basisLabel ?? "hourly average"))
         .addTo(map);
     });
     map.on("mouseleave", "lmp-dots", leave);

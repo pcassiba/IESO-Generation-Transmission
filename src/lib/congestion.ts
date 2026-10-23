@@ -119,8 +119,17 @@ export interface ConstraintSummary {
   lastBindingUtc: string;
 }
 
+/** "hourly" = average of the hour's five-minute prices (so far, for the hour in progress); "5min" = the newest five-minute price. */
+export type PriceBasis = "hourly" | "5min";
+
 export interface CongestionResponse {
   hourTsUtc: string | null;
+  /** What the prices for this hour are: 5min only applies to the hour in progress, otherwise hourly. */
+  priceBasis: PriceBasis;
+  /** Five-minute intervals averaged into this hour's prices (12 = complete hour). */
+  hourIntervals: number | null;
+  /** Set when priceBasis is 5min: which interval, when it ends and IESO's file stamp (EST). */
+  latestInterval: { interval: number; endUtc: string; createdAt: string | null } | null;
   latestTsUtc: string | null;
   thresholdPerMWh: number;
   /** Median LMP across all locations for the hour, a reference for the map colours. */
@@ -142,7 +151,7 @@ const mean = (xs: (number | null)[]) => {
   return v.length ? Math.round((v.reduce((a, b) => a + b, 0) / v.length) * 100) / 100 : null;
 };
 
-export async function getCongestion(db: Db, requestedTs?: string | null, constraintDays = 7): Promise<CongestionResponse> {
+export async function getCongestion(db: Db, requestedTs?: string | null, constraintDays = 7, price: PriceBasis = "hourly"): Promise<CongestionResponse> {
   const threshold = config.congestion.thresholdPerMWh;
   const latest = iso((await db.query<{ mx: string | null }>("SELECT max(ts_utc) AS mx FROM lmp_hourly"))[0]?.mx);
   let hour = latest;
@@ -152,9 +161,23 @@ export async function getCongestion(db: Db, requestedTs?: string | null, constra
   }
 
   const facilities = await readFacilitiesFromDb(db);
-  const rows = hour
+  let rows = hour
     ? await db.query<{ location: string; lmp: number | null; loss: number | null; congestion: number | null }>("SELECT location, lmp, loss, congestion FROM lmp_hourly WHERE ts_utc = $1", [hour])
     : [];
+  const hourIntervals = hour ? ((await db.query<{ n: number | null }>("SELECT max(intervals) AS n FROM lmp_hourly WHERE ts_utc = $1", [hour]))[0]?.n ?? null) : null;
+  // The newest five-minute prices exist only for the hour in progress (from the rolling file).
+  let latestInterval: CongestionResponse["latestInterval"] = null;
+  if (price === "5min" && hour) {
+    const five = await db.query<{ location: string; lmp: number | null; loss: number | null; congestion: number | null; interval: number; created_at: string | null }>(
+      "SELECT location, lmp, loss, congestion, interval, created_at FROM lmp_interval_latest WHERE ts_utc = $1",
+      [hour],
+    );
+    if (five.length) {
+      const interval = Math.max(...five.map((r) => Number(r.interval)));
+      latestInterval = { interval, endUtc: new Date(new Date(hour).getTime() - HOUR + interval * 5 * 60_000).toISOString(), createdAt: five[0].created_at };
+      rows = five;
+    }
+  }
   const locations = rows.map((r) => r.location);
   const matches = matchLocations(facilities, locations, loadOverrides());
   const facilityOf = new Map<string, string>();
@@ -224,6 +247,9 @@ export async function getCongestion(db: Db, requestedTs?: string | null, constra
   const unmatchedNodes = [...new Set(gen.filter((l) => !facilityOf.has(l)).map(nodeOf))].sort();
   return {
     hourTsUtc: hour,
+    priceBasis: latestInterval ? "5min" : "hourly",
+    hourIntervals: hourIntervals === null ? null : Number(hourIntervals),
+    latestInterval,
     latestTsUtc: latest,
     thresholdPerMWh: threshold,
     medianLmp: lmps.length ? lmps[Math.floor(lmps.length / 2)] : null,

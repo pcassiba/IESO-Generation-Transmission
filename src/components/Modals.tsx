@@ -6,7 +6,7 @@ import { STATUSES, STATUS_LABEL, TECHNOLOGIES, TECHNOLOGY_LABEL } from "@/lib/ty
 import { fmtMW } from "@/lib/ui";
 import { StatusDot, TechIcon } from "./Icons";
 
-function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6" onClick={onClose}>
       <div className="flex max-h-full w-full max-w-3xl flex-col rounded-lg border border-[var(--border)] bg-[var(--panel)] shadow-2xl" onClick={(e) => e.stopPropagation()}>

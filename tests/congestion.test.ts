@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { getCongestion, isGeneratorLocation, matchLocations, nodeOf, resourceBase } from "../src/lib/congestion";
 import { createMemoryDb, type Db } from "../src/lib/db";
 import { normaliseFacility, seedFacilities } from "../src/lib/facilities";
-import { ensureLmpHour, missingConstraintDays, missingLmpHours, storeConstraints, storeLmp } from "../src/lib/ieso/congestion-ingest";
+import { ensureLmpHour, missingConstraintDays, missingLmpHours, storeConstraints, storeLmp, storeLmpLatestInterval } from "../src/lib/ieso/congestion-ingest";
 import { parseConstraintShadowPrices, parseRealtimeLmpCsv } from "../src/lib/ieso/market";
 
 describe("pricing location matching", () => {
@@ -125,4 +125,40 @@ describe("congestion end to end (PGlite in-memory)", () => {
       vi.unstubAllGlobals();
     }
   });
+});
+
+describe("latest five-minute price for the hour in progress", () => {
+  // Rolling file part-way through HE 10: intervals 1–3 published.
+  const rolling =
+    "CREATED AT 2026/10/16 09:16:00 FOR 2026/10/16\nDelivery Hour,Interval,Pricing Location,LMP,Energy Loss Price,Energy Congestion Price\n" +
+    ["10,1,ABKENORA-LT.AG,10,0.5,-1", "10,2,ABKENORA-LT.AG,20,0.5,-2", "10,3,ABKENORA-LT.AG,60,0.5,-3"].join("\n");
+
+  it("keeps the newest interval as published", () => {
+    const row = parseRealtimeLmpCsv(rolling).rows[0];
+    expect(row.lmp).toBe(30);
+    expect(row.intervals).toBe(3);
+    expect(row.last).toEqual({ interval: 3, lmp: 60, loss: 0.5, congestion: -3 });
+  });
+
+  it("serves the hourly average or the latest 5-min price on request", async () => {
+    const db = await createMemoryDb();
+    await seedFacilities(db, [
+      normaliseFacility({ id: "kenora", name: "Abitibi Kenora", technology: "hydro", lat: 49.77, lon: -94.48, geocodeConfidence: "high", sourceUrls: [], resources: [{ ieso: "ABKENORA" }] }),
+    ]);
+    const parsed = parseRealtimeLmpCsv(rolling);
+    await storeLmp(db, parsed, "rolling", "r1");
+    await storeLmpLatestInterval(db, parsed);
+
+    const avg = await getCongestion(db);
+    expect(avg.priceBasis).toBe("hourly");
+    expect(avg.hourIntervals).toBe(3);
+    expect(avg.facilities[0].lmp).toBe(30);
+
+    const five = await getCongestion(db, null, 7, "5min");
+    expect(five.priceBasis).toBe("5min");
+    // HE 10 EST on Oct 16 runs 09:00–10:00 EST (14:00–15:00Z); interval 3 ends at 09:15 EST.
+    expect(five.latestInterval).toEqual({ interval: 3, endUtc: "2026-10-16T14:15:00.000Z", createdAt: "2026-10-16T09:16:00" });
+    expect(five.facilities[0].lmp).toBe(60);
+    expect(five.facilities[0].congestion).toBe(-3);
+  }, 60_000);
 });

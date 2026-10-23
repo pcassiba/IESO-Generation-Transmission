@@ -254,3 +254,9 @@ export async function getTxRisk(db: Db, tIso: string | null): Promise<TxRiskResp
     notes,
   };
 }
+
+/** Status of each transmission report as last downloaded, without fetching anything. */
+export function txReportStatuses(now = Date.now()): ReportStatus[] {
+  loadFromDisk();
+  return REPORTS.map((d) => reportStatus(d, slot(d.kind), now));
+}

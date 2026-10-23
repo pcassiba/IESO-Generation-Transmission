@@ -105,6 +105,8 @@ CREATE TABLE IF NOT EXISTS market_files (
   fetched_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (report, period)
 );
+-- IESO's own "created at" stamp from the file header (EST), shown on the Data sources page.
+ALTER TABLE market_files ADD COLUMN IF NOT EXISTS created_at TEXT;
 
 CREATE TABLE IF NOT EXISTS lmp_hourly (
   location TEXT NOT NULL,
@@ -118,6 +120,18 @@ CREATE TABLE IF NOT EXISTS lmp_hourly (
   PRIMARY KEY (location, ts_utc)
 );
 CREATE INDEX IF NOT EXISTS lmp_hourly_ts_idx ON lmp_hourly (ts_utc);
+
+-- The newest five-minute interval of the hour in progress, from the rolling LMP file (replaced on each download).
+CREATE TABLE IF NOT EXISTS lmp_interval_latest (
+  location TEXT PRIMARY KEY,
+  ts_utc TIMESTAMPTZ NOT NULL,
+  interval SMALLINT NOT NULL,
+  lmp DOUBLE PRECISION,
+  loss DOUBLE PRECISION,
+  congestion DOUBLE PRECISION,
+  created_at TEXT,
+  fetched_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
 -- Intertie prices (RealTimeIntertieLMP), one row per intertie pricing location and hour.
 CREATE TABLE IF NOT EXISTS intertie_lmp_hourly (
