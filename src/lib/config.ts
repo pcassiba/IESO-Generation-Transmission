@@ -22,6 +22,8 @@ export const config = {
     lmpBaseUrl: process.env.IESO_LMP_BASE_URL ?? "https://reports-public.ieso.ca/public/RealtimeEnergyLMP/",
     intertieLmpBaseUrl: process.env.IESO_INTERTIE_LMP_BASE_URL ?? "https://reports-public.ieso.ca/public/RealTimeIntertieLMP/",
     constraintsBaseUrl: process.env.IESO_CONSTRAINTS_BASE_URL ?? "https://reports-public.ieso.ca/public/RealtimeConstrShadowPrices/",
+    /** Minutes between downloads of the current-hour price files (IESO adds a five-minute price every 5 minutes). */
+    pricePollMinutes: num("PRICE_POLL_MINUTES", 5),
     /** Days of hourly nodal prices to backfill (one file per hour, so keep this modest). */
     lmpBackfillDays: num("CONGESTION_LMP_DAYS", 7),
     /** Days of hourly intertie prices to backfill; older hours are fetched when someone picks them. */

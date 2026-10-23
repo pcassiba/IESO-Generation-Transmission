@@ -179,6 +179,31 @@ export async function ingestConstraintsDay(db: Db, date: string): Promise<{ bind
   return storeConstraints(db, parseConstraintShadowPrices(res.body), url, sha256(res.body));
 }
 
+const PRICES_LATEST = "prices-latest";
+
+/**
+ * Download the current-hour nodal and intertie price files if the last download is older than
+ * `minutes`. Cheap (two small files), so it runs far more often than the full congestion sync;
+ * the check is kept in the database so separate serverless instances share it.
+ */
+export async function pollPricesIfDue(db: Db, minutes = config.congestion.pricePollMinutes, now = new Date()): Promise<"skipped" | "fetched"> {
+  if (!config.congestion.enabled) return "skipped";
+  const last = await db.query<{ at: string }>("SELECT at FROM ingest_log WHERE kind = $1 ORDER BY id DESC LIMIT 1", [PRICES_LATEST]);
+  if (last[0] && now.getTime() - new Date(last[0].at).getTime() < minutes * 60_000) return "skipped";
+  // Claim the slot before downloading so concurrent requests don't all fetch.
+  await log(db, PRICES_LATEST, true, "started");
+  const errors: string[] = [];
+  for (const [what, fn] of [["LMP latest", () => ingestLmpLatest(db)], ["Intertie latest", () => ingestIntertieLatest(db)]] as const) {
+    try {
+      await fn();
+    } catch (e) {
+      errors.push(`${what}: ${(e as Error).message}`);
+    }
+  }
+  if (errors.length) await log(db, PRICES_LATEST, false, errors.join("; "));
+  return "fetched";
+}
+
 /** Completed market hours in the last `hours` hours without a complete file of `report`, newest first. */
 export async function missingLmpHours(db: Db, hours: number, now = new Date(), report = LMP): Promise<{ date: string; hour: number }[]> {
   const have = await db.query<{ period: string }>("SELECT period FROM market_files WHERE report = $1 AND complete", [report]);

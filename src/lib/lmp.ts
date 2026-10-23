@@ -126,3 +126,15 @@ export function intertieMarkers(points: IntertiePoint[], scale: LmpScale | null)
     return { point, heat, color: heatColor(heat, INTERTIE_HEAT_STOPS), label: formatLmpShort(point.lmp) };
   });
 }
+
+/** Price moves between two refreshes of the same view: id → change in $/MWh (only moves of at least `minDelta`). */
+export function priceChanges(prev: Map<string, number>, next: Map<string, number>, minDelta = 0.01): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const [id, v] of next) {
+    const p = prev.get(id);
+    if (p === undefined) continue;
+    const d = Math.round((v - p) * 100) / 100;
+    if (Math.abs(d) >= minDelta) out.set(id, d);
+  }
+  return out;
+}
