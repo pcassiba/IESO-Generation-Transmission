@@ -61,11 +61,20 @@ export interface LmpOverlay {
   hourTsUtc: string | null;
   /** What the prices are, for the tooltip, e.g. "hourly average" or "5-min price, interval 7". */
   basisLabel: string;
+  /** facility id → price change ($/MWh) since the previous refresh. */
+  changes: Map<string, number>;
+  /** Changes when a refresh brought new prices; each new value pulses the facilities that moved. */
+  pulseKey: number;
+  /** False when flashing animations are off or the system asks for reduced motion. */
+  animate: boolean;
 }
 
 /** Icon layers hidden while the LMP view is on. */
 const ICON_LAYERS = ["clusters", "cluster-count", "unclustered", "points"];
-const LMP_LAYERS = ["lmp-glow", "lmp-dots", "lmp-labels"];
+const LMP_LAYERS = ["lmp-glow", "lmp-pulse", "lmp-dots", "lmp-labels"];
+const PULSE_MS = 2400;
+const PRICE_UP = "#ef4444";
+const PRICE_DOWN = "#22c55e";
 /** Intertie layers, kept above everything else. */
 const INTERTIE_LAYERS = ["intertie-glow", "intertie-arrows", "intertie-dots", "intertie-labels"];
 
@@ -225,8 +234,8 @@ function lmpFeatures(map: MLMap, located: FacilityState[], spreadPoints: ReturnT
         type: "Feature",
         geometry: { type: "Point", coordinates },
         properties: p
-          ? { id: f.id, priced: true, heat: p.heat, color: p.color, label: p.label, textColor: p.textColor }
-          : { id: f.id, priced: false, heat: -1, color: "#94a3b8", label: "", textColor: "#111827" },
+          ? { id: f.id, priced: true, heat: p.heat, color: p.color, label: p.label, textColor: p.textColor, change: Math.sign(lmp.changes.get(f.id) ?? 0) }
+          : { id: f.id, priced: false, heat: -1, color: "#94a3b8", label: "", textColor: "#111827", change: 0 },
       });
     }
   }
@@ -302,7 +311,7 @@ function intertieArrowImage(): ImageData {
 
 const money = (v: number | null) => (v === null ? "—" : `${v.toFixed(2)} $/MWh`);
 
-function lmpTooltipHtml(f: FacilityState, p: FacilityLmp | undefined, hourTsUtc: string | null, basisLabel: string): string {
+function lmpTooltipHtml(f: FacilityState, p: FacilityLmp | undefined, hourTsUtc: string | null, basisLabel: string, change?: number): string {
   if (!p) {
     return `<div class="oge-tip"><div class="oge-tip-title">${esc(f.name)}</div><div class="oge-tip-row"><span>No IESO pricing location linked to this facility</span></div></div>`;
   }
@@ -311,6 +320,7 @@ function lmpTooltipHtml(f: FacilityState, p: FacilityLmp | undefined, hourTsUtc:
     [d.units.length > 1 ? `LMP (average of ${d.units.length} units)` : "LMP", money(p.lmp)],
     ["Congestion part", money(d.congestion)],
     ["Loss part", money(d.loss)],
+    ...(change ? ([["Since last update", `<span style="color:${change > 0 ? PRICE_UP : PRICE_DOWN}">${change > 0 ? "▲ +" : "▼ −"}${Math.abs(change).toFixed(2)} $/MWh</span>`]] as [string, string][]) : []),
   ];
   const units =
     d.units.length > 1
@@ -583,6 +593,21 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
         "circle-blur": 1,
       },
     });
+    // Expanding ring on facilities whose price just moved: red = up, green = down. Hidden until a refresh brings changes.
+    map.addLayer({
+      id: "lmp-pulse",
+      type: "circle",
+      source: "lmp",
+      filter: ["!=", ["get", "change"], 0],
+      layout: hidden,
+      paint: {
+        "circle-radius": 12,
+        "circle-color": "rgba(0,0,0,0)",
+        "circle-stroke-color": ["case", [">", ["get", "change"], 0], PRICE_UP, PRICE_DOWN],
+        "circle-stroke-width": 3,
+        "circle-stroke-opacity": 0,
+      },
+    });
     map.addLayer({
       id: "lmp-dots",
       type: "circle",
@@ -729,7 +754,7 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
       if (!f) return;
       popup
         .setLngLat((e.features![0].geometry as GeoJSON.Point).coordinates as [number, number])
-        .setHTML(lmpTooltipHtml(f, lmpRef.current?.byFacility.get(f.id), lmpRef.current?.hourTsUtc ?? null, lmpRef.current?.basisLabel ?? "hourly average"))
+        .setHTML(lmpTooltipHtml(f, lmpRef.current?.byFacility.get(f.id), lmpRef.current?.hourTsUtc ?? null, lmpRef.current?.basisLabel ?? "hourly average", lmpRef.current?.changes.get(f.id)))
         .addTo(map);
     });
     map.on("mouseleave", "lmp-dots", leave);
@@ -822,6 +847,30 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     refreshData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lmp]);
+
+  // Pulse the facilities whose price moved, once per refresh that brought new prices.
+  const pulseKey = lmp?.pulseKey ?? 0;
+  const pulseAnimate = !!lmp?.animate;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !pulseKey || !pulseAnimate || !map.getLayer("lmp-pulse")) return;
+    let raf = 0;
+    const start = performance.now();
+    const frame = (t: number) => {
+      if (!map.getLayer("lmp-pulse")) return;
+      const k = Math.min(1, (t - start) / PULSE_MS);
+      // Two rings, each growing from the dot outwards and fading.
+      const ring = (k * 2) % 1;
+      map.setPaintProperty("lmp-pulse", "circle-radius", 10 + ring * 22);
+      map.setPaintProperty("lmp-pulse", "circle-stroke-opacity", k >= 1 ? 0 : 0.9 * (1 - ring));
+      if (k < 1) raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(raf);
+      if (map.getLayer("lmp-pulse")) map.setPaintProperty("lmp-pulse", "circle-stroke-opacity", 0);
+    };
+  }, [pulseKey, pulseAnimate]);
 
   useEffect(() => {
     tieRef.current = interties ?? null;

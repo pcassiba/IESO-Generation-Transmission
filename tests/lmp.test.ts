@@ -6,7 +6,7 @@ import { createMemoryDb, type Db } from "../src/lib/db";
 import { normaliseFacility, seedFacilities } from "../src/lib/facilities";
 import { storeLmp } from "../src/lib/ieso/congestion-ingest";
 import { parseRealtimeLmpCsv } from "../src/lib/ieso/market";
-import { facilityLmps, formatLmpShort, heatColor, lmpHeat, lmpScale } from "../src/lib/lmp";
+import { facilityLmps, formatLmpShort, heatColor, lmpHeat, lmpScale, priceChanges } from "../src/lib/lmp";
 
 // Saved in the live PUB_RealtimeEnergyLMP_YYYYMMDDHH.csv layout (12 intervals per location, HE15).
 const FIXTURE = fs.readFileSync(path.join(__dirname, "fixtures", "lmp", "PUB_RealtimeEnergyLMP_2026101915.csv"), "utf8");
@@ -100,5 +100,13 @@ describe("one LMP per facility from the saved report", () => {
     const bruce = m.get("bruce-b-ngs")!;
     expect(bruce.heat).toBeGreaterThan(0.5);
     expect(bruce.heat).toBeLessThan(1);
+  });
+});
+
+describe("price changes between refreshes", () => {
+  it("reports moves of at least a cent for facilities priced both times", () => {
+    const prev = new Map([["a", 40], ["b", 50], ["c", 60]]);
+    const next = new Map([["a", 42.5], ["b", 50.004], ["c", 55], ["d", 10]]);
+    expect([...priceChanges(prev, next)]).toEqual([["a", 2.5], ["c", -5]]);
   });
 });

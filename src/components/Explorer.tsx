@@ -9,7 +9,7 @@ import { DEFAULT_VISIBLE, VOLTAGE_CLASSES, VOLTAGE_COLOR, VOLTAGE_LABEL, type Vo
 import type { FacilityState, StateResponse } from "@/lib/types";
 import { STATUSES, STATUS_LABEL, STORAGE_MODE_LABEL, TECHNOLOGIES, TECHNOLOGY_LABEL } from "@/lib/types";
 import { toCsv } from "@/lib/csv";
-import { INTERTIE_GRADIENT_CSS, LMP_GRADIENT_CSS, facilityLmps, formatLmpShort, intertieMarkers, lmpScale } from "@/lib/lmp";
+import { INTERTIE_GRADIENT_CSS, LMP_GRADIENT_CSS, facilityLmps, formatLmpShort, intertieMarkers, lmpScale, priceChanges } from "@/lib/lmp";
 import { hourEndingLabel } from "@/lib/time";
 import { CONGESTION_NEG, CONGESTION_POS } from "@/lib/ui";
 import { LEGEND as TXR_LEGEND, RISK_COLOR } from "@/lib/txrisk/ui";
@@ -75,6 +75,7 @@ export default function Explorer() {
   const [showInterties, setShowInterties] = useState(false);
   /** Current hour only: average of the five-minute prices so far, or the newest five-minute price. */
   const [priceBasis, setPriceBasis] = useState<PriceBasis>("hourly");
+  const [priceTick, setPriceTick] = useState(0);
   const mapRef = useRef<MLMap | null>(null);
   const tx = useTxRisk();
   const txOverlay = useMemo(
@@ -135,7 +136,30 @@ export default function Explorer() {
     return () => {
       cancelled = true;
     };
-  }, [showCongestion, showLmp, showInterties, congestionTs, stateKey, priceBasis]);
+  }, [showCongestion, showLmp, showInterties, congestionTs, stateKey, priceBasis, priceTick]);
+
+  // On the latest hour, re-read prices every minute; the server downloads IESO's current-hour files every 5 minutes.
+  useEffect(() => {
+    if ((!showCongestion && !showLmp && !showInterties) || congestionTs) return;
+    const t = setInterval(() => setPriceTick((x) => x + 1), 60_000);
+    return () => clearInterval(t);
+  }, [showCongestion, showLmp, showInterties, congestionTs]);
+
+  // Facility price moves since the previous refresh of the same view (same hour choice and price basis).
+  const lastPrices = useRef<{ key: string; prices: Map<string, number> } | null>(null);
+  const [lmpChanges, setLmpChanges] = useState<{ deltas: Map<string, number>; at: number } | null>(null);
+  useEffect(() => {
+    if (!congestion) return;
+    const key = `${congestionFor ?? "latest"}|${congestion.priceBasis}`;
+    const prices = new Map(congestion.facilities.filter((f) => f.lmp !== null).map((f) => [f.facilityId, f.lmp!]));
+    const prev = lastPrices.current;
+    lastPrices.current = { key, prices };
+    if (!prev || prev.key !== key) setLmpChanges(null);
+    else {
+      const deltas = priceChanges(prev.prices, prices);
+      if (deltas.size) setLmpChanges({ deltas, at: Date.now() });
+    }
+  }, [congestion, congestionFor]);
 
   const lineVisibility = useMemo(
     () => Object.fromEntries(VOLTAGE_CLASSES.map((c) => [c, showLines && lineClasses[c]])) as Record<VoltageClass, boolean>,
@@ -156,8 +180,18 @@ export default function Explorer() {
   const lmpView = useMemo(() => {
     if (!showLmp || !priceScale) return null;
     const { priced, scale } = priceScale;
-    return { scale, overlay: { byFacility: facilityLmps(priced, scale), hourTsUtc: congestion!.hourTsUtc, basisLabel: priceBasisLabel(congestion!) } satisfies LmpOverlay };
-  }, [showLmp, priceScale, congestion]);
+    return {
+      scale,
+      overlay: {
+        byFacility: facilityLmps(priced, scale),
+        hourTsUtc: congestion!.hourTsUtc,
+        basisLabel: priceBasisLabel(congestion!),
+        changes: lmpChanges?.deltas ?? new Map(),
+        pulseKey: lmpChanges?.at ?? 0,
+        animate: tx.flashing && !tx.reducedMotion,
+      } satisfies LmpOverlay,
+    };
+  }, [showLmp, priceScale, congestion, lmpChanges, tx.flashing, tx.reducedMotion]);
 
   // Interties: yellow circles, more intense the higher the intertie price sits against the facility prices.
   const intertieView = useMemo(() => {
@@ -347,7 +381,7 @@ export default function Explorer() {
               >
                 <Zap size={13} /> Show Outages & Congestion Risk: {tx.enabled ? "ON" : "OFF"}
               </button>
-              {tx.enabled && (
+              {(tx.enabled || showLmp) && (
                 <button
                   onClick={() => tx.setFlashing((v) => !v)}
                   aria-pressed={tx.flashing}

@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { getCongestion, isGeneratorLocation, matchLocations, nodeOf, resourceBase } from "../src/lib/congestion";
 import { createMemoryDb, type Db } from "../src/lib/db";
 import { normaliseFacility, seedFacilities } from "../src/lib/facilities";
-import { ensureLmpHour, missingConstraintDays, missingLmpHours, storeConstraints, storeLmp, storeLmpLatestInterval } from "../src/lib/ieso/congestion-ingest";
+import { ensureLmpHour, missingConstraintDays, missingLmpHours, pollPricesIfDue, storeConstraints, storeLmp, storeLmpLatestInterval } from "../src/lib/ieso/congestion-ingest";
 import { parseConstraintShadowPrices, parseRealtimeLmpCsv } from "../src/lib/ieso/market";
 
 describe("pricing location matching", () => {
@@ -160,5 +160,29 @@ describe("latest five-minute price for the hour in progress", () => {
     expect(five.latestInterval).toEqual({ interval: 3, endUtc: "2026-10-16T14:15:00.000Z", createdAt: "2026-10-16T09:16:00" });
     expect(five.facilities[0].lmp).toBe(60);
     expect(five.facilities[0].congestion).toBe(-3);
+  }, 60_000);
+});
+
+describe("current-hour price downloads", () => {
+  it("fetch at most once per interval, shared through the database", async () => {
+    const db = await createMemoryDb();
+    const urls: string[] = [];
+    vi.stubGlobal("fetch", async (url: string) => {
+      urls.push(url);
+      return new Response("not found", { status: 404 });
+    });
+    try {
+      const t0 = new Date();
+      expect(await pollPricesIfDue(db, 5, t0)).toBe("fetched");
+      expect(urls.some((u) => u.endsWith("PUB_RealtimeEnergyLMP.csv"))).toBe(true);
+      expect(urls.some((u) => u.endsWith("PUB_RealTimeIntertieLMP.xml"))).toBe(true);
+      const n = urls.length;
+      expect(await pollPricesIfDue(db, 5, new Date(t0.getTime() + 60_000))).toBe("skipped");
+      expect(urls).toHaveLength(n);
+      expect(await pollPricesIfDue(db, 5, new Date(t0.getTime() + 6 * 60_000))).toBe("fetched");
+      expect(urls.length).toBeGreaterThan(n);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   }, 60_000);
 });

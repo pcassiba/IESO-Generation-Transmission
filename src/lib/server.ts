@@ -3,7 +3,7 @@ import path from "node:path";
 import { config } from "./config";
 import { getDb, type Db } from "./db";
 import { facilitiesDir, loadFacilityFiles, seedFacilities, validateFacilities, type MetadataIssue } from "./facilities";
-import { syncCongestion } from "./ieso/congestion-ingest";
+import { pollPricesIfDue, syncCongestion } from "./ieso/congestion-ingest";
 import { backfill, ingestDaily, ingestLatest, missingDailyDates } from "./ieso/ingest";
 import { refreshAll as refreshTxRisk } from "./txrisk/store";
 
@@ -24,6 +24,7 @@ interface Runtime {
   lastPollAt: string | null;
   lastPollError: string | null;
   timer?: ReturnType<typeof setInterval>;
+  priceTimer?: ReturnType<typeof setInterval>;
 }
 
 type G = typeof globalThis & { __ogeRuntime?: Runtime };
@@ -142,6 +143,13 @@ export function startScheduler(): void {
       console.error("[scheduler] poll failed", e);
     }
   }, config.pollMinutes * 60_000);
+  rt.priceTimer = setInterval(async () => {
+    try {
+      await pollPricesIfDue(await ensureInitialized());
+    } catch (e) {
+      console.error("[scheduler] price poll failed", e);
+    }
+  }, config.congestion.pricePollMinutes * 60_000);
 }
 
 /**
@@ -150,6 +158,8 @@ export function startScheduler(): void {
  */
 export async function pollServerless(opts: { minIntervalMinutes?: number; dailyPerRun?: number } = {}): Promise<{ skipped: boolean }> {
   const db = await ensureInitialized();
+  // Current-hour prices change every 5 minutes, more often than the generator report.
+  await pollPricesIfDue(db).catch((e) => console.warn(`[prices] ${(e as Error).message}`));
   const minutes = opts.minIntervalMinutes ?? config.pollMinutes;
   const missing = await missingDailyDates(db, Math.max(config.backfillDays, 1));
   if (minutes > 0 && missing.length === 0) {
