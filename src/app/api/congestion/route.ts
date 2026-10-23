@@ -9,11 +9,12 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/** GET /api/congestion?ts=… — nodal congestion and binding constraints for the hour at or before ts. */
+/** GET /api/congestion?ts=…&price=5min — nodal congestion and binding constraints for the hour at or before ts. */
 export async function GET(req: Request) {
   try {
     const db = await ensureInitialized();
-    const ts = new URL(req.url).searchParams.get("ts");
+    const params = new URL(req.url).searchParams;
+    const ts = params.get("ts");
     // Hours older than the backfill window are fetched from the IESO archive the first time they're asked for.
     let intertieError: string | undefined;
     if (config.congestion.enabled) {
@@ -32,7 +33,7 @@ export async function GET(req: Request) {
         console.warn(`[congestion] intertie price fetch${ts ? ` for ${ts}` : ""} failed: ${intertieError}`);
       }
     }
-    const body = await getCongestion(db, ts);
+    const body = await getCongestion(db, ts, undefined, params.get("price") === "5min" ? "5min" : "hourly");
     if (intertieError && !body.interties.points.length) body.interties.fetchError = intertieError;
     return NextResponse.json(body, { headers: { "Cache-Control": "no-store" } });
   } catch (e) {

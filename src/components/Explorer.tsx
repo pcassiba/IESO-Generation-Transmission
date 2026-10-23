@@ -4,7 +4,7 @@ import type { Map as MLMap } from "maplibre-gl";
 import dynamic from "next/dynamic";
 import { Activity, AlertTriangle, ArrowLeftRight, Cable, DollarSign, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { CongestionResponse } from "@/lib/congestion";
+import type { CongestionResponse, PriceBasis } from "@/lib/congestion";
 import { DEFAULT_VISIBLE, VOLTAGE_CLASSES, VOLTAGE_COLOR, VOLTAGE_LABEL, type VoltageClass } from "@/lib/transmission";
 import type { FacilityState, StateResponse } from "@/lib/types";
 import { STATUSES, STATUS_LABEL, STORAGE_MODE_LABEL, TECHNOLOGIES, TECHNOLOGY_LABEL } from "@/lib/types";
@@ -37,6 +37,16 @@ function download(name: string, blob: Blob) {
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 
+/** "hourly average", "average of 7 of 12 intervals so far" or "5-min price, interval 7 (ends 14:35 EST)". */
+function priceBasisLabel(c: CongestionResponse): string {
+  if (c.priceBasis === "5min" && c.latestInterval) {
+    const end = new Date(new Date(c.latestInterval.endUtc).getTime() - 5 * 3_600_000).toISOString().slice(11, 16);
+    return `5-min price, interval ${c.latestInterval.interval} of 12 (ends ${end} EST)`;
+  }
+  if (c.hourIntervals !== null && c.hourIntervals < 12) return `average of ${c.hourIntervals} of 12 intervals so far`;
+  return "hourly average";
+}
+
 export default function Explorer() {
   const [state, setState] = useState<StateResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -63,6 +73,8 @@ export default function Explorer() {
   const [congestionFor, setCongestionFor] = useState<string | null | undefined>(undefined);
   const [showLmp, setShowLmp] = useState(false);
   const [showInterties, setShowInterties] = useState(false);
+  /** Current hour only: average of the five-minute prices so far, or the newest five-minute price. */
+  const [priceBasis, setPriceBasis] = useState<PriceBasis>("hourly");
   const mapRef = useRef<MLMap | null>(null);
   const tx = useTxRisk();
   const txOverlay = useMemo(
@@ -107,7 +119,8 @@ export default function Explorer() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/congestion${congestionTs ? `?ts=${encodeURIComponent(congestionTs)}` : ""}`, { cache: "no-store" });
+        const query = congestionTs ? `?ts=${encodeURIComponent(congestionTs)}` : priceBasis === "5min" ? "?price=5min" : "";
+        const res = await fetch(`/api/congestion${query}`, { cache: "no-store" });
         const j = await res.json();
         if (!res.ok || j.error) throw new Error(j.error ?? `HTTP ${res.status}`);
         if (!cancelled) {
@@ -122,7 +135,7 @@ export default function Explorer() {
     return () => {
       cancelled = true;
     };
-  }, [showCongestion, showLmp, showInterties, congestionTs, stateKey]);
+  }, [showCongestion, showLmp, showInterties, congestionTs, stateKey, priceBasis]);
 
   const lineVisibility = useMemo(
     () => Object.fromEntries(VOLTAGE_CLASSES.map((c) => [c, showLines && lineClasses[c]])) as Record<VoltageClass, boolean>,
@@ -143,7 +156,7 @@ export default function Explorer() {
   const lmpView = useMemo(() => {
     if (!showLmp || !priceScale) return null;
     const { priced, scale } = priceScale;
-    return { scale, overlay: { byFacility: facilityLmps(priced, scale), hourTsUtc: congestion!.hourTsUtc } satisfies LmpOverlay };
+    return { scale, overlay: { byFacility: facilityLmps(priced, scale), hourTsUtc: congestion!.hourTsUtc, basisLabel: priceBasisLabel(congestion!) } satisfies LmpOverlay };
   }, [showLmp, priceScale, congestion]);
 
   // Interties: yellow circles, more intense the higher the intertie price sits against the facility prices.
@@ -299,6 +312,25 @@ export default function Explorer() {
               >
                 <DollarSign size={13} /> LMP: {showLmp ? "ON" : "OFF"}
               </button>
+              {showLmp && !congestionTs && (
+                <span className="flex items-center overflow-hidden rounded border border-[var(--border)]" title="Current hour only: IESO publishes a price every 5 minutes">
+                  {(
+                    [
+                      ["hourly", "Hour average so far"],
+                      ["5min", "Latest 5-min"],
+                    ] as const
+                  ).map(([b, label]) => (
+                    <button
+                      key={b}
+                      onClick={() => setPriceBasis(b)}
+                      aria-pressed={priceBasis === b}
+                      className={`px-1.5 py-0.5 ${priceBasis === b ? "bg-sky-500/25 text-sky-200" : "hover:bg-[var(--hover)]"}`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </span>
+              )}
               <button
                 onClick={() => setShowInterties((v) => !v)}
                 aria-pressed={showInterties}
@@ -341,6 +373,10 @@ export default function Explorer() {
                   <>
                     <span className="font-semibold">Real-time LMP</span>
                     <span className="text-[var(--muted)]">{hourEndingLabel(congestion.hourTsUtc)}</span>
+                    <span className={congestion.priceBasis === "5min" ? "text-sky-300" : "text-[var(--muted)]"}>{priceBasisLabel(congestion)}</span>
+                    {!congestionTs && priceBasis === "5min" && congestion.priceBasis !== "5min" && (
+                      <span className="text-amber-300">5-min prices for this hour aren&apos;t downloaded yet, showing the average</span>
+                    )}
                     {congestionTs && congestion.hourTsUtc !== congestionTs && (
                       <span className="text-amber-300">IESO prices for {hourEndingLabel(congestionTs)} aren&apos;t available, showing the nearest earlier hour</span>
                     )}

@@ -146,7 +146,7 @@ async function nodalPrices(db: Db, requested: string | null): Promise<SourceEntr
     fetchedAtUtc: at(file?.fetched_at ?? null),
     complete: file ? file.complete : null,
     howToCheck: mh
-      ? `The file has 12 five-minute rows per pricing location for Delivery Hour ${mh.hour}. The app shows the plain average of those 12 LMP values (same for the loss and congestion parts). A facility's price is the average of its units' pricing locations.`
+      ? `The file has 12 five-minute rows per pricing location for Delivery Hour ${mh.hour}. The app shows the plain average of those 12 LMP values (same for the loss and congestion parts). A facility's price is the average of its units' pricing locations. With "Latest 5-min" selected, the hour in progress shows the newest interval's row exactly as published instead.`
       : "No nodal prices stored yet.",
     examples,
     note: file && file.url.endsWith("PUB_RealtimeEnergyLMP.csv") ? "Read from the rolling file for the hour in progress, which IESO overwrites; check against the dated file instead." : null,

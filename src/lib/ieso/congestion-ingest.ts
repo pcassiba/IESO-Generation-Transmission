@@ -71,6 +71,27 @@ export async function storeLmp(db: Db, parsed: ParsedLmp, url: string, sha: stri
 }
 
 /** Store one hour of intertie prices and record its coverage. */
+/** Keep the newest five-minute prices of the newest hour in the file, replacing what was there. */
+export async function storeLmpLatestInterval(db: Db, parsed: ParsedLmp): Promise<{ rows: number }> {
+  const hour = Math.max(0, ...parsed.rows.map((r) => r.hour));
+  const rows = parsed.rows.filter((r) => r.hour === hour && r.last.interval > 0);
+  if (!rows.length) return { rows: 0 };
+  await db.transaction(async (tx) => {
+    await tx.query("DELETE FROM lmp_interval_latest");
+    const CHUNK = 500;
+    for (let i = 0; i < rows.length; i += CHUNK) {
+      const values: unknown[] = [];
+      const tuples = rows.slice(i, i + CHUNK).map((r, j) => {
+        const b = j * 7;
+        values.push(r.location, r.tsUtc, r.last.interval, r.last.lmp, r.last.loss, r.last.congestion, parsed.createdAt);
+        return `($${b + 1},$${b + 2},$${b + 3},$${b + 4},$${b + 5},$${b + 6},$${b + 7})`;
+      });
+      await tx.query(`INSERT INTO lmp_interval_latest (location, ts_utc, interval, lmp, loss, congestion, created_at) VALUES ${tuples.join(",")}`, values);
+    }
+  });
+  return { rows: rows.length };
+}
+
 export async function storeIntertieLmp(db: Db, parsed: ParsedIntertieLmp, url: string, sha: string): Promise<{ rows: number }> {
   const ints = Math.max(0, ...parsed.rows.map((r) => r.intervals));
   await db.transaction(async (tx) => {
@@ -144,7 +165,9 @@ export async function ingestLmpLatest(db: Db): Promise<{ rows: number; skipped?:
   if (res.kind !== "ok") return { rows: 0, skipped: true };
   const sha = sha256(res.body);
   if (sha === lastRollingSha) return { rows: 0, skipped: true };
-  const r = await storeLmp(db, parseRealtimeLmpCsv(res.body), url, sha);
+  const parsed = parseRealtimeLmpCsv(res.body);
+  const r = await storeLmp(db, parsed, url, sha);
+  await storeLmpLatestInterval(db, parsed);
   lastRollingSha = sha;
   return r;
 }
