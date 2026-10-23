@@ -105,6 +105,8 @@ CREATE TABLE IF NOT EXISTS market_files (
   fetched_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (report, period)
 );
+-- IESO's own "created at" stamp from the file header (EST), shown on the Data sources page.
+ALTER TABLE market_files ADD COLUMN IF NOT EXISTS created_at TEXT;
 
 CREATE TABLE IF NOT EXISTS lmp_hourly (
   location TEXT NOT NULL,

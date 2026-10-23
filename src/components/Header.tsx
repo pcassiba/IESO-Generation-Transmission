@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, ChevronLeft, ChevronRight, Clock, Database, History, Moon, RefreshCw, Sun, Zap } from "lucide-react";
+import { BookOpen, FileSearch, ChevronLeft, ChevronRight, Clock, Database, History, Moon, RefreshCw, Sun, Zap } from "lucide-react";
 import type { DataMeta } from "@/lib/types";
 import { formatOntario, hourEndingLabel, utcToMarketHour } from "@/lib/time";
 
@@ -43,6 +43,7 @@ export default function Header({
   onSelectTs,
   onOpenMethodology,
   onOpenCoverage,
+  onOpenSources,
 }: {
   meta: DataMeta | null;
   theme: "dark" | "light";
@@ -53,6 +54,7 @@ export default function Header({
   onSelectTs: (ts: string | null) => void;
   onOpenMethodology: () => void;
   onOpenCoverage: () => void;
+  onOpenSources: () => void;
 }) {
   const fresh = meta && !meta.stale && !meta.lastError;
   const freshness = !meta ? "Loading" : meta.lastError ? "Fetch error" : meta.stale ? "Stale" : "Current";
@@ -126,6 +128,9 @@ export default function Header({
         </div>
         <button onClick={onRefresh} disabled={refreshing} className="flex items-center gap-1 rounded border border-[var(--border)] px-2 py-1 hover:bg-white/5 disabled:opacity-50" title={refreshMsg ?? "Check IESO for a new report"}>
           <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} /> Refresh
+        </button>
+        <button onClick={onOpenSources} className="flex items-center gap-1 rounded border border-[var(--border)] px-2 py-1 hover:bg-white/5" title="Which IESO report, file and hour each dataset comes from">
+          <FileSearch size={13} /> Sources
         </button>
         <button onClick={onOpenCoverage} className="rounded p-1.5 text-[var(--muted)] hover:bg-white/10" title="Data coverage & mapping">
           <Database size={15} />

@@ -21,6 +21,7 @@ import Header from "./Header";
 import { StatusDot, TechIcon } from "./Icons";
 import type { IntertieOverlay, LmpOverlay, MapCommand } from "./MapView";
 import { CoverageModal, MethodologyModal } from "./Modals";
+import { SourcesModal } from "./SourcesModal";
 import Sidebar, { applyFilters, defaultFilters, type Filters } from "./Sidebar";
 import TimeBar from "./txrisk/TimeBar";
 import TxRiskPanel from "./txrisk/TxRiskPanel";
@@ -49,7 +50,7 @@ export default function Explorer() {
   const [command, setCommand] = useState<MapCommand | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshMsg, setRefreshMsg] = useState<string | null>(null);
-  const [modal, setModal] = useState<"methodology" | "coverage" | null>(null);
+  const [modal, setModal] = useState<"methodology" | "coverage" | "sources" | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(true);
   const [showLines, setShowLines] = useState(true);
@@ -238,6 +239,7 @@ export default function Explorer() {
         onSelectTs={(ts) => setSelectedTs(ts)}
         onOpenMethodology={() => setModal("methodology")}
         onOpenCoverage={() => setModal("coverage")}
+        onOpenSources={() => setModal("sources")}
       />
       {meta?.mode === "historical" && (
         <div className="bg-fuchsia-600/20 px-3 py-1 text-center text-xs text-fuchsia-200">
@@ -543,6 +545,7 @@ export default function Explorer() {
       )}
 
       {modal === "methodology" && <MethodologyModal onClose={() => setModal(null)} />}
+      {modal === "sources" && <SourcesModal ts={meta?.mode === "historical" ? meta.selectedTsUtc : null} onClose={() => setModal(null)} />}
       {modal === "coverage" && state && (
         <CoverageModal
           state={state}

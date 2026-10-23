@@ -19,11 +19,11 @@ import { parseConstraintShadowPrices, parseRealtimeIntertieLmp, parseRealtimeLmp
  */
 
 const HOUR = 3_600_000;
-const LMP = "lmp";
-const CONSTRAINTS = "constraints";
-const INTERTIE = "intertie";
+export const LMP = "lmp";
+export const CONSTRAINTS = "constraints";
+export const INTERTIE = "intertie";
 
-const hourPeriod = (date: string, hour: number) => `${date} ${String(hour).padStart(2, "0")}`;
+export const hourPeriod = (date: string, hour: number) => `${date} ${String(hour).padStart(2, "0")}`;
 
 async function log(db: Db, kind: string, ok: boolean, message: string) {
   try {
@@ -33,12 +33,12 @@ async function log(db: Db, kind: string, ok: boolean, message: string) {
   }
 }
 
-async function markFile(db: Pick<Db, "query">, report: string, period: string, url: string, sha: string, complete: boolean, rows: number) {
+async function markFile(db: Pick<Db, "query">, report: string, period: string, url: string, sha: string, complete: boolean, rows: number, createdAt: string | null) {
   await db.query(
-    `INSERT INTO market_files (report, period, url, sha256, complete, row_count) VALUES ($1,$2,$3,$4,$5,$6)
+    `INSERT INTO market_files (report, period, url, sha256, complete, row_count, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7)
      ON CONFLICT (report, period) DO UPDATE SET url = EXCLUDED.url, sha256 = EXCLUDED.sha256,
-       complete = market_files.complete OR EXCLUDED.complete, row_count = EXCLUDED.row_count, fetched_at = now()`,
-    [report, period, url, sha, complete, rows],
+       complete = market_files.complete OR EXCLUDED.complete, row_count = EXCLUDED.row_count, created_at = EXCLUDED.created_at, fetched_at = now()`,
+    [report, period, url, sha, complete, rows, createdAt],
   );
 }
 
@@ -65,7 +65,7 @@ export async function storeLmp(db: Db, parsed: ParsedLmp, url: string, sha: stri
         values,
       );
     }
-    for (const [hour, ints] of byHour) await markFile(tx, LMP, hourPeriod(parsed.deliveryDate, hour), url, sha, ints >= 12, parsed.rows.filter((r) => r.hour === hour).length);
+    for (const [hour, ints] of byHour) await markFile(tx, LMP, hourPeriod(parsed.deliveryDate, hour), url, sha, ints >= 12, parsed.rows.filter((r) => r.hour === hour).length, parsed.createdAt);
   });
   return { hours: [...byHour.keys()].map((h) => hourPeriod(parsed.deliveryDate, h)), rows: parsed.rows.length };
 }
@@ -83,7 +83,7 @@ export async function storeIntertieLmp(db: Db, parsed: ParsedIntertieLmp, url: s
         [r.location, r.tsUtc, r.intervals, r.lmp, r.loss, r.congestion, r.externalCongestion, r.nisl],
       );
     }
-    await markFile(tx, INTERTIE, hourPeriod(parsed.deliveryDate, parsed.hour), url, sha, ints >= 12, parsed.rows.length);
+    await markFile(tx, INTERTIE, hourPeriod(parsed.deliveryDate, parsed.hour), url, sha, ints >= 12, parsed.rows.length, parsed.createdAt);
   });
   return { rows: parsed.rows.length };
 }
@@ -100,7 +100,7 @@ export async function storeConstraints(db: Db, parsed: ParsedConstraints, url: s
         [r.constraint, r.tsUtc, r.bindingIntervals, r.avgShadowPrice, r.peakShadowPrice],
       );
     }
-    await markFile(tx, CONSTRAINTS, parsed.deliveryDate, url, sha, hours.has(24), parsed.rows.length);
+    await markFile(tx, CONSTRAINTS, parsed.deliveryDate, url, sha, hours.has(24), parsed.rows.length, parsed.createdAt);
   });
   return { binding: binding.length };
 }
