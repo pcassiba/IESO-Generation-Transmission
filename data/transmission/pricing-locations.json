@@ -1,4 +1,127 @@
 {
   "_comment": "Manual links from facility id to IESO pricing-location nodes (the part of the location name before the first '-' or ':'), for facilities whose IESO resource name differs from their pricing node. Most facilities match automatically; unmatched generator nodes are listed in the Congestion panel.",
-  "bruce-a-ngs": ["BRUCE"]
+  "bruce-a-ngs": [
+    "BRUCE"
+  ],
+  "amherst-island-wind": [
+    "AMHERSTCGS"
+  ],
+  "belle-river-wind": [
+    "BELLERVRWF"
+  ],
+  "bluewater-wind": [
+    "BLAKEWF"
+  ],
+  "bow-lake-wind": [
+    "BOWLAKEWF"
+  ],
+  "brighton-beach-gs": [
+    "BRIGHTONCGS"
+  ],
+  "cedar-point-wind": [
+    "CEDARPOINT"
+  ],
+  "east-lake-st-clair-wind": [
+    "EASTLAKESCWF"
+  ],
+  "east-windsor-cogeneration-centre": [
+    "EASTWCGS"
+  ],
+  "erie-shores-wind": [
+    "PTBURWELL"
+  ],
+  "gartshore-gs": [
+    "GARTSHORECGS"
+  ],
+  "goreway-station": [
+    "SITHEG"
+  ],
+  "gosfield-wind": [
+    "GOSFIELD"
+  ],
+  "goulais-wind": [
+    "GOULAISWF"
+  ],
+  "green-electron-power-plant": [
+    "GSPC"
+  ],
+  "greenfield-energy-centre": [
+    "GREENFIELD"
+  ],
+  "hagersville-bess": [
+    "HAGERSVILLE"
+  ],
+  "iroquois-falls-hydro-gs": [
+    "APIROQFALLS"
+  ],
+  "k2-wind": [
+    "K2WIND2",
+    "K2WIND5"
+  ],
+  "lake-superior-power": [
+    "LAKESUPERIOR"
+  ],
+  "lower-white-river-gs": [
+    "LOWERWHITE"
+  ],
+  "mackay-gs": [
+    "MACKAYCGS"
+  ],
+  "mission-gs": [
+    "MISSIONFLS"
+  ],
+  "nanticoke-solar": [
+    "NANTSOLAR"
+  ],
+  "napanee-gs": [
+    "NAPANEECGS"
+  ],
+  "niagara-region-wind": [
+    "WESTLINWF"
+  ],
+  "north-kent-wind": [
+    "NKENT1WF"
+  ],
+  "oneida-energy-storage": [
+    "ONEIDA"
+  ],
+  "peter-sutherland-sr-gs": [
+    "SUTHERLAND"
+  ],
+  "romney-wind": [
+    "ROMNEYWF"
+  ],
+  "smoky-falls-gs": [
+    "SMOKYFALLS"
+  ],
+  "steephill-falls-gs": [
+    "STEEPHILLF"
+  ],
+  "stone-mills-solar": [
+    "STONEMILLS"
+  ],
+  "suncor-adelaide-wind": [
+    "LANDONWF"
+  ],
+  "talbot-wind": [
+    "SPENCECGS"
+  ],
+  "thorold-cogeneration": [
+    "THOROLDGS"
+  ],
+  "thunder-bay-abibow": [
+    "TBAYBOWATER"
+  ],
+  "tilbury-bess": [
+    "TILBURYBESS"
+  ],
+  "underwood-wind": [
+    "UNDERWOODWGS"
+  ],
+  "upper-white-river-gs": [
+    "UPPERWHITE"
+  ],
+  "windsor-airport-solar": [
+    "WINDSORSF"
+  ]
 }

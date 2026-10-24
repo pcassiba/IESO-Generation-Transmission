@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { getCongestion, isGeneratorLocation, matchLocations, nodeOf, resourceBase } from "../src/lib/congestion";
+import { getCongestion, isGeneratorLocation, loadOverrides, matchLocations, nodeOf, resourceBase } from "../src/lib/congestion";
 import { createMemoryDb, type Db } from "../src/lib/db";
 import { normaliseFacility, seedFacilities } from "../src/lib/facilities";
 import { ensureLmpHour, missingConstraintDays, missingLmpHours, pollPricesIfDue, storeConstraints, storeLmp, storeLmpLatestInterval } from "../src/lib/ieso/congestion-ingest";
@@ -16,6 +16,7 @@ describe("pricing location matching", () => {
     expect(isGeneratorLocation("BECK2PGS-LT.APG123_LF")).toBe(false);
     expect(isGeneratorLocation("CHATHAM-LT.VOLTUS_DRA")).toBe(false);
     expect(isGeneratorLocation("BUCHANAN-230:LMP")).toBe(false);
+    expect(isGeneratorLocation("LAKESUPERIOR-LT.GTG1")).toBe(true);
     expect(nodeOf("BUCHANAN-230:LMP")).toBe("BUCHANAN");
     expect(resourceBase("BRUCEB-G5")).toBe("BRUCEB");
     expect(resourceBase("BECK2 PGS")).toBe("BECK2PGS");
@@ -40,6 +41,18 @@ describe("pricing location matching", () => {
     expect(m.get("halton")).toEqual(["HALTONHILLS-LT.G1"]);
     expect(m.get("adelaide")).toEqual(["ADELAIDE-LT.AG_T1"]);
     expect(m.has("nothing")).toBe(false);
+  });
+
+  it("manual links point at real facilities (e.g. Goreway's units price at SITHEG)", () => {
+    const facilities = fs
+      .readdirSync(path.join(process.cwd(), "data", "facilities"))
+      .flatMap((f) => JSON.parse(fs.readFileSync(path.join(process.cwd(), "data", "facilities", f), "utf8")) as { id: string; resources: { ieso: string }[] }[]);
+    const ids = new Set(facilities.map((f) => f.id));
+    const overrides = loadOverrides();
+    for (const id of Object.keys(overrides)) expect(ids.has(id), id).toBe(true);
+    const m = matchLocations(facilities, ["SITHEG-LT.G11", "SITHEG-LT.G15", "GOREWAY-LT.LFJ", "GOREWAYBESS-LT.BATT_TG"], overrides);
+    expect(m.get("goreway-station")).toEqual(["SITHEG-LT.G11", "SITHEG-LT.G15"]);
+    expect(m.get("goreway-bess")).toEqual(["GOREWAYBESS-LT.BATT_TG"]);
   });
 });
 
