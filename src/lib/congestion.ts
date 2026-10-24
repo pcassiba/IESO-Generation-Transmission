@@ -30,7 +30,7 @@ export function isGeneratorLocation(location: string): boolean {
   if (!m) return false;
   const suffix = m[1].toUpperCase();
   if (/_LF|LF_|_DRA|LOAD/.test(suffix)) return false;
-  return /^(AG|G\d|G_|SG\d|APG\d|BATT_TG)/.test(suffix);
+  return /^(AG|G\d|G_|GTG\d|SG\d|APG\d|BATT_TG)/.test(suffix);
 }
 
 export function resourceBase(resource: string): string {
