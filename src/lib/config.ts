@@ -15,6 +15,13 @@ export const config = {
   /** Days of history to backfill from IESO daily archive files on first start. */
   backfillDays: num("IESO_BACKFILL_DAYS", 30),
   fetchTimeoutMs: num("IESO_FETCH_TIMEOUT_MS", 180_000),
+  /**
+   * Days of hourly history kept in the database; older rows are deleted by the daily cron so
+   * storage stays well inside a free Postgres plan. Set to 0 to keep everything.
+   */
+  retentionDays: num("DATA_RETENTION_DAYS", 60),
+  /** Days of ingest log entries kept (one is written every few minutes). */
+  logRetentionDays: num("LOG_RETENTION_DAYS", 7),
 
   congestion: {
     /** Set CONGESTION_ENABLED=0 to stop fetching the price and constraint reports. */
