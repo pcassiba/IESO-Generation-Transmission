@@ -4,7 +4,7 @@ import type { Db } from "./db";
 import { CONSTRAINTS, hourPeriod, INTERTIE, LMP } from "./ieso/congestion-ingest";
 import { readProjectJson } from "./project-files";
 import { compactDate, utcToMarketHour } from "./time";
-import { txReportStatuses } from "./txrisk/store";
+import { syncTxReports, txReportStatuses } from "./txrisk/store";
 
 /**
  * "Where does this number come from?" — for the hour on screen, the exact IESO report and file
@@ -263,6 +263,7 @@ function transmissionReports(): SourceEntry[] {
 export async function getSources(db: Db, requestedTs?: string | null): Promise<SourcesResponse> {
   const t = requestedTs ? new Date(requestedTs) : null;
   const requested = t && !Number.isNaN(t.getTime()) ? t.toISOString() : null;
+  await syncTxReports(db).catch(() => undefined);
   const entries = [await generation(db, requested), await nodalPrices(db, requested), await intertiePrices(db, requested), await constraints(db), transmissionMap(), ...transmissionReports()];
   return { requestedTsUtc: requested, entries };
 }

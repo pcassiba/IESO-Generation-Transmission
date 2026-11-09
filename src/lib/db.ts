@@ -161,6 +161,19 @@ CREATE TABLE IF NOT EXISTS constraint_hourly (
 );
 CREATE INDEX IF NOT EXISTS constraint_hourly_ts_idx ON constraint_hourly (ts_utc);
 
+-- Latest copy of each IESO transmission outage / limits report (src/lib/txrisk/store.ts), shared by
+-- every server instance so a restart or a new serverless instance does not download them again.
+CREATE TABLE IF NOT EXISTS tx_reports (
+  kind TEXT PRIMARY KEY,
+  url TEXT NOT NULL,
+  body TEXT NOT NULL,
+  etag TEXT,
+  last_modified TEXT,
+  fetched_at TIMESTAMPTZ NOT NULL,
+  checked_at TIMESTAMPTZ NOT NULL,
+  last_error TEXT
+);
+
 -- Authoritative outage evidence (manually curated, each row must cite a source).
 CREATE TABLE IF NOT EXISTS outage_evidence (
   id SERIAL PRIMARY KEY,

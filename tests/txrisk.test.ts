@@ -353,6 +353,29 @@ describe("report freshness", () => {
   });
 });
 
+describe("stored transmission reports (shared by server instances)", () => {
+  it("stores a download in the database and re-uses it in a fresh instance without fetching again", async () => {
+    const { createMemoryDb } = await import("../src/lib/db");
+    const { syncTxReports } = await import("../src/lib/txrisk/store");
+    const db = await createMemoryDb();
+    const def = REPORTS.find((d) => d.kind === "outages")!;
+    let calls = 0;
+    const ok = async () => (calls++, { kind: "ok" as const, url: "u", body: fx("PUB_TxOutagesTodayAll_20261017_excerpt.xml"), etag: "a", lastModified: null });
+    const g = globalThis as unknown as { __ogeTxRisk?: unknown };
+    g.__ogeTxRisk = undefined;
+    await refreshReport(def, true, ok, db);
+    expect(calls).toBe(1);
+    // A new instance (empty memory) loads the stored copy and sees it was checked just now.
+    g.__ogeTxRisk = undefined;
+    await syncTxReports(db);
+    await refreshReport(def, false, ok, db);
+    expect(calls).toBe(1);
+    const s = (g.__ogeTxRisk as { slots: Map<string, { parsed: { outages: unknown[] } | null; etag: string | null }> }).slots.get("outages")!;
+    expect(s.parsed!.outages).toHaveLength(9);
+    expect(s.etag).toBe("a");
+  });
+});
+
 describe("overlay toggles and table helpers", async () => {
   const ui = await import("../src/lib/txrisk/ui");
   const items = classify(input());

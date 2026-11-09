@@ -20,8 +20,12 @@ import { isServerless } from "../platform";
  *  - Fetches the latest undated file of each report through the app's backend (no browser CORS).
  *  - Conditional requests (ETag / Last-Modified); each report is re-checked on its own cadence,
  *    matched to how often IESO publishes it.
- *  - The raw XML of the last successfully *parsed* download is kept under data/cache/txrisk/ and
- *    re-used after a restart. A failed download or parse never replaces it, and is reported.
+ *  - The raw XML of the last successfully *parsed* download is stored in the database (tx_reports)
+ *    with its ETag and the time it was last checked. Every server instance (each serverless copy on
+ *    Vercel or Cloudflare, or a restarted Node server) re-uses it, and the check cadence is shared, so
+ *    IESO is asked at most once per cadence and only downloads a changed file. When no database is
+ *    passed (tests, CLI) the copy is kept under data/cache/txrisk/ instead.
+ *    A failed download or parse never replaces the stored copy, and is reported.
  *  - A report is stale when its own CreatedAt is older than the threshold below.
  */
 
@@ -57,6 +61,8 @@ interface Slot {
   lastAttemptUtc: string | null;
   lastSuccessUtc: string | null;
   lastError: string | null;
+  /** fetched_at of the stored copy that `parsed` came from (to skip re-reading an unchanged body). */
+  storedFetchedAt?: string | null;
 }
 
 interface TxRuntime {
@@ -109,8 +115,52 @@ function loadFromDisk() {
   }
 }
 
+const iso = (v: string | Date | null) => (v === null ? null : new Date(v).toISOString());
+
+/**
+ * Bring this instance's copies up to date with the database: check times and errors always, the
+ * report body only when the stored copy is newer than the one already parsed here.
+ */
+export async function syncTxReports(db: Db): Promise<void> {
+  const rows = await db.query<{ kind: string; fetched_at: string | Date; checked_at: string | Date; etag: string | null; last_modified: string | null; last_error: string | null }>(
+    "SELECT kind, fetched_at, checked_at, etag, last_modified, last_error FROM tx_reports",
+  );
+  for (const row of rows) {
+    const def = REPORTS.find((d) => d.kind === row.kind);
+    if (!def) continue;
+    const s = slot(def.kind);
+    const fetchedAt = iso(row.fetched_at);
+    const checkedAt = iso(row.checked_at);
+    if (s.storedFetchedAt !== fetchedAt) {
+      const body = (await db.query<{ body: string }>("SELECT body FROM tx_reports WHERE kind = $1", [def.kind]))[0]?.body;
+      if (body === undefined) continue;
+      try {
+        s.parsed = parseReport(def, body);
+        s.storedFetchedAt = fetchedAt;
+        s.etag = row.etag;
+        s.lastModified = row.last_modified;
+      } catch {
+        continue; /* stored copy no longer parses; the next check downloads a fresh one */
+      }
+    }
+    // Another instance may have checked more recently than this one.
+    if (checkedAt && (!s.lastAttemptUtc || checkedAt > s.lastAttemptUtc)) {
+      s.lastAttemptUtc = checkedAt;
+      s.lastError = row.last_error;
+      if (!row.last_error) s.lastSuccessUtc = checkedAt;
+    }
+  }
+}
+
+async function saveCheck(db: Db | undefined, def: ReportDef, s: Slot): Promise<void> {
+  if (!db || !s.storedFetchedAt) return;
+  await db
+    .query("UPDATE tx_reports SET checked_at = $2, last_error = $3 WHERE kind = $1", [def.kind, s.lastAttemptUtc, s.lastError])
+    .catch((e) => console.warn(`[txrisk] could not save check time: ${(e as Error).message}`));
+}
+
 /** Fetch one report if due (or forced). Keeps the previous parsed copy on any failure. */
-export async function refreshReport(def: ReportDef, force = false, fetcher = fetchReport): Promise<void> {
+export async function refreshReport(def: ReportDef, force = false, fetcher = fetchReport, db?: Db): Promise<void> {
   const s = slot(def.kind);
   if (!force && s.lastAttemptUtc && Date.now() - Date.parse(s.lastAttemptUtc) < def.refreshMinutes * 60_000) return;
   s.lastAttemptUtc = new Date().toISOString();
@@ -119,6 +169,7 @@ export async function refreshReport(def: ReportDef, force = false, fetcher = fet
     if (res.kind === "not-modified") {
       s.lastSuccessUtc = s.lastAttemptUtc;
       s.lastError = null;
+      await saveCheck(db, def, s);
       return;
     }
     const parsed = parseReport(def, res.body);
@@ -127,6 +178,18 @@ export async function refreshReport(def: ReportDef, force = false, fetcher = fet
     s.lastModified = res.lastModified;
     s.lastSuccessUtc = s.lastAttemptUtc;
     s.lastError = null;
+    if (db) {
+      await db
+        .query(
+          `INSERT INTO tx_reports (kind, url, body, etag, last_modified, fetched_at, checked_at, last_error) VALUES ($1,$2,$3,$4,$5,$6,$6,NULL)
+           ON CONFLICT (kind) DO UPDATE SET url = EXCLUDED.url, body = EXCLUDED.body, etag = EXCLUDED.etag, last_modified = EXCLUDED.last_modified,
+             fetched_at = EXCLUDED.fetched_at, checked_at = EXCLUDED.checked_at, last_error = NULL`,
+          [def.kind, res.url, res.body, res.etag, res.lastModified, s.lastAttemptUtc],
+        )
+        .then(() => (s.storedFetchedAt = s.lastAttemptUtc))
+        .catch((e) => console.warn(`[txrisk] could not store ${def.kind}: ${(e as Error).message}`));
+      return;
+    }
     try {
       const dir = cacheDir();
       fs.writeFileSync(path.join(dir, `${def.kind}.xml`), res.body);
@@ -136,6 +199,7 @@ export async function refreshReport(def: ReportDef, force = false, fetcher = fet
     }
   } catch (e) {
     s.lastError = (e as Error).message;
+    await saveCheck(db, def, s);
   }
 }
 
@@ -144,11 +208,13 @@ export function allAttempted(): boolean {
   return REPORTS.every((d) => slot(d.kind).lastAttemptUtc !== null);
 }
 
-export async function refreshAll(force = false): Promise<void> {
-  loadFromDisk();
+export async function refreshAll(force = false, db?: Db): Promise<void> {
   const r = rt();
   if (r.running) return r.running;
-  r.running = Promise.all(REPORTS.map((d) => refreshReport(d, force)))
+  if (db) await syncTxReports(db).catch((e) => console.warn(`[txrisk] could not read stored reports: ${(e as Error).message}`));
+  else loadFromDisk();
+  if (r.running) return r.running;
+  r.running = Promise.all(REPORTS.map((d) => refreshReport(d, force, fetchReport, db)))
     .then(() => undefined)
     .finally(() => {
       r.running = null;
@@ -214,7 +280,6 @@ async function bindingHours(db: Db): Promise<{ rows: BindingHour[]; through: str
 }
 
 export async function getTxRisk(db: Db, tIso: string | null): Promise<TxRiskResponse> {
-  loadFromDisk();
   const now = Date.now();
   let t = tIso ? Date.parse(tIso) : now;
   if (!Number.isFinite(t)) t = now;
@@ -251,8 +316,7 @@ export async function getTxRisk(db: Db, tIso: string | null): Promise<TxRiskResp
   };
 }
 
-/** Status of each transmission report as last downloaded, without fetching anything. */
+/** Status of each transmission report as last downloaded, without fetching anything (call syncTxReports first). */
 export function txReportStatuses(now = Date.now()): ReportStatus[] {
-  loadFromDisk();
   return REPORTS.map((d) => reportStatus(d, slot(d.kind), now));
 }
