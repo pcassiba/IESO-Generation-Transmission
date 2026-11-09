@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import path from "node:path";
 import { config } from "./config";
 import { getDb, type Db } from "./db";
@@ -53,7 +54,18 @@ export async function syncMetadata(db: Db, force = false): Promise<void> {
   const { issues } = validateFacilities(list);
   rt.metadataIssues = issues;
   for (const i of issues.filter((x) => x.level === "error")) console.warn(`[metadata] ${i.facilityId ?? ""}: ${i.message}`);
-  await seedFacilities(db, list);
+  // Every new server instance (each serverless cold start) gets here. Re-writing ~350 rows each time is slow
+  // over a long network path and makes instances wait on each other's locks, so skip it when the database
+  // already holds exactly this metadata.
+  const fingerprint = crypto.createHash("sha256").update(JSON.stringify(list)).digest("hex");
+  const stored = await db.query<{ value: string }>("SELECT value FROM app_meta WHERE key = 'facilities_sha256'").catch(() => []);
+  if (stored[0]?.value !== fingerprint) {
+    await seedFacilities(db, list);
+    await db.query(
+      "INSERT INTO app_meta (key, value, updated_at) VALUES ('facilities_sha256', $1, now()) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()",
+      [fingerprint],
+    );
+  }
   rt.metaSignature = sig;
 }
 
