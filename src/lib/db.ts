@@ -174,6 +174,13 @@ CREATE TABLE IF NOT EXISTS tx_reports (
   last_error TEXT
 );
 
+-- Small key/value settings, e.g. a fingerprint of the facility metadata last seeded (src/lib/server.ts).
+CREATE TABLE IF NOT EXISTS app_meta (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Authoritative outage evidence (manually curated, each row must cite a source).
 CREATE TABLE IF NOT EXISTS outage_evidence (
   id SERIAL PRIMARY KEY,

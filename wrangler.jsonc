@@ -20,6 +20,11 @@
       "service": "ieso-generation-transmission"
     }
   ],
+  // Run the Worker close to the database (Neon, AWS us-east-2) instead of close to each visitor: a page
+  // makes many small database queries, so a short path to Neon matters more than a short path to the browser.
+  "placement": {
+    "mode": "smart"
+  },
   "observability": {
     "enabled": true
   },
