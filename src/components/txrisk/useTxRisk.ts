@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { TxRiskResponse } from "@/lib/txrisk/types";
 import type { HorizonPreset } from "@/lib/txrisk/ui";
 
-/** State and data loading for the outages & congestion risk layer. */
-export function useTxRisk() {
+/** State and data loading for the outages & congestion risk layer. `active` is false while nobody is viewing the page. */
+export function useTxRisk(active = true) {
   const [enabled, setEnabled] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [flashing, setFlashing] = useState(true);
@@ -57,11 +57,16 @@ export function useTxRisk() {
   }, [enabled, tUtc, tick]);
 
   // In the current view, re-read every 5 minutes (the server re-checks IESO on each report's own cadence).
+  // Paused while nobody is viewing the page; re-reads once when they come back.
+  const wasActive = useRef(active);
   useEffect(() => {
-    if (!enabled || tUtc) return;
+    const resumed = active && !wasActive.current;
+    wasActive.current = active;
+    if (!enabled || tUtc || !active) return;
+    if (resumed) setTick((x) => x + 1);
     const i = setInterval(() => setTick((x) => x + 1), 5 * 60_000);
     return () => clearInterval(i);
-  }, [enabled, tUtc]);
+  }, [enabled, tUtc, active]);
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
