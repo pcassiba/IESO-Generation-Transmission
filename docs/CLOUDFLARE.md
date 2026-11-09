@@ -12,7 +12,7 @@ The app can run on Cloudflare Workers through the [OpenNext adapter](https://ope
 | Database | PGlite locally, Neon on Vercel | An external Postgres is required (the same Neon database works). Set `DATABASE_URL`, or add Hyperdrive. |
 | Scheduled polling | Node timer locally; daily cron on Vercel (`vercel.json`) | Cron Trigger in `wrangler.jsonc` (hourly at :15) calls `/api/cron` |
 | Data files (`data/`, `public/geo`) | Read from disk | Compiled into the Worker (`src/lib/bundled-files.ts`) |
-| Raw IESO file cache | `data/cache` (local), `/tmp` (Vercel) | `/tmp`, cleared often, so files are re-downloaded |
+| Raw IESO file cache | `data/cache` (local), `/tmp` (Vercel) | `/tmp`, cleared often (data itself is in Postgres) |
 
 ## Commands
 
@@ -33,8 +33,8 @@ Free plan allows only 10 ms of CPU time per request, and parsing an IESO report 
 1. In the Cloudflare dashboard, open **Workers & Pages**, then your Worker (or **Create** → **Import a repository** and pick `IESO-Generation-Transmission`).
 2. The Worker's name must be `ieso-generation-transmission`, the `name` in `wrangler.jsonc`. If your existing Worker has a different name, change `name` (and the `service` under `services`) in `wrangler.jsonc` to match it.
 3. Under **Settings** → **Build**, set:
-   - Build command: `npx opennextjs-cloudflare build`
-   - Deploy command: `npx opennextjs-cloudflare deploy`
+   - Build command: `npx opennextjs-cloudflare build` (not `npm run build`, which only builds the plain Next.js app)
+   - Deploy command: `npx opennextjs-cloudflare deploy` (not `npx wrangler deploy`, which tries to set up OpenNext on its own and fails)
    - Non-production branch deploy command: `npx opennextjs-cloudflare upload`
    - Production branch: `main`. Builds of the migration branch then only create preview versions.
 4. The earlier error `Cannot find package 'wrangler'` came from `wrangler` not being installed. It is now in `devDependencies`, so the build installs it.
@@ -67,8 +67,8 @@ Do not add a custom domain or route until you have decided to move the live site
 ## Known limitations on Workers
 
 - **CPU and time limits.** Work that continues after a response (`after()`) gets about 30 seconds. The hourly cron can run longer (up to 15 minutes), so the 30-day backfill fills in over several runs and page views.
-- **No disk.** Raw IESO downloads and the transmission-outage report cache are only kept for a short time, so some files are downloaded again more often than on a Node server.
-- **Per-isolate memory.** Cloudflare runs several copies of the Worker. Each copy keeps its own in-memory state (the transmission outage reports and the 30-second rate limit on the Refresh buttons).
+- **No disk.** The raw copies of downloaded IESO generator files (kept for provenance) are only kept briefly. All the data itself, and the latest transmission outage and limits reports, are stored in Postgres and shared by every copy of the Worker, so nothing complete is downloaded twice.
+- **Per-isolate memory.** Cloudflare runs several copies of the Worker. Each keeps its own 30-second rate limit on the Refresh buttons.
 - **Editing data files** under `data/` or `public/geo` needs a rebuild and redeploy (also true on Vercel).
 - **Command-line scripts** (`npm run ingest`, `build:transmission`, `validate:facilities`, …) run on your PC with Node, not on Cloudflare. To load data into the shared Neon database from your PC, set `DATABASE_URL` before running them.
 - **PGlite** (the built-in local database) does not run on Workers. Its code is still in the bundle but never used.
