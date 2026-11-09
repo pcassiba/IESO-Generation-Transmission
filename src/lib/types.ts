@@ -166,6 +166,11 @@ export interface FacilityState extends FacilityMeta {
   explanation: string[];
   isGenerating: boolean;
   partialData: boolean;
+  /**
+   * Only when the selected hour has no output reading: the facility's most recent earlier reported
+   * output (within LAST_OUTPUT_LOOKBACK_DAYS), summed over the units that reported at that hour.
+   */
+  lastOutput?: { mw: number; tsUtc: string } | null;
 }
 
 export interface CoverageSummary {

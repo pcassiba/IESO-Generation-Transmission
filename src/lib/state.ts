@@ -87,6 +87,7 @@ export async function getState(db: Db, requestedTs?: string | null): Promise<Sta
   const outages: OutageLite[] = outageRows.map((o) => ({ facilityId: o.facility_id, iesoName: o.ieso_name, description: o.description, sourceUrl: o.source_url }));
 
   const states = buildFacilityStates(facilities, obs, refs, outages, { stale, windowDays });
+  if (selected) await attachLastOutput(db, states, selected);
   const coverage = computeCoverage(facilities, [...obs.keys()], duplicateResources);
   const unmatched = coverage.unmatchedResources.map((n) => {
     const o = obs.get(n)!;
@@ -114,6 +115,36 @@ export async function getState(db: Db, requestedTs?: string | null): Promise<Sta
     coverage,
     unmatched,
   };
+}
+
+export const LAST_OUTPUT_LOOKBACK_DAYS = 7;
+
+/**
+ * For facilities with no output reading at the selected hour, find their last earlier reading so the
+ * map's Output view can show it (labelled as such). One query, only for the resources that need it.
+ */
+async function attachLastOutput(db: Db, states: StateResponse["facilities"], selected: string): Promise<void> {
+  const missing = states.filter((f) => f.outputMW === null && f.resources.length);
+  if (!missing.length) return;
+  const names = [...new Set(missing.flatMap((f) => f.resources.map((r) => r.ieso)))];
+  const rows = await db.query<{ ieso_name: string; ts: string; mw: number }>(
+    `SELECT DISTINCT ON (ieso_name) ieso_name, ts_utc AS ts, output_mw AS mw FROM observations
+     WHERE ieso_name = ANY($1::text[]) AND output_mw IS NOT NULL
+       AND ts_utc < $2::timestamptz AND ts_utc > $2::timestamptz - make_interval(days => $3)
+     ORDER BY ieso_name, ts_utc DESC`,
+    [names, selected, LAST_OUTPUT_LOOKBACK_DAYS],
+  );
+  const last = new Map(rows.map((r) => [r.ieso_name, { ts: iso(r.ts)!, mw: Number(r.mw) }]));
+  for (const f of missing) {
+    const found = f.resources.map((r) => last.get(r.ieso)).filter((x): x is { ts: string; mw: number } => !!x);
+    if (!found.length) {
+      f.lastOutput = null;
+      continue;
+    }
+    // The facility's last reported hour, and the sum of its units that reported then.
+    const ts = found.reduce((a, b) => (a > b.ts ? a : b.ts), found[0].ts);
+    f.lastOutput = { tsUtc: ts, mw: found.filter((x) => x.ts === ts).reduce((a, b) => a + b.mw, 0) };
+  }
 }
 
 export interface HistoryPoint {
