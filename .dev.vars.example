@@ -1,0 +1,3 @@
+# Copy to .dev.vars for `npm run cf:preview` (local Cloudflare runtime). Never commit .dev.vars.
+DATABASE_URL=postgres://user:password@host/dbname?sslmode=require
+# CRON_SECRET=any-long-random-string

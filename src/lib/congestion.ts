@@ -1,10 +1,10 @@
-import fs from "node:fs";
 import path from "node:path";
 import { config } from "./config";
 import type { Db } from "./db";
 import { readFacilitiesFromDb } from "./facilities";
 import { describeConstraint } from "./ieso/market";
 import { groupIntertiePrices, loadIntertieLocations, type IntertiePoint } from "./interties";
+import { readProjectJson } from "./project-files";
 import { hourEndingToUtc } from "./time";
 import type { FacilityMeta } from "./types";
 
@@ -48,7 +48,7 @@ export function overridesPath(): string {
 
 export function loadOverrides(file = overridesPath()): Record<string, string[]> {
   try {
-    const raw = JSON.parse(fs.readFileSync(file, "utf8")) as Record<string, unknown>;
+    const raw = readProjectJson<Record<string, unknown>>(file);
     const out: Record<string, string[]> = {};
     for (const [k, v] of Object.entries(raw)) if (!k.startsWith("_") && Array.isArray(v)) out[k] = v.map((x) => String(x).toUpperCase());
     return out;

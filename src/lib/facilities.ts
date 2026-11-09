@@ -1,5 +1,5 @@
-import fs from "node:fs";
 import path from "node:path";
+import { listProjectJsonFiles, readProjectJson } from "./project-files";
 import type { FacilityMeta, GeocodeConfidence, Technology } from "./types";
 import { TECHNOLOGIES } from "./types";
 import type { Db } from "./db";
@@ -25,11 +25,10 @@ export function facilitiesDir(): string {
 }
 
 export function loadFacilityFiles(dir = facilitiesDir()): FacilityMeta[] {
-  if (!fs.existsSync(dir)) return [];
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".json")).sort();
+  const files = listProjectJsonFiles(dir);
   const all: FacilityMeta[] = [];
   for (const f of files) {
-    const raw = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
+    const raw = readProjectJson(path.join(dir, f));
     if (!Array.isArray(raw)) throw new Error(`${f}: expected a JSON array of facilities`);
     for (const r of raw) all.push(normaliseFacility(r));
   }

@@ -18,6 +18,9 @@ npm run ingest -- congestion  # manual: fetch IESO nodal prices + binding constr
 No database install is needed: PostgreSQL runs embedded via PGlite (`data/pglite`). Set `DATABASE_URL`
 to use an external PostgreSQL / Supabase instance instead.
 
+Hosting: Vercel (`vercel.json`, Neon via `DATABASE_URL`) or Cloudflare Workers via OpenNext
+(`npm run cf:preview` / `npm run cf:deploy`, see [docs/CLOUDFLARE.md](docs/CLOUDFLARE.md)).
+
 ## Architecture
 
 | Layer | Location |

@@ -44,3 +44,9 @@ next-env.d.ts
 /data/pglite
 /data/cache
 /public/maplibre-gl-worker.mjs
+
+# cloudflare (OpenNext / wrangler)
+/.open-next
+/.wrangler
+.dev.vars*
+!.dev.vars.example

@@ -1,5 +1,5 @@
-import fs from "node:fs";
 import path from "node:path";
+import { readProjectJson } from "./project-files";
 
 /**
  * Intertie prices on the map. IESO publishes one real-time LMP per intertie pricing location
@@ -54,7 +54,7 @@ export function intertieLocationsPath(): string {
 
 export function loadIntertieLocations(file = intertieLocationsPath()): IntertieLocationsFile {
   try {
-    const raw = JSON.parse(fs.readFileSync(file, "utf8")) as Partial<IntertieLocationsFile>;
+    const raw = readProjectJson<Partial<IntertieLocationsFile>>(file);
     return { points: raw.points ?? [], suffixes: raw.suffixes ?? {} };
   } catch {
     return { points: [], suffixes: {} };
