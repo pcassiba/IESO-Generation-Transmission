@@ -72,4 +72,16 @@ describe("end-to-end ingestion into PostgreSQL (PGlite in-memory)", () => {
     const sum = Object.values(h.resources).reduce((a, pts) => a + (pts[pts.length - 1].outputMW ?? 0), 0);
     expect(last.outputMW).toBe(sum);
   });
+
+  it("gives the last reported output to facilities with no reading this hour (Output map view)", async () => {
+    const he19 = await db.query<{ mw: number }>("SELECT output_mw AS mw FROM observations WHERE ieso_name='K2WIND' AND ts_utc='2026-10-15T00:00:00Z'");
+    // Simulate K2 missing from the HE20 report's output column.
+    await db.query("UPDATE observations SET output_mw = NULL WHERE ieso_name='K2WIND' AND ts_utc='2026-10-15T01:00:00Z'");
+    const s = await getState(db);
+    const k2 = s.facilities.find((f) => f.id === "k2")!;
+    expect(k2.outputMW).toBeNull();
+    expect(k2.lastOutput).toEqual({ mw: he19[0].mw, tsUtc: "2026-10-15T00:00:00.000Z" });
+    // Facilities that did report this hour don't get one.
+    expect(s.facilities.find((f) => f.id === "oneida")!.lastOutput).toBeUndefined();
+  });
 });

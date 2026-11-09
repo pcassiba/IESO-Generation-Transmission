@@ -47,6 +47,13 @@ interface Props {
   lmp?: LmpOverlay | null;
   /** Intertie prices as yellow circles; null hides them. */
   interties?: IntertieOverlay | null;
+  /** Output view: when set, each facility icon is replaced by its reported MW output. */
+  output?: OutputOverlay | null;
+}
+
+export interface OutputOverlay {
+  /** The hour the outputs are for (the selected hour, or the latest). */
+  hourTsUtc: string | null;
 }
 
 export interface IntertieOverlay {
@@ -72,6 +79,7 @@ export interface LmpOverlay {
 /** Icon layers hidden while the LMP view is on. */
 const ICON_LAYERS = ["clusters", "cluster-count", "unclustered", "points"];
 const LMP_LAYERS = ["lmp-glow", "lmp-pulse", "lmp-dots", "lmp-labels"];
+const OUTPUT_LAYERS = ["output-dots", "output-labels"];
 const PULSE_MS = 2400;
 const PRICE_UP = "#ef4444";
 const PRICE_DOWN = "#22c55e";
@@ -242,6 +250,64 @@ function lmpFeatures(map: MLMap, located: FacilityState[], spreadPoints: ReturnT
   return { type: "FeatureCollection" as const, features };
 }
 
+/** "1,234" style MW label; storage charging shows as negative. */
+function outputLabel(mw: number): string {
+  const r = Math.round(mw);
+  return `${r < 0 ? "−" : ""}${Math.abs(r).toLocaleString("en-CA")}`;
+}
+
+/**
+ * One output marker per facility: the hour's reported MW, or (marked "last") the last earlier reading
+ * when the facility has none this hour. Disc area grows with output, colour = technology.
+ */
+function outputFeatures(map: MLMap, located: FacilityState[], spreadPoints: ReturnType<typeof toFeature>[], on: boolean) {
+  const features: GeoJSON.Feature[] = [];
+  if (on) {
+    const spreadAt = new Map(spreadPoints.map((p) => [p.properties.id, p.geometry.coordinates]));
+    const useSpread = map.getZoom() >= CLUSTER_MAX_ZOOM + 1;
+    for (const f of located) {
+      const coordinates = (useSpread && spreadAt.get(f.id)) || [f.lon!, f.lat!];
+      const mw = f.outputMW ?? f.lastOutput?.mw ?? null;
+      const kind = f.outputMW !== null ? "now" : f.lastOutput ? "last" : "none";
+      features.push({
+        type: "Feature",
+        geometry: { type: "Point", coordinates },
+        properties: {
+          id: f.id,
+          kind,
+          size: mw === null ? 0 : Math.sqrt(Math.abs(mw)),
+          color: TECH_COLOR[f.technology],
+          label: mw === null ? "" : `${outputLabel(mw)}${kind === "last" ? "*" : ""}`,
+        },
+      });
+    }
+  }
+  return { type: "FeatureCollection" as const, features };
+}
+
+function outputTooltipHtml(f: FacilityState, hourTsUtc: string | null): string {
+  const vg = f.technology === "wind" || f.technology === "solar";
+  const rows: [string, string][] = [];
+  let foot = `${esc(hourEndingLabel(hourTsUtc))} · IESO Generator Output and Capability`;
+  if (f.outputMW !== null) {
+    rows.push(["Reported output", fmtMW(f.outputMW)]);
+  } else if (f.lastOutput) {
+    rows.push(["Last reported output", fmtMW(f.lastOutput.mw)]);
+    rows.push(["Reported at", esc(hourEndingLabel(f.lastOutput.tsUtc))]);
+    foot = `No output reading for ${esc(hourEndingLabel(hourTsUtc))}`;
+  } else {
+    rows.push(["Reported output", "—"]);
+    foot = `No output reading for ${esc(hourEndingLabel(hourTsUtc))} or the week before`;
+  }
+  rows.push([vg ? "Available capacity" : "Reported capability", fmtMW(f.capabilityMW)]);
+  if (f.outputMW !== null && f.capabilityMW) rows.push(["Share of capability", `${Math.round((Math.max(0, f.outputMW) / f.capabilityMW) * 100)}%`]);
+  rows.push(["Type", `${TECHNOLOGY_LABEL[f.technology]}${f.subtype ? ` · ${esc(f.subtype)}` : ""}`]);
+  if (f.storageMode) rows.push(["Storage", STORAGE_MODE_LABEL[f.storageMode]]);
+  return `<div class="oge-tip"><div class="oge-tip-title">${esc(f.name)}</div>${rows
+    .map(([k, v]) => `<div class="oge-tip-row"><span>${k}</span><b>${v}</b></div>`)
+    .join("")}<div class="oge-tip-row" style="margin-top:4px"><span>${foot}</span></div></div>`;
+}
+
 function intertieFeatures(o: IntertieOverlay | null) {
   return {
     type: "FeatureCollection" as const,
@@ -346,7 +412,7 @@ function tooltipHtml(f: FacilityState, cong?: { congestion: number | null; lmp: 
     .join("")}</div>`;
 }
 
-export default function MapView({ facilities, selectedId, onSelect, theme, scaleByCapacity, command, onMapReady, lineVisibility, congestion, onTransmissionStatus, txRisk, onTxRiskPick, lmp, interties }: Props) {
+export default function MapView({ facilities, selectedId, onSelect, theme, scaleByCapacity, command, onMapReady, lineVisibility, congestion, onTransmissionStatus, txRisk, onTxRiskPick, lmp, interties, output }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const facRef = useRef<FacilityState[]>(facilities);
@@ -360,6 +426,7 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
   const congRef = useRef(congestion);
   const lmpRef = useRef(lmp ?? null);
   const tieRef = useRef(interties ?? null);
+  const outRef = useRef(output ?? null);
   const txStatusRef = useRef(onTransmissionStatus);
   txStatusRef.current = onTransmissionStatus;
   const txrRef = useRef(txRisk ?? null);
@@ -388,6 +455,7 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     (map.getSource("fac-anchors") as GeoJSONSource).setData(spread.anchors);
     (map.getSource("cong") as GeoJSONSource | undefined)?.setData(congestionFeatures(located, congRef.current));
     (map.getSource("lmp") as GeoJSONSource | undefined)?.setData(lmpFeatures(map, located, spread.points.features, lmpRef.current));
+    (map.getSource("output") as GeoJSONSource | undefined)?.setData(outputFeatures(map, located, spread.points.features, !!outRef.current));
     (map.getSource("interties") as GeoJSONSource | undefined)?.setData(intertieFeatures(tieRef.current));
     // Layers added later (transmission, outage overlay) would otherwise cover the intertie circles.
     if (tieRef.current) for (const l of INTERTIE_LAYERS) if (map.getLayer(l)) map.moveLayer(l);
@@ -399,13 +467,15 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     });
   };
 
-  /** Swap facility icons for LMP markers (or back). */
+  /** Swap facility icons for LMP or output markers (or back). LMP wins if both are ever set. */
   const applyLmpVisibility = () => {
     const map = mapRef.current;
     if (!map) return;
-    const on = !!lmpRef.current;
-    for (const l of ICON_LAYERS) if (map.getLayer(l)) map.setLayoutProperty(l, "visibility", on ? "none" : "visible");
-    for (const l of LMP_LAYERS) if (map.getLayer(l)) map.setLayoutProperty(l, "visibility", on ? "visible" : "none");
+    const lmpOn = !!lmpRef.current;
+    const outOn = !lmpOn && !!outRef.current;
+    for (const l of ICON_LAYERS) if (map.getLayer(l)) map.setLayoutProperty(l, "visibility", lmpOn || outOn ? "none" : "visible");
+    for (const l of LMP_LAYERS) if (map.getLayer(l)) map.setLayoutProperty(l, "visibility", lmpOn ? "visible" : "none");
+    for (const l of OUTPUT_LAYERS) if (map.getLayer(l)) map.setLayoutProperty(l, "visibility", outOn ? "visible" : "none");
   };
 
   const iconSizeExpr = (): maplibregl.ExpressionSpecification | number =>
@@ -636,6 +706,46 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
       },
       paint: { "text-color": ["get", "textColor"] },
     });
+
+    // Output view: a technology-coloured disc whose area grows with MW, and the MW on top.
+    // Last-reported values (no reading this hour) are faded, with a white ring and a "*".
+    map.addSource("output", { type: "geojson", data: empty });
+    map.addLayer({
+      id: "output-dots",
+      type: "circle",
+      source: "output",
+      layout: { ...hidden, "circle-sort-key": ["get", "size"] },
+      paint: {
+        "circle-radius": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          4,
+          ["case", ["==", ["get", "kind"], "none"], 3, ["+", 6, ["*", 0.38, ["get", "size"]]]],
+          9,
+          ["case", ["==", ["get", "kind"], "none"], 5, ["+", 11, ["*", 0.7, ["get", "size"]]]],
+        ],
+        "circle-color": ["case", ["==", ["get", "kind"], "none"], "#94a3b8", ["get", "color"]],
+        "circle-opacity": ["match", ["get", "kind"], "now", 0.9, "last", 0.4, 0.5],
+        "circle-stroke-color": ["case", ["==", ["get", "kind"], "last"], "#f8fafc", theme === "dark" ? "#0b1220" : "#475569"],
+        "circle-stroke-width": ["case", ["==", ["get", "kind"], "last"], 1.5, 1],
+      },
+    });
+    map.addLayer({
+      id: "output-labels",
+      type: "symbol",
+      source: "output",
+      filter: ["!=", ["get", "kind"], "none"],
+      layout: {
+        ...hidden,
+        "text-field": ["get", "label"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 4, 9, 9, 11],
+        "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+        "symbol-sort-key": ["-", 0, ["get", "size"]],
+        "text-padding": 1,
+      },
+      paint: { "text-color": "#ffffff", "text-halo-color": "#0b1220", "text-halo-width": 1.3 },
+    });
     applyLmpVisibility();
 
     // Interties: yellow circles with a yellow ring, deeper yellow and a wider glow when pricier than Ontario's generators.
@@ -728,6 +838,7 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     map.on("click", "unclustered", clickFac);
     map.on("click", "points", clickFac);
     map.on("click", "lmp-dots", clickFac);
+    map.on("click", "output-dots", clickFac);
 
     const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 18, className: "oge-popup", maxWidth: "300px" });
     popupRef.current = popup;
@@ -758,6 +869,17 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
         .addTo(map);
     });
     map.on("mouseleave", "lmp-dots", leave);
+    map.on("mousemove", "output-dots", (e: MapLayerMouseEvent) => {
+      map.getCanvas().style.cursor = "pointer";
+      const id = e.features?.[0]?.properties?.id as string | undefined;
+      const f = facRef.current.find((x) => x.id === id);
+      if (!f) return;
+      popup
+        .setLngLat((e.features![0].geometry as GeoJSON.Point).coordinates as [number, number])
+        .setHTML(outputTooltipHtml(f, outRef.current?.hourTsUtc ?? null))
+        .addTo(map);
+    });
+    map.on("mouseleave", "output-dots", leave);
     map.on("mousemove", "intertie-dots", (e: MapLayerMouseEvent) => {
       const id = e.features?.[0]?.properties?.id as string | undefined;
       const o = tieRef.current;
@@ -767,7 +889,7 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
     });
     map.on("mouseleave", "intertie-dots", () => popup.remove());
     const lineHover = (e: MapLayerMouseEvent) => {
-      if (map.queryRenderedFeatures(e.point, { layers: ["unclustered", "points", "clusters", "lmp-dots", "intertie-dots"].filter((l) => map.getLayer(l)) }).length) return;
+      if (map.queryRenderedFeatures(e.point, { layers: ["unclustered", "points", "clusters", "lmp-dots", "output-dots", "intertie-dots"].filter((l) => map.getLayer(l)) }).length) return;
       const p = e.features?.[0]?.properties;
       if (!p) return;
       popup.setLngLat(e.lngLat).setHTML(lineTooltipHtml(p)).addTo(map);
@@ -871,6 +993,13 @@ export default function MapView({ facilities, selectedId, onSelect, theme, scale
       if (map.getLayer("lmp-pulse")) map.setPaintProperty("lmp-pulse", "circle-stroke-opacity", 0);
     };
   }, [pulseKey, pulseAnimate]);
+
+  useEffect(() => {
+    outRef.current = output ?? null;
+    applyLmpVisibility();
+    refreshData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [output]);
 
   useEffect(() => {
     tieRef.current = interties ?? null;

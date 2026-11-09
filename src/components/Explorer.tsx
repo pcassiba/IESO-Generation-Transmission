@@ -2,7 +2,7 @@
 
 import type { Map as MLMap } from "maplibre-gl";
 import dynamic from "next/dynamic";
-import { Activity, AlertTriangle, ArrowLeftRight, Cable, DollarSign, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling, Zap } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeftRight, Cable, DollarSign, Gauge, Download, Expand, FileSpreadsheet, Home, Image as ImageIcon, Layers, Scaling, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CongestionResponse, PriceBasis } from "@/lib/congestion";
 import { DEFAULT_VISIBLE, VOLTAGE_CLASSES, VOLTAGE_COLOR, VOLTAGE_LABEL, type VoltageClass } from "@/lib/transmission";
@@ -11,7 +11,7 @@ import { STATUSES, STATUS_LABEL, STORAGE_MODE_LABEL, TECHNOLOGIES, TECHNOLOGY_LA
 import { toCsv } from "@/lib/csv";
 import { INTERTIE_GRADIENT_CSS, LMP_GRADIENT_CSS, facilityLmps, formatLmpShort, intertieMarkers, lmpScale, priceChanges } from "@/lib/lmp";
 import { hourEndingLabel } from "@/lib/time";
-import { CONGESTION_NEG, CONGESTION_POS } from "@/lib/ui";
+import { CONGESTION_NEG, CONGESTION_POS, TECH_COLOR, fmtMW } from "@/lib/ui";
 import { LEGEND as TXR_LEGEND, RISK_COLOR } from "@/lib/txrisk/ui";
 import ComparePanel from "./ComparePanel";
 import CongestionPanel from "./CongestionPanel";
@@ -20,7 +20,7 @@ import DetailPanel from "./DetailPanel";
 import Header from "./Header";
 import { useActiveViewer } from "./useActiveViewer";
 import { StatusDot, TechIcon } from "./Icons";
-import type { IntertieOverlay, LmpOverlay, MapCommand } from "./MapView";
+import type { IntertieOverlay, LmpOverlay, MapCommand, OutputOverlay } from "./MapView";
 import { CoverageModal, MethodologyModal } from "./Modals";
 import { SourcesModal } from "./SourcesModal";
 import Sidebar, { applyFilters, defaultFilters, type Filters } from "./Sidebar";
@@ -73,6 +73,8 @@ export default function Explorer() {
   /** The hour the stored congestion response was asked for (null = latest), to tell loading apart from a gap. */
   const [congestionFor, setCongestionFor] = useState<string | null | undefined>(undefined);
   const [showLmp, setShowLmp] = useState(false);
+  /** Output view: facility icons replaced by reported MW. Only one of LMP / Output is on at a time. */
+  const [showOutput, setShowOutput] = useState(false);
   const [showInterties, setShowInterties] = useState(false);
   /** Current hour only: average of the five-minute prices so far, or the newest five-minute price. */
   const [priceBasis, setPriceBasis] = useState<PriceBasis>("hourly");
@@ -208,6 +210,20 @@ export default function Explorer() {
     return { overlay: { markers: intertieMarkers(tie.points, priceScale.scale), hourTsUtc: tie.hourTsUtc, medianLmp: congestion.medianLmp } satisfies IntertieOverlay };
   }, [showInterties, congestion, priceScale]);
   const filtered = useMemo(() => applyFilters(all, filters), [all, filters]);
+  // Output view: follows the hour the rest of the map shows (latest, or the one picked on the timeline).
+  const outputHourTs = state?.meta.selectedTsUtc ?? null;
+  const outputView = useMemo(() => (showOutput ? ({ hourTsUtc: outputHourTs } satisfies OutputOverlay) : null), [showOutput, outputHourTs]);
+  const outputSummary = useMemo(() => {
+    if (!showOutput) return null;
+    const mapped = filtered.filter((f) => f.lat !== null && f.lon !== null);
+    const now = mapped.filter((f) => f.outputMW !== null);
+    return {
+      totalMW: now.reduce((a, f) => a + Math.max(0, f.outputMW!), 0),
+      reporting: now.length,
+      last: mapped.filter((f) => f.outputMW === null && f.lastOutput).length,
+      none: mapped.filter((f) => f.outputMW === null && !f.lastOutput).length,
+    };
+  }, [showOutput, filtered]);
   const selected = all.find((f) => f.id === selectedId) ?? null;
   const compareFacilities = compare.map((id) => all.find((f) => f.id === id)).filter((f): f is FacilityState => !!f);
 
@@ -341,13 +357,28 @@ export default function Explorer() {
             onTxRiskPick={(id) => tx.setSelectedId(id)}
             lmp={lmpView?.overlay ?? null}
             interties={intertieView?.overlay ?? null}
+            output={outputView}
           />
 
           {/* Outages & congestion risk: prominent toggle, flashing toggle and time selector */}
           <div className="pointer-events-none absolute left-14 right-14 top-3 z-10 flex flex-col items-start gap-1">
             <div className="pointer-events-auto flex flex-wrap items-center gap-1 rounded border border-[var(--border)] bg-[var(--panel)]/95 px-2 py-1 text-[11px] shadow">
               <button
-                onClick={() => setShowLmp((v) => !v)}
+                onClick={() => {
+                  setShowOutput((v) => !v);
+                  setShowLmp(false);
+                }}
+                aria-pressed={showOutput}
+                title="Replace facility icons with each facility's reported MW output for the hour (or its last reported output, marked *)"
+                className={`flex items-center gap-1 rounded px-2 py-0.5 font-semibold ${showOutput ? "bg-emerald-500/25 text-emerald-200" : "hover:bg-[var(--hover)]"}`}
+              >
+                <Gauge size={13} /> Output: {showOutput ? "ON" : "OFF"}
+              </button>
+              <button
+                onClick={() => {
+                  setShowLmp((v) => !v);
+                  setShowOutput(false);
+                }}
                 aria-pressed={showLmp}
                 title="Replace facility icons with each facility's real-time LMP (average of its units)"
                 className={`flex items-center gap-1 rounded px-2 py-0.5 font-semibold ${showLmp ? "bg-red-500/25 text-red-200" : "hover:bg-[var(--hover)]"}`}
@@ -401,6 +432,18 @@ export default function Explorer() {
                 </button>
               )}
             </div>
+            {showOutput && outputSummary && (
+              <div className="pointer-events-auto flex flex-wrap items-center gap-2 rounded border border-[var(--border)] bg-[var(--panel)]/95 px-2 py-1 text-[11px] shadow">
+                <span className="font-semibold">Reported output</span>
+                <span className="text-[var(--muted)]">{hourEndingLabel(outputHourTs)}</span>
+                <span>
+                  {fmtMW(outputSummary.totalMW)} from {outputSummary.reporting} mapped facilities
+                </span>
+                <span className="text-[var(--muted)]">· bigger disc = more MW · colour = type</span>
+                {outputSummary.last > 0 && <span className="text-amber-300">· faded with * = last reported output ({outputSummary.last} with no reading this hour)</span>}
+                {outputSummary.none > 0 && <span className="text-[var(--muted)]">· {outputSummary.none} grey = no reading in the past week</span>}
+              </div>
+            )}
             {showLmp && (
               <div className="pointer-events-auto flex flex-wrap items-center gap-2 rounded border border-[var(--border)] bg-[var(--panel)]/95 px-2 py-1 text-[11px] shadow">
                 {congestionError ? (
@@ -512,18 +555,23 @@ export default function Explorer() {
                   <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
                     {TECHNOLOGIES.map((t) => (
                       <span key={t} className="flex items-center gap-1.5">
-                        <TechIcon tech={t} size={10} boxed /> {TECHNOLOGY_LABEL[t]}
+                        {showOutput ? <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: TECH_COLOR[t] }} /> : <TechIcon tech={t} size={10} boxed />}{" "}
+                        {TECHNOLOGY_LABEL[t]}
                       </span>
                     ))}
                   </div>
-                  <div className="mb-1 mt-2 font-semibold uppercase tracking-wide text-[var(--muted)]">Status (marker corner)</div>
-                  <div className="grid grid-cols-1 gap-0.5">
-                    {STATUSES.map((s) => (
-                      <span key={s} className="flex items-center gap-1.5">
-                        <StatusDot status={s} size={11} /> {STATUS_LABEL[s]}
-                      </span>
-                    ))}
-                  </div>
+                  {!showOutput && (
+                    <>
+                      <div className="mb-1 mt-2 font-semibold uppercase tracking-wide text-[var(--muted)]">Status (marker corner)</div>
+                      <div className="grid grid-cols-1 gap-0.5">
+                        {STATUSES.map((s) => (
+                          <span key={s} className="flex items-center gap-1.5">
+                            <StatusDot status={s} size={11} /> {STATUS_LABEL[s]}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </>
               )}
               {showLines && (
