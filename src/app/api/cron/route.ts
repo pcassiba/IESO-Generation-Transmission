@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { pollServerless } from "@/lib/server";
+import { pruneOldData } from "@/lib/retention";
+import { ensureInitialized, pollServerless } from "@/lib/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -13,7 +14,9 @@ export async function GET(req: Request) {
   }
   try {
     const r = await pollServerless({ minIntervalMinutes: 0 });
-    return NextResponse.json({ ok: true, ...r });
+    // Once a day, drop history older than the retention window so the database doesn't keep growing.
+    const pruned = await pruneOldData(await ensureInitialized()).catch((e) => ({ error: (e as Error).message }));
+    return NextResponse.json({ ok: true, ...r, pruned });
   } catch (e) {
     return NextResponse.json({ ok: false, message: (e as Error).message }, { status: 500 });
   }

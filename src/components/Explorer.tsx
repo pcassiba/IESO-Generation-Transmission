@@ -18,6 +18,7 @@ import CongestionPanel from "./CongestionPanel";
 import Dashboard from "./Dashboard";
 import DetailPanel from "./DetailPanel";
 import Header from "./Header";
+import { useActiveViewer } from "./useActiveViewer";
 import { StatusDot, TechIcon } from "./Icons";
 import type { IntertieOverlay, LmpOverlay, MapCommand } from "./MapView";
 import { CoverageModal, MethodologyModal } from "./Modals";
@@ -77,7 +78,9 @@ export default function Explorer() {
   const [priceBasis, setPriceBasis] = useState<PriceBasis>("hourly");
   const [priceTick, setPriceTick] = useState(0);
   const mapRef = useRef<MLMap | null>(null);
-  const tx = useTxRisk();
+  // Auto-refresh only while someone is looking, so an idle or background tab doesn't keep the database awake.
+  const active = useActiveViewer();
+  const tx = useTxRisk(active);
   const txOverlay = useMemo(
     () => ({ items: tx.data?.items ?? [], options: { enabled: tx.enabled, flashing: tx.flashing, reducedMotion: tx.reducedMotion }, selectedId: tx.selectedId }),
     [tx.data, tx.enabled, tx.flashing, tx.reducedMotion, tx.selectedId],
@@ -101,11 +104,12 @@ export default function Explorer() {
   }, []);
 
   useEffect(() => {
+    if (!active) return; // paused; reloads as soon as the viewer comes back
     void load(selectedTs);
     if (selectedTs) return;
     const t = setInterval(() => void load(null), 60_000); // server polls IESO; client re-reads DB state
     return () => clearInterval(t);
-  }, [selectedTs, load]);
+  }, [selectedTs, load, active]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -139,11 +143,15 @@ export default function Explorer() {
   }, [showCongestion, showLmp, showInterties, congestionTs, stateKey, priceBasis, priceTick]);
 
   // On the latest hour, re-read prices every minute; the server downloads IESO's current-hour files every 5 minutes.
+  const wasActive = useRef(active);
   useEffect(() => {
-    if ((!showCongestion && !showLmp && !showInterties) || congestionTs) return;
+    const resumed = active && !wasActive.current;
+    wasActive.current = active;
+    if ((!showCongestion && !showLmp && !showInterties) || congestionTs || !active) return;
+    if (resumed) setPriceTick((x) => x + 1);
     const t = setInterval(() => setPriceTick((x) => x + 1), 60_000);
     return () => clearInterval(t);
-  }, [showCongestion, showLmp, showInterties, congestionTs]);
+  }, [showCongestion, showLmp, showInterties, congestionTs, active]);
 
   // Facility price moves since the previous refresh of the same view (same hour choice and price basis).
   const lastPrices = useRef<{ key: string; prices: Map<string, number> } | null>(null);
