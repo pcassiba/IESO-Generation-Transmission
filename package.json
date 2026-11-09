@@ -15,14 +15,19 @@
     "validate:facilities": "tsx scripts/validate-facilities.ts",
     "copy:worker": "node scripts/copy-worker.js",
     "predev": "node scripts/copy-worker.js",
-    "prebuild": "node scripts/copy-worker.js"
+    "prebuild": "node scripts/copy-worker.js",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.10",
+    "@opennextjs/cloudflare": "^1.20.16",
     "fast-xml-parser": "^5.11.2",
     "lucide-react": "^1.57.0",
     "maplibre-gl": "^6.14.0",
-    "next": "15.5.28",
+    "next": "15.5.29",
     "pg": "^8.23.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -36,12 +41,13 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.5.28",
+    "eslint-config-next": "15.5.29",
     "playwright-core": "^1.64.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vite": "^8.3.4",
-    "vitest": "^5.0.4"
+    "vitest": "^5.0.4",
+    "wrangler": "^4.158.0"
   }
 }

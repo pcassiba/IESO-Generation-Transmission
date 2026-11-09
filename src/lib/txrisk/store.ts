@@ -7,10 +7,12 @@ import { fetchReport } from "../ieso/ingest";
 import { describeConstraint } from "../ieso/market";
 import { hourEndingToUtc } from "../time";
 import { classify, REPORT_URL, type BindingHour, type GenSite } from "./classify";
+import { projectFileVersion } from "../project-files";
 import { loadInterfaces } from "./interfaces";
 import { loadNetworkIndex, type NetworkIndex } from "./network";
 import { parseTxLimits, parseTxOutages } from "./parse";
 import type { ParsedLimits, ParsedOutages, ReportStatus, TxReportKind, TxRiskResponse } from "./types";
+import { isServerless } from "../platform";
 
 /**
  * Server-side retrieval and caching of the four transmission reports.
@@ -72,7 +74,7 @@ function rt(): TxRuntime {
 }
 
 const cacheDir = () => {
-  const d = path.join(process.env.IESO_CACHE_DIR ?? (process.env.VERCEL ? path.join(os.tmpdir(), "oge-cache") : path.join(process.cwd(), "data", "cache")), "txrisk");
+  const d = path.join(process.env.IESO_CACHE_DIR ?? (isServerless() ? path.join(os.tmpdir(), "oge-cache") : path.join(process.cwd(), "data", "cache")), "txrisk");
   fs.mkdirSync(d, { recursive: true });
   return d;
 };
@@ -186,13 +188,7 @@ export function reportStatus(def: ReportDef, s: Slot, now = Date.now()): ReportS
 function network(): NetworkIndex {
   const r = rt();
   const sig = ["public/geo/transmission.geojson", "public/geo/substations.geojson", "data/transmission/station-aliases.json"]
-    .map((p) => {
-      try {
-        return fs.statSync(path.join(process.cwd(), p)).mtimeMs;
-      } catch {
-        return 0;
-      }
-    })
+    .map((p) => projectFileVersion(path.join(process.cwd(), p)))
     .join("|");
   if (!r.network || r.network.sig !== sig) r.network = { idx: loadNetworkIndex(), sig };
   return r.network.idx;

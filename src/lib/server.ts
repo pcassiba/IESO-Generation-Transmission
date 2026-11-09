@@ -1,10 +1,10 @@
-import fs from "node:fs";
 import path from "node:path";
 import { config } from "./config";
 import { getDb, type Db } from "./db";
 import { facilitiesDir, loadFacilityFiles, seedFacilities, validateFacilities, type MetadataIssue } from "./facilities";
 import { pollPricesIfDue, syncCongestion } from "./ieso/congestion-ingest";
 import { backfill, ingestDaily, ingestLatest, missingDailyDates } from "./ieso/ingest";
+import { listProjectJsonFiles, loadBundledProjectFiles, projectFileVersion } from "./project-files";
 import { refreshAll as refreshTxRisk } from "./txrisk/store";
 
 /**
@@ -39,13 +39,9 @@ export function runtime(): Runtime {
 
 function metadataSignature(): string {
   const dir = facilitiesDir();
-  if (!fs.existsSync(dir)) return "none";
-  return fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".json"))
-    .sort()
-    .map((f) => `${f}:${fs.statSync(path.join(dir, f)).mtimeMs}`)
-    .join("|");
+  const files = listProjectJsonFiles(dir);
+  if (!files.length) return "none";
+  return files.map((f) => `${f}:${projectFileVersion(path.join(dir, f))}`).join("|");
 }
 
 /** Re-seed facility metadata if the JSON files changed since last seed. */
@@ -65,6 +61,7 @@ export async function ensureInitialized(): Promise<Db> {
   const rt = runtime();
   if (!rt.init) {
     rt.init = (async () => {
+      await loadBundledProjectFiles();
       const db = await getDb();
       await syncMetadata(db, true);
       return db;

@@ -1,5 +1,5 @@
-import fs from "node:fs";
 import path from "node:path";
+import { readProjectJson } from "../project-files";
 import type { LimitRecord } from "./types";
 
 /**
@@ -23,7 +23,7 @@ export interface InterfaceDef {
 
 export function loadInterfaces(file = path.join(process.cwd(), "data", "transmission", "interfaces.json")): InterfaceDef[] {
   try {
-    return (JSON.parse(fs.readFileSync(file, "utf8")).interfaces ?? []) as InterfaceDef[];
+    return (readProjectJson<{ interfaces?: InterfaceDef[] }>(file).interfaces ?? []) as InterfaceDef[];
   } catch {
     return [];
   }

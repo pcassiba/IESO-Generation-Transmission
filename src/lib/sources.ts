@@ -1,8 +1,8 @@
-import fs from "node:fs";
 import path from "node:path";
 import { config } from "./config";
 import type { Db } from "./db";
 import { CONSTRAINTS, hourPeriod, INTERTIE, LMP } from "./ieso/congestion-ingest";
+import { readProjectJson } from "./project-files";
 import { compactDate, utcToMarketHour } from "./time";
 import { txReportStatuses } from "./txrisk/store";
 
@@ -214,8 +214,8 @@ async function constraints(db: Db): Promise<SourceEntry> {
 function transmissionMap(): SourceEntry {
   let builtAt: string | null = null;
   try {
-    const head = fs.readFileSync(path.join(process.cwd(), "public", "geo", "transmission.geojson"), "utf8").slice(0, 400);
-    builtAt = /"builtAt":"([^"]+)"/.exec(head)?.[1] ?? null;
+    const geo = readProjectJson<{ properties?: { builtAt?: string } }>(path.join(process.cwd(), "public", "geo", "transmission.geojson"));
+    builtAt = geo.properties?.builtAt ?? null;
   } catch {
     /* file missing */
   }

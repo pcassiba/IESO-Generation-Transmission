@@ -1,5 +1,5 @@
-import fs from "node:fs";
 import path from "node:path";
+import { readProjectJson } from "../project-files";
 import type { MatchLevel } from "./types";
 
 /**
@@ -136,7 +136,7 @@ export function buildNetworkIndex(lines: { features: LineFeature[] } | null, sub
 export function loadNetworkIndex(root = process.cwd()): NetworkIndex {
   const read = (p: string) => {
     try {
-      return JSON.parse(fs.readFileSync(path.join(root, p), "utf8"));
+      return readProjectJson<ReturnType<typeof JSON.parse>>(path.join(root, p));
     } catch {
       return null;
     }

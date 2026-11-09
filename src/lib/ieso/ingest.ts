@@ -6,6 +6,7 @@ import { config } from "../config";
 import type { Db } from "../db";
 import { addDays, compactDate, marketDateNow } from "../time";
 import { parseGenOutputCapability, type ParsedReport } from "./parser";
+import { isServerless } from "../platform";
 
 /**
  * Server-side ingestion of the IESO Generator Output and Capability report.
@@ -53,7 +54,7 @@ export async function fetchReport(
 }
 
 function cacheDir(): string {
-  const d = process.env.IESO_CACHE_DIR ?? (process.env.VERCEL ? path.join(os.tmpdir(), "oge-cache") : path.join(process.cwd(), "data", "cache"));
+  const d = process.env.IESO_CACHE_DIR ?? (isServerless() ? path.join(os.tmpdir(), "oge-cache") : path.join(process.cwd(), "data", "cache"));
   fs.mkdirSync(d, { recursive: true });
   return d;
 }

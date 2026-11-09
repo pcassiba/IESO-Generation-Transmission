@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { ensureInitialized } from "@/lib/server";
 import { allAttempted, getTxRisk, refreshAll } from "@/lib/txrisk/store";
 
@@ -14,7 +14,8 @@ export async function GET(req: Request) {
     const t = new URL(req.url).searchParams.get("t");
     // First request after start-up waits for one attempt at each report; later ones refresh in the background.
     if (!allAttempted()) await refreshAll(false);
-    else void refreshAll(false);
+    // after() keeps the background refresh alive on serverless hosts once the response is sent.
+    else after(() => refreshAll(false).catch(() => undefined));
     return NextResponse.json(await getTxRisk(db, t), { headers: { "Cache-Control": "no-store" } });
   } catch (e) {
     return NextResponse.json({ error: `Failed to load transmission outages: ${(e as Error).message}` }, { status: 500 });

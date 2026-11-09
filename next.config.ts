@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/**": ["./data/facilities/*.json", "./data/transmission/*.json", "./public/geo/*.geojson"],
   },
+  // Cloudflare Workers cannot read files at run time, so src/lib/bundled-files.ts imports the GeoJSON as data.
+  webpack: (config) => {
+    config.module.rules.push({ test: /\.geojson$/, type: "json" });
+    return config;
+  },
 };
 
 export default nextConfig;

@@ -1,5 +1,6 @@
 import path from "node:path";
 import fs from "node:fs";
+import { isCloudflareWorkers } from "./platform";
 
 /**
  * Database access.
@@ -7,6 +8,8 @@ import fs from "node:fs";
  * Default: PGlite — a full PostgreSQL engine compiled to WASM, persisted under
  * ./data/pglite. No install needed, free for local development.
  * Set DATABASE_URL to use an external PostgreSQL / Supabase instance via `pg` instead.
+ * On Cloudflare Workers an external database is required (DATABASE_URL, or a Hyperdrive
+ * binding, which cloudflare/worker.ts exposes as HYPERDRIVE_DATABASE_URL).
  * The SQL used throughout is plain PostgreSQL, so both back-ends behave identically.
  */
 
@@ -229,14 +232,52 @@ async function createPg(url: string): Promise<Db> {
   return db;
 }
 
+/**
+ * Cloudflare Workers: a socket opened while handling one request cannot be reused by another, so a
+ * shared connection pool breaks. Each query (or transaction) opens its own connection and closes
+ * it. Put Cloudflare Hyperdrive in front of the database to make these connections cheap.
+ */
+async function createPgPerQuery(url: string): Promise<Db> {
+  const { Client } = await import("pg");
+  const withClient = async <T>(fn: (c: InstanceType<typeof Client>) => Promise<T>): Promise<T> => {
+    const client = new Client({ connectionString: url });
+    await client.connect();
+    try {
+      return await fn(client);
+    } finally {
+      client.end().catch(() => undefined);
+    }
+  };
+  return {
+    query: (sql, params) => withClient(async (c) => (await c.query(sql, params as unknown[])).rows),
+    exec: (sql) => withClient(async (c) => void (await c.query(sql))),
+    transaction: (fn) =>
+      withClient(async (c) => {
+        await c.query("BEGIN");
+        try {
+          const r = await fn({
+            query: async (sql, params) => (await c.query(sql, params as unknown[])).rows,
+            exec: async (sql) => void (await c.query(sql)),
+          });
+          await c.query("COMMIT");
+          return r;
+        } catch (e) {
+          await c.query("ROLLBACK");
+          throw e;
+        }
+      }),
+  };
+}
+
 export function getDb(): Promise<Db> {
   const g = globalThis as Global;
   if (!g.__ogeDb) {
     g.__ogeDb = (async () => {
       // Vercel's Neon/Postgres integrations may expose the connection string as POSTGRES_URL.
-      const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+      const url = process.env.HYPERDRIVE_DATABASE_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL;
       if (!url && process.env.VERCEL) throw new Error("No database configured: on Vercel, connect a Postgres database (e.g. Neon) so DATABASE_URL is set.");
-      const db = url ? await createPg(url) : await createPglite();
+      if (!url && isCloudflareWorkers()) throw new Error("No database configured: on Cloudflare, set the DATABASE_URL secret (or add a Hyperdrive binding named HYPERDRIVE).");
+      const db = isCloudflareWorkers() ? await createPgPerQuery(url!) : url ? await createPg(url) : await createPglite();
       await db.exec(SCHEMA);
       return db;
     })();
