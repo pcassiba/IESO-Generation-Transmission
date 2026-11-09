@@ -31,6 +31,13 @@
   // Non-secret settings. Put DATABASE_URL and CRON_SECRET in as secrets, not here.
   "vars": {
     "IESO_CACHE_DIR": "/tmp/oge-cache"
+  },
+  // Settings for preview versions of pull-request branches (`wrangler preview`). Secrets such as
+  // DATABASE_URL are shared with production; Cron Triggers do not run on previews.
+  "previews": {
+    "vars": {
+      "IESO_CACHE_DIR": "/tmp/oge-cache"
+    }
   }
   // Recommended: put Cloudflare Hyperdrive in front of Neon (fast pooled connections). Create it with
   //   npx wrangler hyperdrive create ieso-db --connection-string="<your Neon URL>"
